@@ -14,7 +14,7 @@
     <a href="https://shepherd.dev/github/teamsquad-io/php-event-bus"><img src="https://img.shields.io/endpoint?style=flat-square&url=https%3A%2F%2Fshepherd.dev%2Fgithub%2Framsey%2Fphp-library-starter-kit%2Fcoverage" alt="Psalm Type Coverage"></a>
 </p>
 <!-- BADGES_END -->
-This is the TeamSquad PHP EventBus Library. It's used to publish events to the bus.
+This is the TeamSquad PHP EventBus Library. It's used to publish and listen events from the bus.
 
 ## Development
 
