@@ -1,14 +1,13 @@
 {
-    "description": "A basic PHP scaffolding",
-    "name": "chemaclass/php-scaffolding",
-    "type": "project",
-    "license": "MIT",
+    "description": "A basic PHP EventBus Library",
+    "name": "teamsquad.io/php-event-bus",
+    "type": "library",
     "keywords": [
         "php",
-        "scaffolding"
+        "event-bus"
     ],
     "require": {
-        "php": ">=8.0"
+        "php": ">=7.4"
     },
     "require-dev": {
         "phpunit/phpunit": "^9.5",
@@ -19,7 +18,7 @@
     },
     "autoload": {
         "psr-4": {
-            "App\\": "src/"
+            "TeamSquad\\EventBus\\": "src/"
         }
     },
     "autoload-dev": {
@@ -45,7 +44,7 @@
     },
     "config": {
         "platform": {
-            "php": "8.0"
+            "php": "7.4"
         },
         "allow-plugins": {
             "composer/package-versions-deprecated": true
