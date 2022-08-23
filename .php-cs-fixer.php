@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection DevelopmentDependenciesUsageInspection */
 
 declare(strict_types=1);
 
@@ -7,7 +7,6 @@ use PhpCsFixer\Finder;
 
 $finder = Finder::create()
     ->files()
-    ->in(__DIR__ . '/example')
     ->in(__DIR__ . '/src')
     ->in(__DIR__ . '/tests');
 

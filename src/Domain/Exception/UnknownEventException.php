@@ -1,6 +1,6 @@
 <?php
 
-namespace TeamSquad\EventBus\Core\Exception;
+namespace TeamSquad\EventBus\Domain\Exception;
 
 use Exception;
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace TeamSquad\EventBus\Core;
+namespace TeamSquad\EventBus\Domain;
 
 interface EventListener
 {
