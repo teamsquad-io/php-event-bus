@@ -1,0 +1,72 @@
+# https://help.github.com/en/categories/automating-your-workflow-with-github-actions
+
+name: CI
+
+on: [push]
+
+jobs:
+  coding-guidelines:
+    name: Coding Guidelines
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.0
+          coverage: none
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress --no-suggest
+
+      - name: Run friendsofphp/php-cs-fixer
+        run: PHP_CS_FIXER_IGNORE_ENV=true ./vendor/bin/php-cs-fixer fix --dry-run --show-progress=dots --using-cache=no --verbose
+
+  type-checker:
+    name: Type Checker
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.0
+          coverage: none
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress --no-suggest
+
+      - name: Run Psalm
+        run: ./vendor/bin/psalm --config=psalm.xml --no-progress --shepherd --show-info=false --stats
+
+      - name: Run PHPStan
+        run: ./vendor/bin/phpstan analyze -c phpstan.neon src
+
+  tests:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        operating-system: [ 'ubuntu-latest', 'windows-latest', 'macos-latest' ]
+        php: [ '8.0' ]
+    name: Tests on PHP ${{ matrix.php }} - ${{ matrix.operating-system }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+
+      - name: Install dependencies
+        run: composer install --no-interaction --no-ansi --no-progress
+
+      - name: Run PHPUnit tests
+        run: vendor/bin/phpunit
+
+      - name: Run tests
+        run: ./vendor/bin/phpunit
