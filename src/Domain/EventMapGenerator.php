@@ -6,7 +6,11 @@ namespace TeamSquad\EventBus\Domain;
 
 use TeamSquad\EventBus\Domain\Exception\UnknownEventException;
 
-interface EventMapResolver
+/**
+ * EventMapGenerator is responsible for generating a hash table with the routing keys (eventName property)
+ * mapping to its events classes.
+ */
+interface EventMapGenerator
 {
     /**
      * @param string $routingKey

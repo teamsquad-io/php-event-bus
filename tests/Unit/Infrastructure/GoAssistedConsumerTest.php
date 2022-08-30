@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 use TeamSquad\EventBus\Infrastructure\Consumer\GoAssistedConsumer;
 use TeamSquad\EventBus\Infrastructure\FakeClock;
 use TeamSquad\EventBus\Infrastructure\SimpleEncrypt;
-use TeamSquad\EventBus\Infrastructure\SimpleEventMapResolver;
+use TeamSquad\EventBus\Infrastructure\SimpleEventMapGenerator;
 use TeamSquad\Tests\SampleEvent;
 use TeamSquad\Tests\SampleSecureEvent;
 use TeamSquad\Tests\Unit\SampleController;
@@ -20,7 +20,7 @@ final class GoAssistedConsumerTest extends TestCase
     public function test_parse_request(): void
     {
         $goAssistedConsumer = new GoAssistedConsumer(
-            new SimpleEventMapResolver([
+            new SimpleEventMapGenerator([
                 'routing_key' => SampleEvent::class,
             ]),
             new SimpleEncrypt(),
@@ -40,7 +40,7 @@ final class GoAssistedConsumerTest extends TestCase
     public function test_parse_request_encrypted_fields(): void
     {
         $goAssistedConsumer = new GoAssistedConsumer(
-            new SimpleEventMapResolver([
+            new SimpleEventMapGenerator([
                 'sample_secure_event' => SampleSecureEvent::class,
             ]),
             new SimpleEncrypt(),

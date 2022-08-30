@@ -1,5 +1,6 @@
 parameters:
     level: 9
+    stubFiles:
+        - stubs/Config.stub
     paths:
         - %currentWorkingDirectory%/src/
-

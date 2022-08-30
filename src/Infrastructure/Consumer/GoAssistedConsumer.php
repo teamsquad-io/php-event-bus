@@ -10,7 +10,7 @@ use ReflectionException;
 use ReflectionMethod;
 use TeamSquad\EventBus\Domain\Clock;
 use TeamSquad\EventBus\Domain\Event;
-use TeamSquad\EventBus\Domain\EventMapResolver;
+use TeamSquad\EventBus\Domain\EventMapGenerator;
 use TeamSquad\EventBus\Domain\Exception\InvalidArguments;
 use TeamSquad\EventBus\Domain\Exception\UnknownEventException;
 use TeamSquad\EventBus\Domain\SecureEvent;
@@ -22,11 +22,11 @@ use function is_string;
 
 class GoAssistedConsumer
 {
-    private EventMapResolver $eventMap;
+    private EventMapGenerator $eventMap;
     private Clock $clock;
     private StringEncrypt $encrypt;
 
-    public function __construct(EventMapResolver $eventMap, StringEncrypt $dataEncrypt, Clock $clock)
+    public function __construct(EventMapGenerator $eventMap, StringEncrypt $dataEncrypt, Clock $clock)
     {
         $this->eventMap = $eventMap;
         $this->clock = $clock;

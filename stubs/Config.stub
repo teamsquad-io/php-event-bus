@@ -1,0 +1,21 @@
+<?php
+
+namespace PHLAK\Config;
+
+use ArrayAccess;
+use DirectoryIterator;
+use IteratorAggregate;
+use PHLAK\Config\Exceptions\InvalidContextException;
+use PHLAK\Config\Interfaces\ConfigInterface;
+use PHLAK\Config\Traits\Arrayable;
+use RuntimeException;
+use SplFileInfo;
+
+/**
+ * @implements \IteratorAggregate<array<string>>
+ * @implements \ArrayAccess<array-key, array<string>>
+ */
+class Config implements ArrayAccess, IteratorAggregate
+{
+
+}

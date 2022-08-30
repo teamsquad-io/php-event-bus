@@ -6,9 +6,9 @@ namespace TeamSquad\EventBus\Infrastructure;
 
 use InvalidArgumentException;
 use TeamSquad\EventBus\Domain\Event;
-use TeamSquad\EventBus\Domain\EventMapResolver;
+use TeamSquad\EventBus\Domain\EventMapGenerator;
 
-class SimpleEventMapResolver implements EventMapResolver
+class SimpleEventMapGenerator implements EventMapGenerator
 {
     /** @var array<string, class-string<Event>> */
     private array $map;

@@ -6,16 +6,22 @@ namespace TeamSquad\Tests;
 
 use TeamSquad\EventBus\Domain\Event;
 
+use function is_string;
+
 class SampleEvent implements Event
 {
     private string $property;
 
     /**
-     * @param array<string, string> $array
+     * @param array<string, mixed> $array
      */
     public function __construct(array $array)
     {
-        $this->property = $array['property'];
+        if (isset($array['property']) && is_string($array['property'])) {
+            $this->property = $array['property'];
+        } else {
+            $this->property = '';
+        }
     }
 
     public function eventName(): string
@@ -31,7 +37,7 @@ class SampleEvent implements Event
     }
 
     /**
-     * @param array<string, string> $array
+     * @param array<string, mixed> $array
      *
      * @return Event
      */

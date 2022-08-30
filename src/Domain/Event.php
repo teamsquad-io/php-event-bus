@@ -8,7 +8,7 @@ interface Event
 {
     /**
      * The event name, used for routing when publishing
-     * Example: vts.tag.saved =>
+     * Event name example: "vts.tag.saved" =>
      *          "vts"   -> company name or team
      *          "tag"   -> bounded context
      *          "saved" -> the event action that has been performed
@@ -25,7 +25,7 @@ interface Event
     /**
      * @param array<string, mixed> $array
      *
-     * @return static
+     * @return Event
      */
     public static function fromArray(array $array): self;
 }
