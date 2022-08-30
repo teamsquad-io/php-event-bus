@@ -1,0 +1,22 @@
+version: "3.8"
+services:
+  consumers:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: php-event-bus
+    environment:
+      DEBUG: "*"
+    ports:
+      - "8999:80"
+  amqp2fcgi:
+    image: registry.vtsmedia.com/iflmedia/amqp2fcgi:0.2.5
+    environment:
+      - AMQP2FCGI_WORKERS=1
+      - AMQP2FCGI_FCGI_ENDPOINT=consumers_v2:9000
+      - AMQP2FCGI_LOGGER_DEVELOPMENT=true
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    ports:
+      - "15672:15672"
+      - "5672:5672"

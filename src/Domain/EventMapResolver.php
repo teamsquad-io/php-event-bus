@@ -1,15 +1,19 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace TeamSquad\EventBus\Domain;
 
 use TeamSquad\EventBus\Domain\Exception\UnknownEventException;
 
-interface EventMap
+interface EventMapResolver
 {
     /**
      * @param string $routingKey
+     *
      * @throws UnknownEventException
-     * @return string
+     *
+     * @return class-string<Event>
      */
     public function get(string $routingKey): string;
 
@@ -20,14 +24,8 @@ interface EventMap
 
     /**
      * @param bool $save
+     *
      * @return void
      */
     public function generate(bool $save = false): void;
-
-    /**
-     * @param string $routingKey
-     * @param array<array-key, mixed> $eventData
-     * @return Event
-     */
-    public function unserialize(string $routingKey, array $eventData): Event;
 }
