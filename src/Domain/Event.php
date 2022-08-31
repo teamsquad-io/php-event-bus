@@ -8,10 +8,10 @@ interface Event
 {
     /**
      * The event name, used for routing when publishing
-     * Event name example: "vts.tag.saved" =>
-     *          "vts"   -> company name or team
-     *          "tag"   -> bounded context
-     *          "saved" -> the event action that has been performed
+     * Event name example: "company.context.action" =>
+     *          "my_company"    -> company name or team
+     *          "users"         -> bounded context
+     *          "registered"    -> the event action that has been performed
      *
      * @return string
      */
