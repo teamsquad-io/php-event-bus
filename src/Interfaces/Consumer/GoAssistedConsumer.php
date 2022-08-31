@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TeamSquad\EventBus\Infrastructure\Consumer;
+namespace TeamSquad\EventBus\Interfaces\Consumer;
 
 use JsonException;
 use ReflectionClass;

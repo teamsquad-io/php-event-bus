@@ -4,16 +4,16 @@
 
 declare(strict_types=1);
 
-namespace TeamSquad\Tests\Unit\Infrastructure;
+namespace TeamSquad\Tests\Unit\Interfaces\Consumer;
 
 use PHPUnit\Framework\TestCase;
-use TeamSquad\EventBus\Infrastructure\Consumer\GoAssistedConsumer;
 use TeamSquad\EventBus\Infrastructure\FakeClock;
 use TeamSquad\EventBus\Infrastructure\SimpleEncrypt;
 use TeamSquad\EventBus\Infrastructure\SimpleEventMapGenerator;
+use TeamSquad\EventBus\Interfaces\Consumer\GoAssistedConsumer;
 use TeamSquad\Tests\SampleEvent;
 use TeamSquad\Tests\SampleSecureEvent;
-use TeamSquad\Tests\Unit\SampleController;
+use TeamSquad\Tests\Unit\Interfaces\SampleController;
 
 final class GoAssistedConsumerTest extends TestCase
 {

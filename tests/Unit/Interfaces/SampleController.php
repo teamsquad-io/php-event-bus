@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TeamSquad\Tests\Unit;
+namespace TeamSquad\Tests\Unit\Interfaces;
 
 use JsonException;
 use TeamSquad\Tests\SampleEvent;
