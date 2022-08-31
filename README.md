@@ -6,12 +6,24 @@
 </p>
 
 <p align="center">
-    <a href="https://github.com/teamsquad-io/php-event-bus"><img src="http://img.shields.io/badge/source-teamsquad.io/php--event--bus-blue.svg?style=flat-square" alt="Source Code"></a>
-    <a href="https://packagist.org/packages/teamsquad-io/php-event-bus"><img src="https://img.shields.io/packagist/v/teamsquad-io/php-event-bus.svg?style=flat-square&label=release" alt="Download Package"></a>
-    <a href="https://php.net"><img src="https://img.shields.io/packagist/php-v/teamsquad-io/php-event-bus.svg?style=flat-square&colorB=%238892BF" alt="PHP Programming Language"></a>
-    <a href="https://github.com/teamsquad-io/php-event-bus/actions/workflows/continuous-integration.yml"><img src="https://img.shields.io/github/workflow/status/teamsquad.io/php-event-bus/build/master?style=flat-square&logo=github" alt="Build Status"></a>
-    <a href="https://codecov.io/gh/teamsquad-io/php-event-bus"><img src="https://img.shields.io/codecov/c/gh/ramsey/php-library-starter-kit?label=codecov&logo=codecov&style=flat-square" alt="Codecov Code Coverage"></a>
-    <a href="https://shepherd.dev/github/teamsquad-io/php-event-bus"><img src="https://img.shields.io/endpoint?style=flat-square&url=https%3A%2F%2Fshepherd.dev%2Fgithub%2Fteamsquad.io%2Fphp-event-bus%2Fcoverage" alt="Psalm Type Coverage"></a>
+    <a href="https://github.com/teamsquad-io/php-event-bus">
+        <img src="https://img.shields.io/badge/source-teamsquad--io/php--event--bus-blue.svg?style=flat-square" alt="Source Code">
+    </a>
+    <a href="https://packagist.org/packages/teamsquad-io/php-event-bus">
+        <img src="https://img.shields.io/packagist/v/teamsquad-io/php-event-bus.svg?style=flat-square&label=release" alt="Download Package">
+    </a>
+    <a href="https://php.net">
+        <img src="https://img.shields.io/packagist/php-v/teamsquad-io/php-event-bus.svg?style=flat-square&colorB=%238892BF" alt="PHP Programming Language">
+    </a>
+    <a href="https://github.com/teamsquad-io/php-event-bus/actions/workflows/ci.yml">
+        <img src="https://img.shields.io/github/workflow/status/teamsquad-io/php-event-bus/build/master?style=flat-square&logo=github" alt="Build Status">
+    </a>
+    <a href="https://codecov.io/gh/teamsquad-io/php-event-bus">
+        <img src="https://img.shields.io/codecov/c/gh/teamsquad-io/php-event-bus?label=codecov&logo=codecov&style=flat-square" alt="Codecov Code Coverage">
+    </a>
+    <a href="https://shepherd.dev/github/teamsquad-io/php-event-bus">
+        <img src="https://img.shields.io/endpoint?style=flat-square&url=https%3A%2F%2Fshepherd.dev%2Fgithub%2Fteamsquad-io%2Fphp-event-bus%2Fcoverage" alt="Psalm Type Coverage">
+    </a>
 </p>
 <!-- BADGES_END -->
 This is the TeamSquad PHP EventBus Library. It's used to publish and listen to events.
@@ -20,7 +32,6 @@ This is the TeamSquad PHP EventBus Library. It's used to publish and listen to e
 <p>
     <code>composer require teamsquad/php-event-bus</code>
 </p>
-
 
 ## Development
 

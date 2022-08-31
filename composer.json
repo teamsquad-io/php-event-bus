@@ -1,5 +1,4 @@
 {
-    "version": "1.0.0",
     "description": "A basic PHP EventBus Library",
     "name": "teamsquad.io/php-event-bus",
     "type": "library",
