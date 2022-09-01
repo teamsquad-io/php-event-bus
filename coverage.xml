@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<coverage generated="1661992652">
+  <project timestamp="1661992652">
+    <file name="/Users/tomasprado/workspace/php-event-bus/src/Domain/Clock.php">
+      <metrics loc="11" ncloc="11" classes="0" methods="0" coveredmethods="0" conditionals="0" coveredconditionals="0" statements="0" coveredstatements="0" elements="0" coveredelements="0"/>
+    </file>
+    <file name="/Users/tomasprado/workspace/php-event-bus/src/Domain/Event.php">
+      <metrics loc="32" ncloc="15" classes="0" methods="0" coveredmethods="0" conditionals="0" coveredconditionals="0" statements="0" coveredstatements="0" elements="0" coveredelements="0"/>
+    </file>
+    <file name="/Users/tomasprado/workspace/php-event-bus/src/Domain/EventCollection.php">
+      <class name="TeamSquad\EventBus\Domain\EventCollection" namespace="global">
+        <metrics complexity="3" methods="1" coveredmethods="0" conditionals="0" coveredconditionals="0" statements="7" coveredstatements="0" elements="8" coveredelements="0"/>
+      </class>
+      <line num="18" type="method" name="__construct" visibility="public" complexity="3" crap="12" count="0"/>
+      <line num="20" type="stmt" count="0"/>
+      <line num="21" type="stmt" count="0"/>
+      <line num="22" type="stmt" count="0"/>
+      <line num="23" type="stmt" count="0"/>
+      <line num="27" type="stmt" count="0"/>
+      <line num="32" type="stmt" count="0"/>
+      <metrics loc="35" ncloc="29" classes="1" methods="1" coveredmethods="0" conditionals="0" coveredconditionals="0" statements="7" coveredstatements="0" elements="8" coveredelements="0"/>
+    </file>
+    <file name="/Users/tomasprado/workspace/php-event-bus/src/Domain/EventListener.php">
+      <metrics loc="29" ncloc="15" classes="0" methods="0" coveredmethods="0" conditionals="0" coveredconditionals="0" statements="0" coveredstatements="0" elements="0" coveredelements="0"/>
+    </file>
+    <file name="/Users/tomasprado/workspace/php-event-bus/src/Domain/EventMapGenerator.php">
+      <metrics loc="36" ncloc="17" classes="0" methods="0" coveredmethods="0" conditionals="0" coveredconditionals="0" statements="0" coveredstatements="0" elements="0" coveredelements="0"/>
+    </file>
+    <file name="/Users/tomasprado/workspace/php-event-bus/src/Domain/Exception/InvalidArguments.php">
+      <class name="TeamSquad\EventBus\Domain\Exception\InvalidArguments" namespace="global">
+        <metrics complexity="0" methods="0" coveredmethods="0" conditionals="0" coveredconditionals="0" statements="0" coveredstatements="0" elements="0" coveredelements="0"/>
+      </class>
+      <metrics loc="12" ncloc="12" classes="0" methods="0" coveredmethods="0" conditionals="0" coveredconditionals="0" statements="0" coveredstatements="0" elements="0" coveredelements="0"/>
+    </file>
+    <file name="/Users/tomasprado/workspace/php-event-bus/src/Domain/Exception/UnknownEventException.php">
+      <class name="TeamSquad\EventBus\Domain\Exception\UnknownEventException" namespace="global">
+        <metrics complexity="0" methods="0" coveredmethods="0" conditionals="0" coveredconditionals="0" statements="0" coveredstatements="0" elements="0" coveredelements="0"/>
+      </class>
+      <metrics loc="12" ncloc="12" classes="0" methods="0" coveredmethods="0" conditionals="0" coveredconditionals="0" statements="0" coveredstatements="0" elements="0" coveredelements="0"/>
+    </file>
+    <file name="/Users/tomasprado/workspace/php-event-bus/src/Domain/Listen.php">
+      <class name="TeamSquad\EventBus\Domain\Listen" namespace="global">
+        <metrics complexity="4" methods="4" coveredmethods="0" conditionals="0" coveredconditionals="0" statements="4" coveredstatements="0" elements="8" coveredelements="0"/>
+      </class>
+      <line num="17" type="method" name="__construct" visibility="public" complexity="1" crap="2" count="0"/>
+      <line num="19" type="stmt" count="0"/>
+      <line num="22" type="method" name="eventName" visibility="public" complexity="1" crap="2" count="0"/>
+      <line num="24" type="stmt" count="0"/>
+      <line num="27" type="method" name="toArray" visibility="public" complexity="1" crap="2" count="0"/>
+      <line num="29" type="stmt" count="0"/>
+      <line num="37" type="method" name="fromArray" visibility="public" complexity="1" crap="2" count="0"/>
+      <line num="39" type="stmt" count="0"/>
+      <metrics loc="42" ncloc="33" classes="1" methods="4" coveredmethods="0" conditionals="0" coveredconditionals="0" statements="4" coveredstatements="0" elements="8" coveredelements="0"/>
+    </file>
+    <file name="/Users/tomasprado/workspace/php-event-bus/src/Domain/RenamedEvent.php">
+      <class name="TeamSquad\EventBus\Domain\RenamedEvent" namespace="global">
+        <metrics complexity="1" methods="1" coveredmethods="0" conditionals="0" coveredconditionals="0" statements="1" coveredstatements="0" elements="2" coveredelements="0"/>
+      </class>
+      <line num="17" type="method" name="__construct" visibility="public" complexity="1" crap="2" count="0"/>
+      <line num="19" type="stmt" count="0"/>
+      <metrics loc="22" ncloc="18" classes="1" methods="1" coveredmethods="0" conditionals="0" coveredconditionals="0" statements="1" coveredstatements="0" elements="2" coveredelements="0"/>
+    </file>
+    <file name="/Users/tomasprado/workspace/php-event-bus/src/Domain/SecureEvent.php">
+      <class name="TeamSquad\EventBus\Domain\SecureEvent" namespace="global">
+        <metrics complexity="1" methods="1" coveredmethods="0" conditionals="0" coveredconditionals="0" statements="1" coveredstatements="0" elements="2" coveredelements="0"/>
+      </class>
+      <line num="12" type="method" name="protectedFields" visibility="public" complexity="1" crap="2" count="0"/>
+      <line num="14" type="stmt" count="0"/>
+      <metrics loc="17" ncloc="14" classes="1" methods="1" coveredmethods="0" conditionals="0" coveredconditionals="0" statements="1" coveredstatements="0" elements="2" coveredelements="0"/>
+    </file>
+    <file name="/Users/tomasprado/workspace/php-event-bus/src/Domain/StringEncrypt.php">
+      <metrics loc="23" ncloc="13" classes="0" methods="0" coveredmethods="0" conditionals="0" coveredconditionals="0" statements="0" coveredstatements="0" elements="0" coveredelements="0"/>
+    </file>
+    <file name="/Users/tomasprado/workspace/php-event-bus/src/Infrastructure/AutoloaderEventMapGenerator.php">
+      <class name="TeamSquad\EventBus\Infrastructure\AutoloaderEventMapGenerator" namespace="global">
+        <metrics complexity="27" methods="5" coveredmethods="0" conditionals="0" coveredconditionals="0" statements="51" coveredstatements="0" elements="56" coveredelements="0"/>
+      </class>
+      <line num="48" type="method" name="__construct" visibility="public" complexity="3" crap="12" count="0"/>
+      <line num="50" type="stmt" count="0"/>
+      <line num="51" type="stmt" count="0"/>
+      <line num="52" type="stmt" count="0"/>
+      <line num="53" type="stmt" count="0"/>
+      <line num="54" type="stmt" count="0"/>
+      <line num="55" type="stmt" count="0"/>
+      <line num="56" type="stmt" count="0"/>
+      <line num="67" type="method" name="get" visibility="public" complexity="2" crap="6" count="0"/>
+      <line num="69" type="stmt" count="0"/>
+      <line num="70" type="stmt" count="0"/>
+      <line num="72" type="stmt" count="0"/>
+      <line num="75" type="method" name="getAll" visibility="public" complexity="1" crap="2" count="0"/>
+      <line num="77" type="stmt" count="0"/>
+      <line num="86" type="method" name="generate" visibility="public" complexity="18" crap="342" count="0"/>
+      <line num="89" type="stmt" count="0"/>
+      <line num="91" type="stmt" count="0"/>
+      <line num="92" type="stmt" count="0"/>
+      <line num="93" type="stmt" count="0"/>
+      <line num="94" type="stmt" count="0"/>
+      <line num="95" type="stmt" count="0"/>
+      <line num="97" type="stmt" count="0"/>
+      <line num="99" type="stmt" count="0"/>
+      <line num="101" type="stmt" count="0"/>
+      <line num="102" type="stmt" count="0"/>
+      <line num="104" type="stmt" count="0"/>
+      <line num="106" type="stmt" count="0"/>
+      <line num="107" type="stmt" count="0"/>
+      <line num="108" type="stmt" count="0"/>
+      <line num="110" type="stmt" count="0"/>
+      <line num="111" type="stmt" count="0"/>
+      <line num="114" type="stmt" count="0"/>
+      <line num="115" type="stmt" count="0"/>
+      <line num="116" type="stmt" count="0"/>
+      <line num="117" type="stmt" count="0"/>
+      <line num="118" type="stmt" count="0"/>
+      <line num="119" type="stmt" count="0"/>
+      <line num="120" type="stmt" count="0"/>
+      <line num="121" type="stmt" count="0"/>
+      <line num="122" type="stmt" count="0"/>
+      <line num="123" type="stmt" count="0"/>
+      <line num="127" type="stmt" count="0"/>
+      <line num="128" type="stmt" count="0"/>
+      <line num="131" type="stmt" count="0"/>
+      <line num="132" type="stmt" count="0"/>
+      <line num="133" type="stmt" count="0"/>
+      <line num="140" type="method" name="save" visibility="private" complexity="3" crap="12" count="0"/>
+      <line num="142" type="stmt" count="0"/>
+      <line num="143" type="stmt" count="0"/>
+      <line num="146" type="stmt" count="0"/>
+      <line num="147" type="stmt" count="0"/>
+      <line num="148" type="stmt" count="0"/>
+      <line num="150" type="stmt" count="0"/>
+      <line num="151" type="stmt" count="0"/>
+      <line num="152" type="stmt" count="0"/>
+      <metrics loc="155" ncloc="118" classes="1" methods="5" coveredmethods="0" conditionals="0" coveredconditionals="0" statements="51" coveredstatements="0" elements="56" coveredelements="0"/>
+    </file>
+    <file name="/Users/tomasprado/workspace/php-event-bus/src/Infrastructure/FakeClock.php">
+      <class name="TeamSquad\EventBus\Infrastructure\FakeClock" namespace="global">
+        <metrics complexity="2" methods="2" coveredmethods="1" conditionals="0" coveredconditionals="0" statements="2" coveredstatements="1" elements="4" coveredelements="2"/>
+      </class>
+      <line num="13" type="method" name="__construct" visibility="public" complexity="1" crap="1" count="2"/>
+      <line num="15" type="stmt" count="2"/>
+      <line num="18" type="method" name="timestamp" visibility="public" complexity="1" crap="2" count="0"/>
+      <line num="20" type="stmt" count="0"/>
+      <metrics loc="23" ncloc="23" classes="1" methods="2" coveredmethods="1" conditionals="0" coveredconditionals="0" statements="2" coveredstatements="1" elements="4" coveredelements="2"/>
+    </file>
+    <file name="/Users/tomasprado/workspace/php-event-bus/src/Infrastructure/SimpleEncrypt.php">
+      <class name="TeamSquad\EventBus\Infrastructure\SimpleEncrypt" namespace="global">
+        <metrics complexity="2" methods="2" coveredmethods="1" conditionals="0" coveredconditionals="0" statements="2" coveredstatements="1" elements="4" coveredelements="2"/>
+      </class>
+      <line num="11" type="method" name="encrypt" visibility="public" complexity="1" crap="2" count="0"/>
+      <line num="13" type="stmt" count="0"/>
+      <line num="16" type="method" name="decrypt" visibility="public" complexity="1" crap="1" count="1"/>
+      <line num="18" type="stmt" count="1"/>
+      <metrics loc="21" ncloc="21" classes="1" methods="2" coveredmethods="1" conditionals="0" coveredconditionals="0" statements="2" coveredstatements="1" elements="4" coveredelements="2"/>
+    </file>
+    <file name="/Users/tomasprado/workspace/php-event-bus/src/Infrastructure/SimpleEventMapGenerator.php">
+      <class name="TeamSquad\EventBus\Infrastructure\SimpleEventMapGenerator" namespace="global">
+        <metrics complexity="5" methods="3" coveredmethods="1" conditionals="0" coveredconditionals="0" statements="5" coveredstatements="3" elements="8" coveredelements="4"/>
+      </class>
+      <line num="19" type="method" name="__construct" visibility="public" complexity="1" crap="1" count="2"/>
+      <line num="21" type="stmt" count="2"/>
+      <line num="29" type="method" name="get" visibility="public" complexity="2" crap="2.15" count="2"/>
+      <line num="31" type="stmt" count="2"/>
+      <line num="32" type="stmt" count="0"/>
+      <line num="35" type="stmt" count="2"/>
+      <line num="38" type="method" name="getAll" visibility="public" complexity="1" crap="2" count="0"/>
+      <line num="40" type="stmt" count="0"/>
+      <metrics loc="47" ncloc="38" classes="1" methods="3" coveredmethods="1" conditionals="0" coveredconditionals="0" statements="5" coveredstatements="3" elements="8" coveredelements="4"/>
+    </file>
+    <file name="/Users/tomasprado/workspace/php-event-bus/src/Infrastructure/SystemClock.php">
+      <class name="TeamSquad\EventBus\Infrastructure\SystemClock" namespace="global">
+        <metrics complexity="1" methods="1" coveredmethods="0" conditionals="0" coveredconditionals="0" statements="1" coveredstatements="0" elements="2" coveredelements="0"/>
+      </class>
+      <line num="12" type="method" name="timestamp" visibility="public" complexity="1" crap="2" count="0"/>
+      <line num="14" type="stmt" count="0"/>
+      <metrics loc="17" ncloc="17" classes="1" methods="1" coveredmethods="0" conditionals="0" coveredconditionals="0" statements="1" coveredstatements="0" elements="2" coveredelements="0"/>
+    </file>
+    <file name="/Users/tomasprado/workspace/php-event-bus/src/Interfaces/Consumer/GoAssistedConsumer.php">
+      <class name="TeamSquad\EventBus\Interfaces\Consumer\GoAssistedConsumer" namespace="global">
+        <metrics complexity="13" methods="5" coveredmethods="3" conditionals="0" coveredconditionals="0" statements="32" coveredstatements="24" elements="37" coveredelements="27"/>
+      </class>
+      <line num="29" type="method" name="__construct" visibility="public" complexity="1" crap="1" count="2"/>
+      <line num="31" type="stmt" count="2"/>
+      <line num="32" type="stmt" count="2"/>
+      <line num="33" type="stmt" count="2"/>
+      <line num="50" type="method" name="parseRequest" visibility="public" complexity="6" crap="8.51" count="2"/>
+      <line num="57" type="stmt" count="2"/>
+      <line num="58" type="stmt" count="0"/>
+      <line num="60" type="stmt" count="2"/>
+      <line num="61" type="stmt" count="0"/>
+      <line num="62" type="stmt" count="0"/>
+      <line num="66" type="stmt" count="2"/>
+      <line num="68" type="stmt" count="2"/>
+      <line num="70" type="stmt" count="2"/>
+      <line num="71" type="stmt" count="2"/>
+      <line num="72" type="stmt" count="0"/>
+      <line num="73" type="stmt" count="0"/>
+      <line num="75" type="stmt" count="0"/>
+      <line num="80" type="stmt" count="2"/>
+      <line num="82" type="stmt" count="2"/>
+      <line num="83" type="stmt" count="2"/>
+      <line num="84" type="stmt" count="0"/>
+      <line num="87" type="stmt" count="2"/>
+      <line num="99" type="method" name="unserialize" visibility="private" complexity="1" crap="1" count="2"/>
+      <line num="101" type="stmt" count="2"/>
+      <line num="102" type="stmt" count="2"/>
+      <line num="103" type="stmt" count="2"/>
+      <line num="105" type="stmt" count="2"/>
+      <line num="106" type="stmt" count="2"/>
+      <line num="117" type="method" name="decryptProtectedFields" visibility="private" complexity="4" crap="4.07" count="2"/>
+      <line num="119" type="stmt" count="2"/>
+      <line num="121" type="stmt" count="1"/>
+      <line num="122" type="stmt" count="1"/>
+      <line num="123" type="stmt" count="1"/>
+      <line num="124" type="stmt" count="0"/>
+      <line num="126" type="stmt" count="1"/>
+      <line num="137" type="method" name="canBeSkipped" visibility="private" complexity="1" crap="1" count="1"/>
+      <line num="139" type="stmt" count="1"/>
+      <metrics loc="142" ncloc="100" classes="1" methods="5" coveredmethods="3" conditionals="0" coveredconditionals="0" statements="32" coveredstatements="24" elements="37" coveredelements="27"/>
+    </file>
+    <metrics files="17" loc="676" ncloc="506" classes="10" methods="25" coveredmethods="6" conditionals="0" coveredconditionals="0" statements="106" coveredstatements="29" elements="131" coveredelements="35"/>
+  </project>
+</coverage>
