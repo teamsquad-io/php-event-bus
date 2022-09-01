@@ -79,7 +79,10 @@ jobs:
       - name: Run PHPUnit tests
         run: vendor/bin/phpunit
 
+      - name: Generate coverage report
+        run: vendor/bin/phpunit --coverage-clover=coverage.xml
+        if: matrix.operating-system == 'ubuntu-latest'
+
       - name: Post Coverage
-        run: ./vendor/bin/phpunit --coverage-clover=coverage.xml
         uses: codecov/codecov-action@v3
-        if: matrix.os == 'ubuntu-latest'
+        if: matrix.operating-system == 'ubuntu-latest'
