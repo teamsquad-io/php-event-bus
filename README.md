@@ -16,7 +16,7 @@
         <img src="https://img.shields.io/packagist/php-v/teamsquad.io/php-event-bus.svg?style=flat-square&colorB=%238892BF" alt="PHP Programming Language">
     </a>
     <a href="https://github.com/teamsquad-io/php-event-bus/actions/workflows/ci.yml">
-        <img src="https://img.shields.io/github/workflow/status/teamsquad--io/php--event--bus/build/master?style=flat-square&logo=github" alt="Build Status">
+        <img src="https://img.shields.io/github/workflow/status/teamsquad-io/php-event-bus/CI?logo=github" alt="Build Status">
     </a>
     <a href="https://codecov.io/gh/teamsquad-io/php-event-bus">
         <img src="https://img.shields.io/codecov/c/gh/teamsquad-io/php-event-bus?label=codecov&logo=codecov&style=flat-square" alt="Codecov Code Coverage">
