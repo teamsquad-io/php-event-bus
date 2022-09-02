@@ -30,6 +30,9 @@ class AutoloadConfig
     {
         /** @var null|string|array<array-key, string> $includedClassNames */
         $includedClassNames = $this->config->get(self::WHITE_LIST_CONFIG_KEY, []);
+        if (empty($includedClassNames)) {
+            return true;
+        }
         return $this->isClassNameInConfig($includedClassNames, $className);
     }
 
@@ -37,21 +40,20 @@ class AutoloadConfig
     {
         /** @var null|string|array<array-key, string> $excludedClassNames */
         $excludedClassNames = $this->config->get(self::BLACK_LIST_CONFIG_KEY, []);
+        if (empty($excludedClassNames)) {
+            return false;
+        }
         return $this->isClassNameInConfig($excludedClassNames, $className);
     }
 
     /**
-     * @param null|string|array<array-key, string> $config
+     * @param string|array<array-key, string> $config
      * @param string $className
      *
      * @return bool
      */
     private function isClassNameInConfig($config, string $className): bool
     {
-        if (empty($config)) {
-            return false;
-        }
-
         if (is_array($config)) {
             foreach ($config as $includedClassName) {
                 if (strpos($className, $includedClassName) !== false) {

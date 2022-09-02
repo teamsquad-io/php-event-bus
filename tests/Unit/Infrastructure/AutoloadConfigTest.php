@@ -7,6 +7,8 @@ declare(strict_types=1);
 namespace TeamSquad\Tests\Unit\Infrastructure;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Yaml\Yaml;
+use TeamSquad\EventBus\Domain\SecureEvent;
 use TeamSquad\EventBus\Infrastructure\AutoloadConfig;
 
 class AutoloadConfigTest extends TestCase
@@ -22,6 +24,28 @@ class AutoloadConfigTest extends TestCase
                 AutoloadConfig::BLACK_LIST_CONFIG_KEY => ['Tests'],
             ]
         );
+    }
+
+    public function test_is_included_in_white_list_when_white_list_is_empty(): void
+    {
+        $this->sut = new AutoloadConfig(
+            [
+                AutoloadConfig::WHITE_LIST_CONFIG_KEY => [],
+                AutoloadConfig::BLACK_LIST_CONFIG_KEY => ['Tests'],
+            ]
+        );
+        self::assertTrue($this->sut->isIncludedInWhiteList('TeamsquadIo'));
+    }
+
+    public function test_is_included_in_black_list_when_black_list_is_empty(): void
+    {
+        $this->sut = new AutoloadConfig(
+            [
+                AutoloadConfig::WHITE_LIST_CONFIG_KEY => [],
+                AutoloadConfig::BLACK_LIST_CONFIG_KEY => [],
+            ]
+        );
+        self::assertFalse($this->sut->isExcludedInBlackList('TeamsquadIo'));
     }
 
     /**
@@ -49,9 +73,9 @@ class AutoloadConfigTest extends TestCase
     {
         return [
             ['TeamsquadIo\SlackService\Domain\Events\AdminCall', true, false],
-            ['TeamSquad\EventBus\Domain\SecureEvent', false, false],
+            [SecureEvent::class, false, false],
             ['TeamSquad\Tests\Domain\SecureEvent', false, true],
-            ['Symfony\Component\Yaml\Yaml', false, false],
+            [Yaml::class, false, false],
         ];
     }
 }
