@@ -79,7 +79,7 @@ class AutoloaderEventMapGenerator implements EventMapGenerator
      * @noinspection PhpRedundantVariableDocTypeInspection
      * @noinspection PhpDeprecationInspection
      */
-    public function generate(bool $save = false): void
+    public function generate(): void
     {
         /** @var ClassLoader $classLoader */
         $classLoader = require $this->vendorPath . '/autoload.php';
@@ -121,9 +121,7 @@ class AutoloaderEventMapGenerator implements EventMapGenerator
             }
         }
         self::$eventMap = $events;
-        if ($save) {
-            $this->save();
-        }
+        $this->save();
     }
 
     /**

@@ -56,7 +56,7 @@ class AutoloadConfig
     {
         if (is_array($config)) {
             foreach ($config as $includedClassName) {
-                if (strpos($className, $includedClassName) !== false) {
+                if (stripos($className, $includedClassName) !== false) {
                     return true;
                 }
             }
@@ -64,6 +64,6 @@ class AutoloadConfig
             return false;
         }
 
-        return strpos($config, $className) !== false;
+        return stripos($config, $className) !== false;
     }
 }

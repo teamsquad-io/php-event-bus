@@ -10,6 +10,7 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Yaml\Yaml;
 use TeamSquad\EventBus\Domain\SecureEvent;
 use TeamSquad\EventBus\Infrastructure\AutoloadConfig;
+use TeamSquad\Tests\SampleEvent;
 
 class AutoloadConfigTest extends TestCase
 {
@@ -46,6 +47,32 @@ class AutoloadConfigTest extends TestCase
             ]
         );
         self::assertFalse($this->sut->isExcludedInBlackList('TeamsquadIo'));
+    }
+
+    public function test_is_included_with_full_namespace_should_return_correct_response(): void
+    {
+        $this->sut = new AutoloadConfig(
+            [
+                AutoloadConfig::WHITE_LIST_CONFIG_KEY => [
+                    'TeamSquad\\Tests',
+                ],
+                AutoloadConfig::BLACK_LIST_CONFIG_KEY => [],
+            ]
+        );
+        self::assertTrue($this->sut->isIncludedInWhiteList(SampleEvent::class));
+    }
+
+    public function test_is_included_with_full_namespace_should_but_not_correctly_escaped_return_correct_response(): void
+    {
+        $this->sut = new AutoloadConfig(
+            [
+                AutoloadConfig::WHITE_LIST_CONFIG_KEY => [
+                    'TeamSquad\Tests',
+                ],
+                AutoloadConfig::BLACK_LIST_CONFIG_KEY => [],
+            ]
+        );
+        self::assertTrue($this->sut->isIncludedInWhiteList(SampleEvent::class));
     }
 
     /**

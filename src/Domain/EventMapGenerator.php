@@ -27,9 +27,7 @@ interface EventMapGenerator
     public function getAll(): array;
 
     /**
-     * @param bool $save
-     *
      * @return void
      */
-    public function generate(bool $save = false): void;
+    public function generate(): void;
 }
