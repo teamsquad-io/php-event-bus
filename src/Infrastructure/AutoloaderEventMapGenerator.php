@@ -7,7 +7,6 @@ namespace TeamSquad\EventBus\Infrastructure;
 use Composer\Autoload\ClassLoader;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
-use PHLAK\Config\Config;
 use PHLAK\Config\Exceptions\InvalidContextException;
 use ReflectionClass;
 use ReflectionException;
@@ -18,9 +17,6 @@ use TeamSquad\EventBus\Domain\Exception\InvalidArguments;
 use TeamSquad\EventBus\Domain\Exception\UnknownEventException;
 use TeamSquad\EventBus\Domain\Listen;
 use TeamSquad\EventBus\Domain\RenamedEvent;
-
-use function in_array;
-use function is_array;
 
 /**
  * AutoloaderEventMapGenerator generates an event map using autoloaded classes
@@ -34,7 +30,7 @@ class AutoloaderEventMapGenerator implements EventMapGenerator
     private static $eventMap;
     private string $vendorPath;
     private ?string $eventMapFilePath;
-    private Config $config;
+    private AutoloadConfig $config;
 
     /**
      * @param string $vendorFolder path to the composer vendor folder
@@ -47,7 +43,7 @@ class AutoloaderEventMapGenerator implements EventMapGenerator
      */
     public function __construct(string $vendorFolder, ?string $eventMapFilePath, array $configuration = [])
     {
-        $this->config = new Config($configuration);
+        $this->config = new AutoloadConfig($configuration);
         $this->vendorPath = $vendorFolder;
         $this->eventMapFilePath = $eventMapFilePath;
         if ($this->eventMapFilePath && is_file($this->eventMapFilePath)) {
@@ -100,14 +96,10 @@ class AutoloaderEventMapGenerator implements EventMapGenerator
         }
         $annotationReader = new AnnotationReader();
         foreach ($classMap as $class => $path) {
-            /** @var mixed|array<array-key, string> $includedClassNames */
-            $includedClassNames = $this->config->get('included_class_names', []);
-            /** @var mixed|array<array-key, string> $excludedClassNames */
-            $excludedClassNames = $this->config->get('excluded_class_names', []);
-            if (!empty($includedClassNames) && is_array($includedClassNames) && !in_array($class, $includedClassNames, true)) {
+            if (!$this->config->isIncludedInWhiteList($class)) {
                 continue;
             }
-            if (!empty($excludedClassNames) && is_array($excludedClassNames) && in_array($class, $excludedClassNames, true)) {
+            if ($this->config->isExcludedInBlackList($class)) {
                 continue;
             }
 
