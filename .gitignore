@@ -5,3 +5,4 @@
 /data/
 /.phpbench/
 *.cache
+tests/Unit/Infrastructure/eventMapFile.php

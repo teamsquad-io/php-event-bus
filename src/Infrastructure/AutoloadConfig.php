@@ -17,7 +17,7 @@ class AutoloadConfig
     private Config $config;
 
     /**
-     * @param array<string, array<string>> $configuration
+     * @param array<string, array<string>|string> $configuration
      *
      * @throws InvalidContextException
      */
@@ -64,6 +64,6 @@ class AutoloadConfig
             return false;
         }
 
-        return stripos($config, $className) !== false;
+        return stripos($className, $config) !== false;
     }
 }

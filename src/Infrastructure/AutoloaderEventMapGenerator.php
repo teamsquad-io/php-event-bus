@@ -35,7 +35,7 @@ class AutoloaderEventMapGenerator implements EventMapGenerator
     /**
      * @param string $vendorFolder path to the composer vendor folder
      * @param string|null $eventMapFilePath if null, the event map will not be saved
-     * @param array<string, array<string>> $configuration
+     * @param array<string, array<string>|string> $configuration
      *
      * @throws InvalidArguments|InvalidContextException
      * @throws UnknownEventException

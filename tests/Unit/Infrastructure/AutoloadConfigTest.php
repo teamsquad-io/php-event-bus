@@ -62,6 +62,16 @@ class AutoloadConfigTest extends TestCase
         self::assertTrue($this->sut->isIncludedInWhiteList(SampleEvent::class));
     }
 
+    public function test_is_included_as_string(): void
+    {
+        $this->sut = new AutoloadConfig(
+            [
+                AutoloadConfig::WHITE_LIST_CONFIG_KEY => 'TeamSquad',
+            ]
+        );
+        self::assertTrue($this->sut->isIncludedInWhiteList(SampleEvent::class));
+    }
+
     public function test_is_included_with_full_namespace_should_but_not_correctly_escaped_return_correct_response(): void
     {
         $this->sut = new AutoloadConfig(
