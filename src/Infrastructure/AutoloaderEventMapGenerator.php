@@ -39,6 +39,7 @@ class AutoloaderEventMapGenerator implements EventMapGenerator
      *
      * @throws InvalidArguments|InvalidContextException
      * @throws UnknownEventException
+     *
      * @psalm-suppress MixedAssignment
      */
     public function __construct(string $vendorFolder, ?string $eventMapFilePath, array $configuration = [])
@@ -76,6 +77,7 @@ class AutoloaderEventMapGenerator implements EventMapGenerator
     /**
      * @throws InvalidArguments
      * @throws UnknownEventException
+     *
      * @noinspection PhpRedundantVariableDocTypeInspection
      * @noinspection PhpDeprecationInspection
      */
