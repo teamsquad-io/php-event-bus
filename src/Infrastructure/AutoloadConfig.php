@@ -7,6 +7,8 @@ namespace TeamSquad\EventBus\Infrastructure;
 use PHLAK\Config\Config;
 use PHLAK\Config\Exceptions\InvalidContextException;
 
+use TeamSquad\EventBus\Domain\Exception\FileNotFound;
+
 use function is_array;
 
 class AutoloadConfig
@@ -26,6 +28,36 @@ class AutoloadConfig
         $this->config = new Config($configuration);
     }
 
+    public function consumerQueueExchangeListenName(): string
+    {
+        /** @var string $exchangeName */
+        $exchangeName = $this->config->get('consumer_queue_listen_name', 'my_company.event.listen');
+        return $exchangeName;
+    }
+
+    /**
+     * @return string
+     */
+    public function eventBusExchangeName(): string
+    {
+        /** @var string $exchangeName */
+        $exchangeName = $this->config->get('event_bus_exchange_name', 'my_company.event_bus');
+        return $exchangeName;
+    }
+
+    /**
+     * @throws FileNotFound
+     */
+    public function configurationPath(): string
+    {
+        /** @var string $configurationPath */
+        $configurationPath = $this->config->get('configuration_path', null);
+        if (!$configurationPath) {
+            throw new FileNotFound('Configuration "configuration_path" is not set');
+        }
+        return $configurationPath;
+    }
+
     public function isIncludedInWhiteList(string $className): bool
     {
         /** @var null|string|array<array-key, string> $includedClassNames */
@@ -36,7 +68,7 @@ class AutoloadConfig
         return $this->isClassNameInConfig($includedClassNames, $className);
     }
 
-    public function isExcludedInBlackList(string $className): bool
+    public function isIncludedInBlackList(string $className): bool
     {
         /** @var null|string|array<array-key, string> $excludedClassNames */
         $excludedClassNames = $this->config->get(self::BLACK_LIST_CONFIG_KEY, []);

@@ -46,7 +46,7 @@ class AutoloadConfigTest extends TestCase
                 AutoloadConfig::BLACK_LIST_CONFIG_KEY => [],
             ]
         );
-        self::assertFalse($this->sut->isExcludedInBlackList('TeamsquadIo'));
+        self::assertFalse($this->sut->isIncludedInBlackList('TeamsquadIo'));
     }
 
     public function test_is_included_with_full_namespace_should_return_correct_response(): void
@@ -99,7 +99,7 @@ class AutoloadConfigTest extends TestCase
      */
     public function test_is_excluded_in_black_list(string $className, bool $_, bool $expected): void
     {
-        $actual = $this->sut->isExcludedInBlackList($className);
+        $actual = $this->sut->isIncludedInBlackList($className);
         self::assertSame($expected, $actual);
     }
 

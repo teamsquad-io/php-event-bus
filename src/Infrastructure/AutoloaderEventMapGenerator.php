@@ -101,7 +101,7 @@ class AutoloaderEventMapGenerator implements EventMapGenerator
             if (!$this->config->isIncludedInWhiteList($class)) {
                 continue;
             }
-            if ($this->config->isExcludedInBlackList($class)) {
+            if ($this->config->isIncludedInBlackList($class)) {
                 continue;
             }
 

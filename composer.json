@@ -45,7 +45,7 @@
         "psalm": "./vendor/bin/psalm",
         "phpstan": "./vendor/bin/phpstan",
         "csfix": "./vendor/bin/php-cs-fixer fix",
-        "csrun": "./vendor/bin/php-cs-fixer fix --dry-run"
+        "csrun": "./vendor/bin/php-cs-fixer fix --dry-run || ./vendor/bin/php-cs-fixer fix"
     },
     "config": {
         "platform": {

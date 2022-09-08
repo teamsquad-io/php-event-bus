@@ -15,22 +15,40 @@ use TeamSquad\EventBus\Domain\Exception\InvalidArguments;
 use TeamSquad\EventBus\Domain\Exception\UnknownEventException;
 use TeamSquad\EventBus\Domain\SecureEvent;
 use TeamSquad\EventBus\Domain\StringEncrypt;
+use TeamSquad\EventBus\Infrastructure\SystemClock;
 
 use function call_user_func_array;
 use function get_class;
 use function is_string;
 
-class GoAssistedConsumer
+trait GoAssistedConsumer
 {
     private EventMapGenerator $eventMap;
     private Clock $clock;
     private StringEncrypt $encrypt;
 
-    public function __construct(EventMapGenerator $eventMap, StringEncrypt $dataEncrypt, Clock $clock)
+    public function init(EventMapGenerator $eventMap, StringEncrypt $dataEncrypt): void
     {
         $this->eventMap = $eventMap;
-        $this->clock = $clock;
         $this->encrypt = $dataEncrypt;
+        $this->clock = new SystemClock();
+    }
+
+    /**
+     * @throws ReflectionException
+     * @throws JsonException
+     * @throws InvalidArguments
+     * @throws UnknownEventException
+     */
+    public function actionIndex(): void
+    {
+        echo $this->parseRequest(
+            $this,
+            $_SERVER['HTTP_FUNCTION'],
+            $_SERVER['HTTP_ROUTING_KEY'],
+            file_get_contents('php://input'),
+            $_SERVER['HTTP_PUBLISHED_AT'],
+        );
     }
 
     /**
@@ -91,8 +109,8 @@ class GoAssistedConsumer
      * @param string $routingKey
      * @param array<array-key, string> $eventData
      *
-     * @throws ReflectionException
      * @throws UnknownEventException
+     * @throws ReflectionException
      *
      * @return Event
      */
