@@ -7,7 +7,6 @@ declare(strict_types=1);
 namespace TeamSquad\Tests\Unit\Interfaces\Consumer;
 
 use PHPUnit\Framework\TestCase;
-use TeamSquad\EventBus\Infrastructure\FakeClock;
 use TeamSquad\EventBus\Infrastructure\SimpleEncrypt;
 use TeamSquad\EventBus\Infrastructure\SimpleEventMapGenerator;
 use TeamSquad\Tests\SampleConsumer;
@@ -24,7 +23,6 @@ final class GoAssistedConsumerTest extends TestCase
                 'routing_key' => SampleEvent::class,
             ]),
             new SimpleEncrypt(),
-            new FakeClock(0)
         );
         $parseRequest = $goAssistedConsumer->parseRequest(
             new SampleController(),
@@ -44,14 +42,13 @@ final class GoAssistedConsumerTest extends TestCase
                 'sample_secure_event' => SampleSecureEvent::class,
             ]),
             new SimpleEncrypt(),
-            new FakeClock(0)
         );
         $parseRequest = $goAssistedConsumer->parseRequest(
             new SampleController(),
             'listenSampleSecureEvent',
             'sample_secure_event',
             json_encode([
-                'property' => 'value',
+                'property'           => 'value',
                 'encrypted_property' => base64_encode('encrypted_value'),
             ], JSON_THROW_ON_ERROR)
         );

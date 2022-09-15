@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace TeamSquad\EventBus\Infrastructure;
 
-use PHLAK\Config\Config;
-use PHLAK\Config\Exceptions\InvalidContextException;
-
 use TeamSquad\EventBus\Domain\Exception\FileNotFound;
 
 use function is_array;
@@ -16,22 +13,21 @@ class AutoloadConfig
     public const WHITE_LIST_CONFIG_KEY = 'white_list';
     public const BLACK_LIST_CONFIG_KEY = 'black_list';
 
-    private Config $config;
+    /** @var array<string, array<string>|string> */
+    private array $config;
 
     /**
      * @param array<string, array<string>|string> $configuration
-     *
-     * @throws InvalidContextException
      */
     public function __construct(array $configuration = [])
     {
-        $this->config = new Config($configuration);
+        $this->config = $configuration;
     }
 
     public function consumerQueueExchangeListenName(): string
     {
         /** @var string $exchangeName */
-        $exchangeName = $this->config->get('consumer_queue_listen_name', 'my_company.event.listen');
+        $exchangeName = $this->config['consumer_queue_listen_name'] ?? 'my_company.event.listen';
         return $exchangeName;
     }
 
@@ -41,7 +37,7 @@ class AutoloadConfig
     public function eventBusExchangeName(): string
     {
         /** @var string $exchangeName */
-        $exchangeName = $this->config->get('event_bus_exchange_name', 'my_company.event_bus');
+        $exchangeName = $this->config['event_bus_exchange_name'] ?? 'my_company.event_bus';
         return $exchangeName;
     }
 
@@ -51,7 +47,7 @@ class AutoloadConfig
     public function configurationPath(): string
     {
         /** @var string $configurationPath */
-        $configurationPath = $this->config->get('configuration_path', null);
+        $configurationPath = $this->config['configuration_path'] ?? null;
         if (!$configurationPath) {
             throw new FileNotFound('Configuration "configuration_path" is not set');
         }
@@ -61,7 +57,7 @@ class AutoloadConfig
     public function isIncludedInWhiteList(string $className): bool
     {
         /** @var null|string|array<array-key, string> $includedClassNames */
-        $includedClassNames = $this->config->get(self::WHITE_LIST_CONFIG_KEY, []);
+        $includedClassNames = $this->config[self::WHITE_LIST_CONFIG_KEY] ?? [];
         if (empty($includedClassNames)) {
             return true;
         }
@@ -71,7 +67,7 @@ class AutoloadConfig
     public function isIncludedInBlackList(string $className): bool
     {
         /** @var null|string|array<array-key, string> $excludedClassNames */
-        $excludedClassNames = $this->config->get(self::BLACK_LIST_CONFIG_KEY, []);
+        $excludedClassNames = $this->config[self::BLACK_LIST_CONFIG_KEY] ?? [];
         if (empty($excludedClassNames)) {
             return false;
         }
