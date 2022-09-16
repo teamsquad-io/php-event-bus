@@ -19,6 +19,8 @@ use TeamSquad\EventBus\Infrastructure\SystemClock;
 
 use function call_user_func_array;
 use function get_class;
+use function gettype;
+use function is_int;
 use function is_string;
 
 trait GoAssistedConsumer
@@ -42,12 +44,32 @@ trait GoAssistedConsumer
      */
     public function actionIndex(): void
     {
+        $methodName = $_SERVER['HTTP_FUNCTION'];
+        if (!is_string($methodName)) {
+            throw new InvalidArguments(sprintf('Invalid method name. Must be string. Got: %s', gettype($methodName)));
+        }
+
+        $routingKey = $_SERVER['HTTP_ROUTING_KEY'];
+        if (!is_string($routingKey)) {
+            throw new InvalidArguments(sprintf('Invalid routing key. Must be string. Got: %s', gettype($routingKey)));
+        }
+
+        $body = file_get_contents('php://input');
+        if (!is_string($body)) {
+            throw new InvalidArguments(sprintf('Invalid body. Must be string. Got: %s', gettype($body)));
+        }
+
+        $publishedAt = $_SERVER['HTTP_PUBLISHED_AT'];
+        if (!is_int($publishedAt)) {
+            throw new InvalidArguments(sprintf('Invalid published at. Must be int. Got: %s', gettype($publishedAt)));
+        }
+
         echo $this->parseRequest(
             $this,
-            $_SERVER['HTTP_FUNCTION'],
-            $_SERVER['HTTP_ROUTING_KEY'],
-            file_get_contents('php://input'),
-            $_SERVER['HTTP_PUBLISHED_AT'],
+            $methodName,
+            $routingKey,
+            $body,
+            $publishedAt,
         );
     }
 

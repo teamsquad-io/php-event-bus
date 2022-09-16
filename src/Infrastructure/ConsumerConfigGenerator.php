@@ -11,12 +11,15 @@ use Doctrine\Common\Annotations\AnnotationRegistry;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
+use ReflectionNamedType;
 use RuntimeException;
 use TeamSquad\EventBus\Domain\Consumer;
 use TeamSquad\EventBus\Domain\Event;
 use TeamSquad\EventBus\Domain\Exception\FileNotFound;
 use TeamSquad\EventBus\Domain\Listen;
 use TeamSquad\EventBus\Domain\RenamedEvent;
+
+use function count;
 
 use function get_class;
 
@@ -42,9 +45,9 @@ class ConsumerConfigGenerator
     }
 
     /**
-     * @throws FileNotFound
      * @throws ReflectionException
      * @throws AnnotationException
+     * @throws FileNotFound
      *
      * @return array<array-key, mixed>
      *
@@ -90,15 +93,16 @@ class ConsumerConfigGenerator
                 $controller = $this->classUniqueUrl($class);
                 foreach ($methods as $method) {
                     if ($method->getNumberOfRequiredParameters() > 0 && strpos($method->getName(), 'listen') === 0) {
-                        $evtClass = $method->getParameters()[0]->getClass();
-                        if (!$evtClass) {
+                        $eventClass = $this->extractEventClassFromMethod($method);
+                        if (!$eventClass) {
                             continue;
                         }
-                        if ($evtClass->implementsInterface(Event::class) && $evtClass->isInstantiable()) {
+
+                        if ($eventClass->implementsInterface(Event::class) && $eventClass->isInstantiable()) {
                             /** @var Event $evt */
-                            $evt = $evtClass->newInstanceWithoutConstructor();
+                            $evt = $eventClass->newInstanceWithoutConstructor();
                             $rk = [$evt->eventName()];
-                            foreach ($annotationReader->getClassAnnotations($evtClass) as $annotation) {
+                            foreach ($annotationReader->getClassAnnotations($eventClass) as $annotation) {
                                 if ($annotation instanceof RenamedEvent) {
                                     $rk[] = $annotation->old;
                                 }
@@ -264,5 +268,41 @@ class ConsumerConfigGenerator
 
         fwrite($fp, '<?php return ' . var_export($controllers, true) . ';');
         fclose($fp);
+    }
+
+    /**
+     * @param ReflectionMethod $method
+     *
+     * @return ReflectionClass<object|Event>|null
+     */
+    private function extractEventClassFromMethod(ReflectionMethod $method): ?ReflectionClass
+    {
+        // If we are in PHP 8, we can use the ReflectionNamedType::getName() method
+        $parameters = $method->getParameters();
+        if (count($parameters) === 0) {
+            return null;
+        }
+        $parameter = $parameters[0];
+
+        if (PHP_VERSION_ID >= 80000) {
+            $type = $parameter->getType();
+            if (!$type instanceof ReflectionNamedType) {
+                return null;
+            }
+
+            $className = $type->getName();
+            if (!class_exists($className)) {
+                return null;
+            }
+
+            return new ReflectionClass($className);
+        }
+
+        $type = $parameter->getClass();
+        if (!$type instanceof ReflectionClass) {
+            return null;
+        }
+
+        return $type;
     }
 }
