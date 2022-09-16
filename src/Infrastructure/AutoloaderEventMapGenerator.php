@@ -7,7 +7,6 @@ namespace TeamSquad\EventBus\Infrastructure;
 use Composer\Autoload\ClassLoader;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Annotations\AnnotationRegistry;
-use PHLAK\Config\Exceptions\InvalidContextException;
 use ReflectionClass;
 use ReflectionException;
 use RuntimeException;
@@ -36,10 +35,8 @@ class AutoloaderEventMapGenerator implements EventMapGenerator
      * @param string $vendorFolder path to the composer vendor folder
      * @param string|null $eventMapFilePath if null, the event map will not be saved
      * @param array<string, array<string>|string> $configuration
-     *
-     * @throws InvalidArguments|InvalidContextException
      * @throws UnknownEventException
-     *
+     * @throws InvalidArguments
      * @psalm-suppress MixedAssignment
      */
     public function __construct(string $vendorFolder, ?string $eventMapFilePath, array $configuration = [])
