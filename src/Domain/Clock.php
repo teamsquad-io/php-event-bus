@@ -7,4 +7,5 @@ namespace TeamSquad\EventBus\Domain;
 interface Clock
 {
     public function timestamp(): int;
+    public function dateTimeWithMicroTime(): string;
 }

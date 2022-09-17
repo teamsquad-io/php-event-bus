@@ -19,4 +19,9 @@ class FakeClock implements Clock
     {
         return $this->timestamp;
     }
+
+    public function dateTimeWithMicroTime(): string
+    {
+        return date('Y-m-d H:i:s.u', $this->timestamp);
+    }
 }
