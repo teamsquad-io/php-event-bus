@@ -9,4 +9,5 @@ namespace TeamSquad\EventBus\Domain;
  */
 interface Consumer
 {
+    public function actionIndex(): void;
 }
