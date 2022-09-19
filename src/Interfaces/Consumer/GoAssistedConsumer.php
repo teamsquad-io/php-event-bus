@@ -59,10 +59,7 @@ trait GoAssistedConsumer
             throw new InvalidArguments(sprintf('Invalid body. Must be string. Got: %s', gettype($body)));
         }
 
-        $publishedAt = $_SERVER['HTTP_PUBLISHED_AT'];
-        if (!is_int($publishedAt)) {
-            throw new InvalidArguments(sprintf('Invalid published at. Must be int. Got: %s', gettype($publishedAt)));
-        }
+        $publishedAt = $_SERVER['HTTP_PUBLISHED_AT'] ?? null;
 
         echo $this->parseRequest(
             $this,
@@ -78,7 +75,7 @@ trait GoAssistedConsumer
      * @param string $methodName
      * @param string $routingKey
      * @param string $body
-     * @param int|null $publishedAt
+     * @param string|null $publishedAt
      *
      * @throws InvalidArguments
      * @throws JsonException
@@ -92,7 +89,7 @@ trait GoAssistedConsumer
         string $methodName,
         string $routingKey,
         string $body,
-        ?int $publishedAt = null
+        ?string $publishedAt = null
     ): string {
         if (!$methodName) {
             return '';
@@ -112,7 +109,7 @@ trait GoAssistedConsumer
             if ($publishedAt !== null) {
                 $params[] = $publishedAt;
             } else {
-                $params[] = $this->clock->timestamp();
+                $params[] = $this->clock->dateTimeWithMicroTime();
             }
         }
 
