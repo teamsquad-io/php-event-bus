@@ -20,7 +20,6 @@ use TeamSquad\EventBus\Infrastructure\SystemClock;
 use function call_user_func_array;
 use function get_class;
 use function gettype;
-use function is_int;
 use function is_string;
 
 trait GoAssistedConsumer
