@@ -30,11 +30,11 @@ class Rabbit
 
     private function __construct(Secrets $secrets)
     {
-        $this->host = $secrets->get('rabbit.host');
-        $this->port = (int)$secrets->get('rabbit.port');
-        $this->user = $secrets->get('rabbit.user');
-        $this->pass = $secrets->get('rabbit.pass');
-        $this->vhost = $secrets->findByKey('rabbit.vhost', '/');
+        $this->host = $secrets->get('rabbit_host');
+        $this->port = (int)$secrets->get('rabbit_port');
+        $this->user = $secrets->get('rabbit_user');
+        $this->pass = $secrets->get('rabbit_pass');
+        $this->vhost = $secrets->findByKey('rabbit_vhost', '/');
         $this->channel = null;
         $this->connection = null;
     }
