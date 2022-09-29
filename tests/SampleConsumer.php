@@ -15,7 +15,7 @@ class SampleConsumer implements Consumer
 
     public function __construct(EventMapGenerator $eventMap, StringEncrypt $dataEncrypt)
     {
-        $this->init($eventMap, $dataEncrypt);
+        $this->initializeConsumer($eventMap, $dataEncrypt);
     }
 
     public function listenSampleEvent(SampleEvent $event): string

@@ -13,8 +13,10 @@ use TeamSquad\EventBus\Domain\Event;
 use TeamSquad\EventBus\Domain\EventMapGenerator;
 use TeamSquad\EventBus\Domain\Exception\InvalidArguments;
 use TeamSquad\EventBus\Domain\Exception\UnknownEventException;
+use TeamSquad\EventBus\Domain\Input;
 use TeamSquad\EventBus\Domain\SecureEvent;
 use TeamSquad\EventBus\Domain\StringEncrypt;
+use TeamSquad\EventBus\Infrastructure\PhpInput;
 use TeamSquad\EventBus\Infrastructure\SystemClock;
 
 use function call_user_func_array;
@@ -27,11 +29,13 @@ trait GoAssistedConsumer
     private EventMapGenerator $eventMap;
     private Clock $clock;
     private StringEncrypt $encrypt;
+    private Input $input;
 
-    public function init(EventMapGenerator $eventMap, StringEncrypt $dataEncrypt): void
+    public function initializeConsumer(EventMapGenerator $eventMap, StringEncrypt $dataEncrypt, ?Input $input = null): void
     {
         $this->eventMap = $eventMap;
         $this->encrypt = $dataEncrypt;
+        $this->input = $input ?: new PhpInput();
         $this->clock = new SystemClock();
     }
 
@@ -53,18 +57,13 @@ trait GoAssistedConsumer
             throw new InvalidArguments(sprintf('Invalid routing key. Must be string. Got: %s', gettype($routingKey)));
         }
 
-        $body = file_get_contents('php://input');
-        if (!is_string($body)) {
-            throw new InvalidArguments(sprintf('Invalid body. Must be string. Got: %s', gettype($body)));
-        }
-
         $publishedAt = $_SERVER['HTTP_PUBLISHED_AT'] ?? null;
 
         echo $this->parseRequest(
             $this,
             $methodName,
             $routingKey,
-            $body,
+            $this->input->get(),
             $publishedAt,
         );
     }
