@@ -35,6 +35,9 @@ class AutoloaderEventMapGeneratorTest extends TestCase
             __DIR__ . '/../../../vendor',
             self::EVENT_MAP_FILE_PATH,
             [
+                AutoloadConfig::CONFIGURATION_PATH_KEY => __DIR__ . '/../../../config',
+                AutoloadConfig::EVENT_BUS_EXCHANGE_NAME_KEY => 'test',
+                AutoloadConfig::CONSUMER_QUEUE_LISTEN_NAME_KEY => 'test',
                 AutoloadConfig::WHITE_LIST_CONFIG_KEY => 'TeamSquad\\NonExistent\\',
             ]
         );
@@ -48,6 +51,9 @@ class AutoloaderEventMapGeneratorTest extends TestCase
             __DIR__ . '/../../../vendor',
             self::EVENT_MAP_FILE_PATH,
             [
+                AutoloadConfig::CONFIGURATION_PATH_KEY => __DIR__ . '/../../../config',
+                AutoloadConfig::EVENT_BUS_EXCHANGE_NAME_KEY => 'test',
+                AutoloadConfig::CONSUMER_QUEUE_LISTEN_NAME_KEY => 'test',
                 AutoloadConfig::WHITE_LIST_CONFIG_KEY => 'TeamSquad',
             ]
         );
@@ -65,6 +71,9 @@ class AutoloaderEventMapGeneratorTest extends TestCase
             __DIR__ . '/../../../vendor',
             self::EVENT_MAP_FILE_PATH,
             [
+                AutoloadConfig::CONFIGURATION_PATH_KEY => __DIR__ . '/../../../config',
+                AutoloadConfig::EVENT_BUS_EXCHANGE_NAME_KEY => 'test',
+                AutoloadConfig::CONSUMER_QUEUE_LISTEN_NAME_KEY => 'test',
                 AutoloadConfig::WHITE_LIST_CONFIG_KEY => 'TeamSquad',
             ]
         );
@@ -89,6 +98,9 @@ class AutoloaderEventMapGeneratorTest extends TestCase
             __DIR__ . '/../../../vendor',
             self::EVENT_MAP_FILE_PATH,
             [
+                AutoloadConfig::CONFIGURATION_PATH_KEY => __DIR__ . '/../../../config',
+                AutoloadConfig::EVENT_BUS_EXCHANGE_NAME_KEY => 'test',
+                AutoloadConfig::CONSUMER_QUEUE_LISTEN_NAME_KEY => 'test',
                 AutoloadConfig::WHITE_LIST_CONFIG_KEY => 'TeamSquad',
                 AutoloadConfig::BLACK_LIST_CONFIG_KEY => 'Secure',
             ]
@@ -106,6 +118,9 @@ class AutoloaderEventMapGeneratorTest extends TestCase
             __DIR__ . '/../../../vendor',
             self::EVENT_MAP_FILE_PATH,
             [
+                AutoloadConfig::CONFIGURATION_PATH_KEY => __DIR__ . '/../../../config',
+                AutoloadConfig::EVENT_BUS_EXCHANGE_NAME_KEY => 'test',
+                AutoloadConfig::CONSUMER_QUEUE_LISTEN_NAME_KEY => 'test',
                 AutoloadConfig::WHITE_LIST_CONFIG_KEY => 'TeamSquad',
                 AutoloadConfig::BLACK_LIST_CONFIG_KEY => 'Secure',
             ]
@@ -122,6 +137,9 @@ class AutoloaderEventMapGeneratorTest extends TestCase
             __DIR__ . '/../../../vendor',
             self::EVENT_MAP_FILE_PATH,
             [
+                AutoloadConfig::CONFIGURATION_PATH_KEY => __DIR__ . '/../../../config',
+                AutoloadConfig::EVENT_BUS_EXCHANGE_NAME_KEY => 'test',
+                AutoloadConfig::CONSUMER_QUEUE_LISTEN_NAME_KEY => 'test',
                 AutoloadConfig::WHITE_LIST_CONFIG_KEY => 'TeamSquad',
                 AutoloadConfig::BLACK_LIST_CONFIG_KEY => 'Secure',
             ]

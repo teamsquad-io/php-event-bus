@@ -36,6 +36,14 @@ class AutoloaderEventMapGenerator implements EventMapGenerator
      * @param string|null $eventMapFilePath if null, the event map will not be saved
      * @param array<string, array<string>|string> $configuration
      *
+     * @psalm-param array{
+     *      consumer_queue_listen_name?: string,
+     *      event_bus_exchange_name?: string,
+     *      configuration_path?: string,
+     *      white_list?: array<string>|string,
+     *      black_list?: array<string>|string
+     * } $configuration
+     *
      * @throws UnknownEventException
      * @throws InvalidArguments
      *
