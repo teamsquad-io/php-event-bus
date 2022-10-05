@@ -35,7 +35,7 @@ class AutoloaderEventMapGeneratorTest extends TestCase
             __DIR__ . '/../../../vendor',
             self::EVENT_MAP_FILE_PATH,
             [
-                AutoloadConfig::CONFIGURATION_PATH_KEY => __DIR__ . '/../../../config',
+                AutoloadConfig::CONFIGURATION_PATH_KEY => __DIR__ . '/../../Utils/SampleConfigPath',
                 AutoloadConfig::EVENT_BUS_EXCHANGE_NAME_KEY => 'test',
                 AutoloadConfig::CONSUMER_QUEUE_LISTEN_NAME_KEY => 'test',
                 AutoloadConfig::WHITE_LIST_CONFIG_KEY => 'TeamSquad\\NonExistent\\',
@@ -45,13 +45,31 @@ class AutoloaderEventMapGeneratorTest extends TestCase
         self::assertFileDoesNotExist(self::EVENT_MAP_FILE_PATH);
     }
 
+    public function test_it_should_fail_if_event_map_file_path_is_pointing_to_invalid_directory(): void
+    {
+        $wrongDir = __DIR__ . '/wrongDirectory';
+        $this->expectException(InvalidArguments::class);
+        $this->expectExceptionMessage('The directory where the event map file should be saved does not exist: ' . $wrongDir);
+
+        new AutoloaderEventMapGenerator(
+            __DIR__ . '/../../../vendor',
+            $wrongDir . '/eventMapFile.php',
+            [
+                AutoloadConfig::CONFIGURATION_PATH_KEY => __DIR__ . '/../../Wrong',
+                AutoloadConfig::EVENT_BUS_EXCHANGE_NAME_KEY => 'test',
+                AutoloadConfig::CONSUMER_QUEUE_LISTEN_NAME_KEY => 'test',
+                AutoloadConfig::WHITE_LIST_CONFIG_KEY => 'TeamSquad\\',
+            ]
+        );
+    }
+
     public function test_generate_event_map(): void
     {
         $sut = new AutoloaderEventMapGenerator(
             __DIR__ . '/../../../vendor',
             self::EVENT_MAP_FILE_PATH,
             [
-                AutoloadConfig::CONFIGURATION_PATH_KEY => __DIR__ . '/../../../config',
+                AutoloadConfig::CONFIGURATION_PATH_KEY => __DIR__ . '/../../Utils/SampleConfigPath',
                 AutoloadConfig::EVENT_BUS_EXCHANGE_NAME_KEY => 'test',
                 AutoloadConfig::CONSUMER_QUEUE_LISTEN_NAME_KEY => 'test',
                 AutoloadConfig::WHITE_LIST_CONFIG_KEY => 'TeamSquad',
@@ -71,7 +89,7 @@ class AutoloaderEventMapGeneratorTest extends TestCase
             __DIR__ . '/../../../vendor',
             self::EVENT_MAP_FILE_PATH,
             [
-                AutoloadConfig::CONFIGURATION_PATH_KEY => __DIR__ . '/../../../config',
+                AutoloadConfig::CONFIGURATION_PATH_KEY => __DIR__ . '/../../Utils/SampleConfigPath',
                 AutoloadConfig::EVENT_BUS_EXCHANGE_NAME_KEY => 'test',
                 AutoloadConfig::CONSUMER_QUEUE_LISTEN_NAME_KEY => 'test',
                 AutoloadConfig::WHITE_LIST_CONFIG_KEY => 'TeamSquad',
@@ -98,7 +116,7 @@ class AutoloaderEventMapGeneratorTest extends TestCase
             __DIR__ . '/../../../vendor',
             self::EVENT_MAP_FILE_PATH,
             [
-                AutoloadConfig::CONFIGURATION_PATH_KEY => __DIR__ . '/../../../config',
+                AutoloadConfig::CONFIGURATION_PATH_KEY => __DIR__ . '/../../Utils/SampleConfigPath',
                 AutoloadConfig::EVENT_BUS_EXCHANGE_NAME_KEY => 'test',
                 AutoloadConfig::CONSUMER_QUEUE_LISTEN_NAME_KEY => 'test',
                 AutoloadConfig::WHITE_LIST_CONFIG_KEY => 'TeamSquad',
@@ -118,7 +136,7 @@ class AutoloaderEventMapGeneratorTest extends TestCase
             __DIR__ . '/../../../vendor',
             self::EVENT_MAP_FILE_PATH,
             [
-                AutoloadConfig::CONFIGURATION_PATH_KEY => __DIR__ . '/../../../config',
+                AutoloadConfig::CONFIGURATION_PATH_KEY => __DIR__ . '/../../Utils/SampleConfigPath',
                 AutoloadConfig::EVENT_BUS_EXCHANGE_NAME_KEY => 'test',
                 AutoloadConfig::CONSUMER_QUEUE_LISTEN_NAME_KEY => 'test',
                 AutoloadConfig::WHITE_LIST_CONFIG_KEY => 'TeamSquad',
@@ -137,7 +155,7 @@ class AutoloaderEventMapGeneratorTest extends TestCase
             __DIR__ . '/../../../vendor',
             self::EVENT_MAP_FILE_PATH,
             [
-                AutoloadConfig::CONFIGURATION_PATH_KEY => __DIR__ . '/../../../config',
+                AutoloadConfig::CONFIGURATION_PATH_KEY => __DIR__ . '/../../Utils/SampleConfigPath',
                 AutoloadConfig::EVENT_BUS_EXCHANGE_NAME_KEY => 'test',
                 AutoloadConfig::CONSUMER_QUEUE_LISTEN_NAME_KEY => 'test',
                 AutoloadConfig::WHITE_LIST_CONFIG_KEY => 'TeamSquad',
