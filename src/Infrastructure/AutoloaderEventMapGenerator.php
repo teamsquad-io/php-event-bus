@@ -162,6 +162,7 @@ class AutoloaderEventMapGenerator implements EventMapGenerator
 
     /**
      * @throws InvalidArguments
+     *
      * @psalm-suppress MixedAssignment
      */
     private function loadEventMapFile(?string $eventMapFilePath): bool
