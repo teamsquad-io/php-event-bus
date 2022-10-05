@@ -121,6 +121,17 @@ class AutoloaderEventMapGenerator implements EventMapGenerator
                 throw new UnknownEventException(sprintf('Class %s does not exist in path %s', $class, $path));
             }
         }
+
+        if (empty($events)) {
+            throw new InvalidArguments(
+                sprintf(
+                    'No events found with whitelist "%s" and blacklist "%s"',
+                    implode(', ', $this->config->getWhiteList()),
+                    implode(', ', $this->config->getBlackList())
+                )
+            );
+        }
+
         self::$eventMap = $events;
         $this->save();
     }

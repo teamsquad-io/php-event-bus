@@ -7,6 +7,7 @@ declare(strict_types=1);
 namespace TeamSquad\Tests\Unit\Infrastructure;
 
 use PHPUnit\Framework\TestCase;
+use TeamSquad\EventBus\Domain\Exception\InvalidArguments;
 use TeamSquad\EventBus\Domain\Exception\UnknownEventException;
 use TeamSquad\EventBus\Infrastructure\AutoloadConfig;
 use TeamSquad\EventBus\Infrastructure\AutoloaderEventMapGenerator;
@@ -20,7 +21,25 @@ class AutoloaderEventMapGeneratorTest extends TestCase
     protected function tearDown(): void
     {
         parent::tearDown();
-        unlink(self::EVENT_MAP_FILE_PATH);
+        if (file_exists(self::EVENT_MAP_FILE_PATH)) {
+            unlink(self::EVENT_MAP_FILE_PATH);
+        }
+    }
+
+    public function test_it_should_fail_if_event_map_file_is_empty(): void
+    {
+        $this->expectException(InvalidArguments::class);
+        $this->expectExceptionMessage('No events found with whitelist "TeamSquad\NonExistent\" and blacklist ""');
+
+        new AutoloaderEventMapGenerator(
+            __DIR__ . '/../../../vendor',
+            self::EVENT_MAP_FILE_PATH,
+            [
+                AutoloadConfig::WHITE_LIST_CONFIG_KEY => 'TeamSquad\\NonExistent\\',
+            ]
+        );
+
+        self::assertFileDoesNotExist(self::EVENT_MAP_FILE_PATH);
     }
 
     public function test_generate_event_map(): void

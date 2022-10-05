@@ -7,6 +7,7 @@ namespace TeamSquad\EventBus\Infrastructure;
 use TeamSquad\EventBus\Domain\Exception\FileNotFound;
 
 use function is_array;
+use function is_string;
 
 class AutoloadConfig
 {
@@ -72,6 +73,32 @@ class AutoloadConfig
             return false;
         }
         return $this->isClassNameInConfig($excludedClassNames, $className);
+    }
+
+    /**
+     * @return array<array-key, string>
+     */
+    public function getWhiteList(): array
+    {
+        $arr = $this->config[self::WHITE_LIST_CONFIG_KEY] ?? [];
+        if (is_string($arr)) {
+            return [$arr];
+        }
+
+        return $arr;
+    }
+
+    /**
+     * @return array<array-key, string>
+     */
+    public function getBlackList(): array
+    {
+        $arr = $this->config[self::BLACK_LIST_CONFIG_KEY] ?? [];
+        if (is_string($arr)) {
+            return [$arr];
+        }
+
+        return $arr;
     }
 
     /**
