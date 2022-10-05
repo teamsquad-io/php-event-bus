@@ -10,6 +10,6 @@ class FileNotFound extends Exception
 {
     public function __construct(string $file)
     {
-        parent::__construct("Configuration path file not found: {$file}");
+        parent::__construct(sprintf("Configuration path file not found: %s", $file));
     }
 }
