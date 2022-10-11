@@ -1,5 +1,7 @@
 <?php
 
+/** @noinspection UnusedFunctionResultInspection */
+
 /** @noinspection PhpUnhandledExceptionInspection */
 
 declare(strict_types=1);
@@ -31,26 +33,34 @@ class AutoloaderEventMapGeneratorTest extends TestCase
         $this->expectException(InvalidArguments::class);
         $this->expectExceptionMessage('No events found with whitelist "TeamSquad\NonExistent\" and blacklist ""');
 
-        new AutoloaderEventMapGenerator(
-            __DIR__ . '/../../../vendor',
-            self::EVENT_MAP_FILE_PATH,
-            [
-                AutoloadConfig::WHITE_LIST_CONFIG_KEY => 'TeamSquad\\NonExistent\\',
-            ]
-        );
+        $this->getAutoloaderEventMapGenerator([
+            AutoloadConfig::WHITE_LIST_CONFIG_KEY          => 'TeamSquad\\NonExistent\\',
+        ]);
 
         self::assertFileDoesNotExist(self::EVENT_MAP_FILE_PATH);
     }
 
-    public function test_generate_event_map(): void
+    public function test_it_should_fail_if_event_map_file_path_is_pointing_to_invalid_directory(): void
     {
-        $sut = new AutoloaderEventMapGenerator(
+        $wrongDir = __DIR__ . '/wrongDirectory';
+        $this->expectException(InvalidArguments::class);
+        $this->expectExceptionMessage('The directory where the event map file should be saved does not exist: ' . $wrongDir);
+
+        new AutoloaderEventMapGenerator(
             __DIR__ . '/../../../vendor',
-            self::EVENT_MAP_FILE_PATH,
+            $wrongDir . '/eventMapFile.php',
             [
-                AutoloadConfig::WHITE_LIST_CONFIG_KEY => 'TeamSquad',
+                AutoloadConfig::CONFIGURATION_PATH_KEY         => __DIR__ . '/../../Wrong',
+                AutoloadConfig::EVENT_BUS_EXCHANGE_NAME_KEY    => 'test',
+                AutoloadConfig::CONSUMER_QUEUE_LISTEN_NAME_KEY => 'test',
+                AutoloadConfig::WHITE_LIST_CONFIG_KEY          => 'TeamSquad\\',
             ]
         );
+    }
+
+    public function test_generate_event_map(): void
+    {
+        $sut = $this->getAutoloaderEventMapGenerator();
 
         self::assertFileExists(self::EVENT_MAP_FILE_PATH);
         self::assertEquals([
@@ -61,13 +71,7 @@ class AutoloaderEventMapGeneratorTest extends TestCase
 
     public function test_generate_event_map_creates_file_with_correct_content(): void
     {
-        $sut = new AutoloaderEventMapGenerator(
-            __DIR__ . '/../../../vendor',
-            self::EVENT_MAP_FILE_PATH,
-            [
-                AutoloadConfig::WHITE_LIST_CONFIG_KEY => 'TeamSquad',
-            ]
-        );
+        $sut = $this->getAutoloaderEventMapGenerator();
 
         $sut->generate();
 
@@ -85,31 +89,20 @@ class AutoloaderEventMapGeneratorTest extends TestCase
 
     public function test_generate_event_map_with_excluding_some_events(): void
     {
-        $sut = new AutoloaderEventMapGenerator(
-            __DIR__ . '/../../../vendor',
-            self::EVENT_MAP_FILE_PATH,
-            [
-                AutoloadConfig::WHITE_LIST_CONFIG_KEY => 'TeamSquad',
-                AutoloadConfig::BLACK_LIST_CONFIG_KEY => 'Secure',
-            ]
-        );
+        $sut = $this->getAutoloaderEventMapGenerator([
+            AutoloadConfig::WHITE_LIST_CONFIG_KEY => 'TeamSquad',
+            AutoloadConfig::BLACK_LIST_CONFIG_KEY => 'Secure',
+        ]);
 
         self::assertFileExists(self::EVENT_MAP_FILE_PATH);
         self::assertEquals([
-            'sample_event'        => SampleEvent::class,
+            'sample_event' => SampleEvent::class,
         ], $sut->getAll());
     }
 
     public function test_get_by_routing_key_returns_correct_class(): void
     {
-        $sut = new AutoloaderEventMapGenerator(
-            __DIR__ . '/../../../vendor',
-            self::EVENT_MAP_FILE_PATH,
-            [
-                AutoloadConfig::WHITE_LIST_CONFIG_KEY => 'TeamSquad',
-                AutoloadConfig::BLACK_LIST_CONFIG_KEY => 'Secure',
-            ]
-        );
+        $sut = $this->getAutoloaderEventMapGenerator();
 
         self::assertEquals(SampleEvent::class, $sut->get('sample_event'));
     }
@@ -118,15 +111,25 @@ class AutoloaderEventMapGeneratorTest extends TestCase
     {
         $this->expectException(UnknownEventException::class);
 
-        $sut = new AutoloaderEventMapGenerator(
-            __DIR__ . '/../../../vendor',
-            self::EVENT_MAP_FILE_PATH,
-            [
-                AutoloadConfig::WHITE_LIST_CONFIG_KEY => 'TeamSquad',
-                AutoloadConfig::BLACK_LIST_CONFIG_KEY => 'Secure',
-            ]
-        );
+        $sut = $this->getAutoloaderEventMapGenerator([
+            AutoloadConfig::WHITE_LIST_CONFIG_KEY => 'TeamSquad',
+            AutoloadConfig::BLACK_LIST_CONFIG_KEY => 'Secure',
+        ]);
 
         self::assertEquals(SampleEvent::class, $sut->get('sample_secure_event'));
+    }
+
+    private function getAutoloaderEventMapGenerator(array $configuration = []): AutoloaderEventMapGenerator
+    {
+        return new AutoloaderEventMapGenerator(
+            __DIR__ . '/../../../vendor',
+            self::EVENT_MAP_FILE_PATH,
+            array_merge([
+                AutoloadConfig::CONFIGURATION_PATH_KEY    => __DIR__ . '/../../Utils/SampleConfigPath',
+                AutoloadConfig::EVENT_BUS_EXCHANGE_NAME_KEY    => 'vts.eventBus',
+                AutoloadConfig::CONSUMER_QUEUE_LISTEN_NAME_KEY => 'consumer.queue.listen',
+                AutoloadConfig::WHITE_LIST_CONFIG_KEY          => 'TeamSquad',
+            ], $configuration)
+        );
     }
 }

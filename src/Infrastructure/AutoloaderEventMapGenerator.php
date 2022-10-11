@@ -17,6 +17,8 @@ use TeamSquad\EventBus\Domain\Exception\UnknownEventException;
 use TeamSquad\EventBus\Domain\Listen;
 use TeamSquad\EventBus\Domain\RenamedEvent;
 
+use function dirname;
+
 /**
  * AutoloaderEventMapGenerator generates an event map using autoloaded classes
  * and annotations.
@@ -26,7 +28,7 @@ use TeamSquad\EventBus\Domain\RenamedEvent;
 class AutoloaderEventMapGenerator implements EventMapGenerator
 {
     /** @var array<string, class-string<Event>> */
-    private static $eventMap;
+    private static array $eventMap;
     private string $vendorPath;
     private ?string $eventMapFilePath;
     private AutoloadConfig $config;
@@ -36,19 +38,23 @@ class AutoloaderEventMapGenerator implements EventMapGenerator
      * @param string|null $eventMapFilePath if null, the event map will not be saved
      * @param array<string, array<string>|string> $configuration
      *
+     * @psalm-param array{
+     *      consumer_queue_listen_name?: string,
+     *      event_bus_exchange_name?: string,
+     *      configuration_path?: string,
+     *      white_list?: array<string>|string,
+     *      black_list?: array<string>|string
+     * } $configuration
+     *
      * @throws UnknownEventException
      * @throws InvalidArguments
-     *
-     * @psalm-suppress MixedAssignment
      */
-    public function __construct(string $vendorFolder, ?string $eventMapFilePath, array $configuration = [])
+    public function __construct(string $vendorFolder, ?string $eventMapFilePath, array $configuration)
     {
         $this->config = new AutoloadConfig($configuration);
         $this->vendorPath = $vendorFolder;
         $this->eventMapFilePath = $eventMapFilePath;
-        if ($this->eventMapFilePath && is_file($this->eventMapFilePath)) {
-            self::$eventMap = require $this->eventMapFilePath;
-        } else {
+        if (!$this->loadEventMapFile($this->eventMapFilePath)) {
             $this->generate();
         }
     }
@@ -152,5 +158,35 @@ class AutoloaderEventMapGenerator implements EventMapGenerator
         $sprintf = sprintf('<?php return %s;', var_export(self::$eventMap, true));
         fwrite($fp, $sprintf);
         fclose($fp);
+    }
+
+    /**
+     * @throws InvalidArguments
+     *
+     * @psalm-suppress MixedAssignment
+     */
+    private function loadEventMapFile(?string $eventMapFilePath): bool
+    {
+        if (!$eventMapFilePath) {
+            return false;
+        }
+
+        // Check if the directory where the event map file should be saved exists
+        $eventMapDirectory = dirname($eventMapFilePath);
+        if (is_dir($eventMapDirectory)) {
+            if (is_file($eventMapFilePath)) {
+                self::$eventMap = require $eventMapFilePath;
+                return true;
+            }
+
+            return false;
+        }
+
+        throw new InvalidArguments(
+            sprintf(
+                'The directory where the event map file should be saved does not exist: %s',
+                $eventMapDirectory
+            )
+        );
     }
 }
