@@ -154,6 +154,16 @@ class AutoloadConfig
         return $arr;
     }
 
+    public function hasWhiteList(): bool
+    {
+        return !empty($this->config[self::WHITE_LIST_CONFIG_KEY]);
+    }
+
+    public function hasBlackList(): bool
+    {
+        return !empty($this->config[self::BLACK_LIST_CONFIG_KEY]);
+    }
+
     /**
      * Check if the class is included in the given list
      *

@@ -29,7 +29,18 @@ class ConsumerConfigGeneratorTest extends TestCase
                 }
             }
         }
-        rmdir(__DIR__ . '/../config');
+        if (is_dir(__DIR__ . '/../config')) {
+            rmdir(__DIR__ . '/../config');
+        }
+    }
+
+    public function test_script_composer_run_generate_consumer_config(): void
+    {
+        $changeDirectoryToRoot = sprintf('cd %s/../../../', __DIR__);
+        $composerScript = 'composer run generate-consumer-config';
+        $expectedOutput = 'Generated 1 consumers successfully';
+        $output         = shell_exec($changeDirectoryToRoot . ' & ' . $composerScript);
+        self::assertStringContainsString($expectedOutput, $output);
     }
 
     public function test_generate(): void

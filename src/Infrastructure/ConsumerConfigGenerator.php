@@ -37,17 +37,21 @@ class ConsumerConfigGenerator
 {
     private AutoloadConfig $config;
     private string $vendorFolder;
+    private bool $fromConsole;
 
     public function __construct(string $vendorFolder, AutoloadConfig $config)
     {
         $this->config = $config;
         $this->vendorFolder = $vendorFolder;
+
+        // Detect if we are being called from a CLI context
+        $this->fromConsole = PHP_SAPI === 'cli';
     }
 
     /**
-     * @throws ReflectionException
      * @throws AnnotationException
      * @throws FileNotFound
+     * @throws ReflectionException
      *
      * @return array<array-key, mixed>
      *
@@ -64,6 +68,10 @@ class ConsumerConfigGenerator
         $classLoader = require $this->vendorFolder . '/autoload.php';
         /** @var array<class-string<Consumer>, string> $classMap */
         $classMap = $classLoader->getClassMap();
+        if (count($classMap) < 1000) {
+            throw new RuntimeException('Class map is too small, did you run composer dump-autoload -o?');
+        }
+
         $consumers = [];
         $controllers = [];
         $routes = [];
@@ -182,13 +190,36 @@ class ConsumerConfigGenerator
         $configDir = $this->config->configurationPath();
         if (!is_dir($configDir) && !mkdir($configDir, 0777, true) && !is_dir($configDir)) {
             throw new RuntimeException(
-                sprintf('Directory "%s" was not created', $configDir)
+                sprintf('Directory "%s" could not be created. Please check permissions.', $configDir)
+            );
+        }
+
+        if (empty($consumers)) {
+            throw new RuntimeException(
+                'No consumers found. Possible because of a misconfiguration in the white/black list. ' .
+                $this->getReasonBecauseNoConfigGenerated()
+            );
+        }
+
+        if (empty($controllers)) {
+            throw new RuntimeException(
+                'No controllers found. Check that your controllers implements Consumer::class and the constructors are callable (no private __construct)'
+            );
+        }
+
+        if (empty($routes)) {
+            throw new RuntimeException(
+                "No routes found. Check that your controllers methods start with 'listen' and have at least one parameter \$event that implements Event::class"
             );
         }
 
         $this->writeToFile($configDir . '/auto_controllerMap.php', $controllers);
         $this->writeToFile($configDir . '/auto_routes.php', $routes);
         $this->writeToFile($configDir . '/auto_consumerConf.php', $consumers);
+
+        if ($this->fromConsole) {
+            echo 'Generated ' . count($consumers) . ' consumers successfully' . PHP_EOL;
+        }
 
         return [
             'controllers' => $controllers,
@@ -304,5 +335,17 @@ class ConsumerConfigGenerator
         }
 
         return $type;
+    }
+
+    private function getReasonBecauseNoConfigGenerated(): string
+    {
+        $reason = '';
+        if ($this->config->hasWhiteList()) {
+            $reason = 'Whitelist is ' . implode(', ', $this->config->getWhiteList());
+        }
+        if ($this->config->hasBlackList()) {
+            $reason = 'and Blacklist is ' . implode(', ', $this->config->getBlackList());
+        }
+        return $reason;
     }
 }

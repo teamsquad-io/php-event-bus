@@ -6,3 +6,4 @@
 /.phpbench/
 *.cache
 tests/Unit/Infrastructure/eventMapFile.php
+auto_*.php
