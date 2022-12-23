@@ -9,10 +9,10 @@
     "require": {
         "php": ">=7.4",
         "php-amqplib/php-amqplib": "^3.2.0",
-        "ext-json": "*"
+        "ext-json": "*",
+        "doctrine/annotations": "^2.0.0"
     },
     "require-dev": {
-        "friendsofphp/php-cs-fixer": "^3.10",
         "phpunit/phpunit": "^9.5",
         "vimeo/psalm": "^4.22",
         "phpstan/phpstan": "^1.5",
@@ -42,8 +42,8 @@
         "test-phpunit": "./vendor/bin/phpunit",
         "psalm": "./vendor/bin/psalm",
         "phpstan": "./vendor/bin/phpstan",
-        "csfix": "./vendor/bin/php-cs-fixer fix",
-        "csrun": "./vendor/bin/php-cs-fixer fix --dry-run || ./vendor/bin/php-cs-fixer fix",
+        "csfix": "./tools/php-cs-fixer/vendor/bin/php-cs-fixer fix src",
+        "csrun": "./tools/php-cs-fixer/vendor/bin/php-cs-fixer fix --dry-run || ./tools/php-cs-fixer/vendor/bin/php-cs-fixer fix",
         "generate-consumer-config": [
             "composer dump-autoload -o",
             "TeamSquad\\Tests\\Unit\\Interfaces\\SampleConfigGeneratorController::generateConsumerConfig"

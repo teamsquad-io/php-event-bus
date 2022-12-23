@@ -6,7 +6,6 @@ namespace TeamSquad\EventBus\Infrastructure;
 
 use Composer\Autoload\ClassLoader;
 use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\Common\Annotations\AnnotationRegistry;
 use ReflectionClass;
 use ReflectionException;
 use RuntimeException;
@@ -84,7 +83,6 @@ class AutoloaderEventMapGenerator implements EventMapGenerator
      * @throws UnknownEventException
      *
      * @noinspection PhpRedundantVariableDocTypeInspection
-     * @noinspection PhpDeprecationInspection
      */
     public function generate(): void
     {
@@ -93,14 +91,6 @@ class AutoloaderEventMapGenerator implements EventMapGenerator
         /** @var array<class-string<Event>, string> $classMap */
         $classMap = $classLoader->getClassMap();
         $events = [];
-        $autoloadFunctions = spl_autoload_functions();
-        if (!$autoloadFunctions) {
-            $autoloadFunctions = [];
-        }
-        foreach ($autoloadFunctions as $autoloadFunction) {
-            /** @psalm-suppress DeprecatedMethod */
-            AnnotationRegistry::registerLoader($autoloadFunction);
-        }
         $annotationReader = new AnnotationReader();
         foreach ($classMap as $class => $path) {
             if (!$this->config->isIncludedInWhiteList($class)) {
