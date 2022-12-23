@@ -7,7 +7,6 @@ namespace TeamSquad\EventBus\Infrastructure;
 use Composer\Autoload\ClassLoader;
 use Doctrine\Common\Annotations\AnnotationException;
 use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\Common\Annotations\AnnotationRegistry;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
@@ -22,8 +21,6 @@ use TeamSquad\EventBus\Domain\RenamedEvent;
 use function count;
 
 use function get_class;
-
-use function is_array;
 
 use const PHP_EOL;
 
@@ -56,7 +53,6 @@ class ConsumerConfigGenerator
      * @return array<array-key, mixed>
      *
      * @noinspection PhpRedundantVariableDocTypeInspection
-     * @noinspection PhpDeprecationInspection
      */
     public function generate(): array
     {
@@ -75,13 +71,6 @@ class ConsumerConfigGenerator
         $consumers = [];
         $controllers = [];
         $routes = [];
-        $functions = spl_autoload_functions();
-        if (is_array($functions)) {
-            foreach ($functions as $autoloadFunction) {
-                /** @psalm-suppress DeprecatedMethod */
-                AnnotationRegistry::registerLoader($autoloadFunction);
-            }
-        }
         $annotationReader = new AnnotationReader();
         foreach ($classMap as $class => $_) {
             if (!$this->config->isIncludedInWhiteList($class)) {
