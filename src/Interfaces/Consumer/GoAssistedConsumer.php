@@ -18,7 +18,7 @@ use TeamSquad\EventBus\Domain\SecureEvent;
 use TeamSquad\EventBus\Domain\StringEncrypt;
 use TeamSquad\EventBus\Infrastructure\PhpInput;
 use TeamSquad\EventBus\Infrastructure\SystemClock;
-
+use Throwable;
 use function call_user_func_array;
 use function get_class;
 use function gettype;
@@ -83,43 +83,52 @@ trait GoAssistedConsumer
      * @return string
      */
     final public function parseRequest(
-        object $controllerInstance,
-        string $methodName,
-        string $routingKey,
-        string $body,
+        object  $controllerInstance,
+        string  $methodName,
+        string  $routingKey,
+        string  $body,
         ?string $publishedAt = null
     ): string {
         if (!$methodName) {
             return '';
         }
+
         if (!method_exists($controllerInstance, $methodName)) {
             throw new InvalidArguments(
                 sprintf("%s::%s method doesn't exists", get_class($controllerInstance), $methodName)
             );
         }
-        /** @var array<array-key, string> $rawCommand */
-        $rawCommand = json_decode($body, true, 512, JSON_THROW_ON_ERROR);
-        $params = [
-            $this->unserialize($routingKey, $rawCommand),
-        ];
-        $method = new ReflectionMethod($controllerInstance, $methodName);
-        if ($method->getNumberOfRequiredParameters() > 1) {
-            if ($publishedAt !== null) {
-                $params[] = $publishedAt;
-            } else {
-                $params[] = $this->clock->dateTimeWithMicroTime();
+
+        try {
+            /** @var array<array-key, string> $rawCommand */
+            $rawCommand = json_decode($body, true, 512, JSON_THROW_ON_ERROR);
+            $params = [
+                $this->unserialize($routingKey, $rawCommand),
+            ];
+            $method = new ReflectionMethod($controllerInstance, $methodName);
+            if ($method->getNumberOfRequiredParameters() > 1) {
+                if ($publishedAt !== null) {
+                    $params[] = $publishedAt;
+                } else {
+                    $params[] = $this->clock->dateTimeWithMicroTime();
+                }
             }
-        }
 
-        /** @var callable $callback */
-        $callback = $method->getClosure($controllerInstance);
-        /** @var string|false $resultFunctionCall */
-        $resultFunctionCall = call_user_func_array($callback, $params);
-        if (!is_string($resultFunctionCall)) {
-            return '';
-        }
+            /** @var callable $callback */
+            $callback = $method->getClosure($controllerInstance);
+            /** @var string|false $resultFunctionCall */
+            $resultFunctionCall = call_user_func_array($callback, $params);
+            if (!is_string($resultFunctionCall)) {
+                return '';
+            }
 
-        return $resultFunctionCall;
+            return $resultFunctionCall;
+        } catch (Throwable $e) {
+            \file_put_contents("/tmp/consumer_error.log", $methodName . $routingKey . $body . \PHP_EOL, \FILE_APPEND);
+            \file_put_contents("/tmp/consumer_error.log", $e->getMessage() . \PHP_EOL, \FILE_APPEND);
+            \file_put_contents("/tmp/consumer_error.log", $e->getTraceAsString() . \PHP_EOL . \PHP_EOL, \FILE_APPEND);
+            throw $e;
+        }
     }
 
     /**
