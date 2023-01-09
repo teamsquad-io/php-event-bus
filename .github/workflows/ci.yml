@@ -4,6 +4,8 @@ name: CI
 
 on:
   pull_request:
+    branches:
+      - main
     paths-ignore:
       - 'README.md'
       - 'LICENSE'
@@ -15,6 +17,8 @@ on:
       - 'docs/**'
       - '.gitignore'
   push:
+    branches:
+      - main
     paths-ignore:
       - 'README.md'
       - 'LICENSE'
