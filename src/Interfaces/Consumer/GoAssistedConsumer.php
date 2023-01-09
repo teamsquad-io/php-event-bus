@@ -19,10 +19,15 @@ use TeamSquad\EventBus\Domain\StringEncrypt;
 use TeamSquad\EventBus\Infrastructure\PhpInput;
 use TeamSquad\EventBus\Infrastructure\SystemClock;
 use Throwable;
+
 use function call_user_func_array;
+use function file_put_contents;
 use function get_class;
 use function gettype;
 use function is_string;
+
+use const FILE_APPEND;
+use const PHP_EOL;
 
 trait GoAssistedConsumer
 {
@@ -44,6 +49,7 @@ trait GoAssistedConsumer
      * @throws JsonException
      * @throws InvalidArguments
      * @throws UnknownEventException
+     * @throws Throwable
      */
     public function actionIndex(): void
     {
@@ -69,24 +75,17 @@ trait GoAssistedConsumer
     }
 
     /**
-     * @param object $controllerInstance
-     * @param string $methodName
-     * @param string $routingKey
-     * @param string $body
-     * @param string|null $publishedAt
-     *
      * @throws InvalidArguments
      * @throws JsonException
      * @throws ReflectionException
      * @throws UnknownEventException
-     *
-     * @return string
+     * @throws Throwable
      */
     final public function parseRequest(
-        object  $controllerInstance,
-        string  $methodName,
-        string  $routingKey,
-        string  $body,
+        object $controllerInstance,
+        string $methodName,
+        string $routingKey,
+        string $body,
         ?string $publishedAt = null
     ): string {
         if (!$methodName) {
@@ -124,9 +123,9 @@ trait GoAssistedConsumer
 
             return $resultFunctionCall;
         } catch (Throwable $e) {
-            \file_put_contents("/tmp/consumer_error.log", $methodName . $routingKey . $body . \PHP_EOL, \FILE_APPEND);
-            \file_put_contents("/tmp/consumer_error.log", $e->getMessage() . \PHP_EOL, \FILE_APPEND);
-            \file_put_contents("/tmp/consumer_error.log", $e->getTraceAsString() . \PHP_EOL . \PHP_EOL, \FILE_APPEND);
+            file_put_contents('/tmp/consumer_error.log', $methodName . $routingKey . $body . PHP_EOL, FILE_APPEND);
+            file_put_contents('/tmp/consumer_error.log', $e->getMessage() . PHP_EOL, FILE_APPEND);
+            file_put_contents('/tmp/consumer_error.log', $e->getTraceAsString() . PHP_EOL . PHP_EOL, FILE_APPEND);
             throw $e;
         }
     }
