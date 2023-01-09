@@ -3,6 +3,17 @@
 name: CI
 
 on:
+  pull_request:
+    paths-ignore:
+      - 'README.md'
+      - 'LICENSE'
+      - 'CODE_OF_CONDUCT.md'
+      - 'CONTRIBUTING.md'
+      - 'CHANGELOG.md'
+      - 'CODEOWNERS'
+      - 'SECURITY.md'
+      - 'docs/**'
+      - '.gitignore'
   push:
     paths-ignore:
       - 'README.md'
