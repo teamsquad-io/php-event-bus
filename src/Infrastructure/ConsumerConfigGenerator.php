@@ -62,7 +62,7 @@ class ConsumerConfigGenerator
 
         /** @var ClassLoader $classLoader */
         $classLoader = require $this->vendorFolder . '/autoload.php';
-        /** @var array<class-string<Consumer>, string> $classMap */
+        /** @var array<class-string, string> $classMap */
         $classMap = $classLoader->getClassMap();
         if (count($classMap) < 1000) {
             throw new RuntimeException('Class map is too small, did you run composer dump-autoload -o?');

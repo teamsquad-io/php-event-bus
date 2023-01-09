@@ -11,4 +11,19 @@
             <directory name="vendor"/>
         </ignoreFiles>
     </projectFiles>
-<plugins><pluginClass class="Psalm\PhpUnitPlugin\Plugin"/></plugins></psalm>
+    <issueHandlers>
+        <UnnecessaryVarAnnotation>
+            <errorLevel type="suppress">
+                <directory name="src/"/>
+            </errorLevel>
+        </UnnecessaryVarAnnotation>
+        <RedundantCondition>
+            <errorLevel type="suppress">
+                <directory name="src/"/>
+            </errorLevel>
+        </RedundantCondition>
+    </issueHandlers>
+    <plugins>
+        <pluginClass class="Psalm\PhpUnitPlugin\Plugin"/>
+    </plugins>
+</psalm>

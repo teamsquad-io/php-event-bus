@@ -105,7 +105,9 @@ class AutoloaderEventMapGenerator implements EventMapGenerator
                 if ($class !== Listen::class &&
                     $reflect->isInstantiable() &&
                     $reflect->implementsInterface(Event::class)) {
-                    $eventName = $reflect->newInstanceWithoutConstructor()->eventName();
+                    /** @var Event $event */
+                    $event = $reflect->newInstanceWithoutConstructor();
+                    $eventName = $event->eventName();
                     $events[$eventName] = $class;
                     foreach ($annotationReader->getClassAnnotations($reflect) as $annotation) {
                         if ($annotation instanceof RenamedEvent && $annotation->old !== null) {

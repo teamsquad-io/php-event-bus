@@ -8,7 +8,12 @@ use PhpCsFixer\Finder;
 $finder = Finder::create()
     ->files()
     ->in(__DIR__ . '/src')
-    ->in(__DIR__ . '/tests');
+    ->in(__DIR__ . '/tests')
+    ->exclude(__DIR__ . '/tests/Utils')
+    ->ignoreDotFiles(true)
+    ->ignoreVCS(true)
+    ->ignoreUnreadableDirs();
+
 
 return (new Config())
     ->setFinder($finder)
