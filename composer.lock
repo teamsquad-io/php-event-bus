@@ -322,16 +322,16 @@
         },
         {
             "name": "php-amqplib/php-amqplib",
-            "version": "v3.5.1",
+            "version": "v3.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-amqplib/php-amqplib.git",
-                "reference": "2c565476269889544e020d76da0cdf3471675b52"
+                "reference": "703eef998946f4972e630c3e3d827f7cf020fe68"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-amqplib/php-amqplib/zipball/2c565476269889544e020d76da0cdf3471675b52",
-                "reference": "2c565476269889544e020d76da0cdf3471675b52",
+                "url": "https://api.github.com/repos/php-amqplib/php-amqplib/zipball/703eef998946f4972e630c3e3d827f7cf020fe68",
+                "reference": "703eef998946f4972e630c3e3d827f7cf020fe68",
                 "shasum": ""
             },
             "require": {
@@ -397,22 +397,22 @@
             ],
             "support": {
                 "issues": "https://github.com/php-amqplib/php-amqplib/issues",
-                "source": "https://github.com/php-amqplib/php-amqplib/tree/v3.5.1"
+                "source": "https://github.com/php-amqplib/php-amqplib/tree/v3.5.2"
             },
-            "time": "2023-01-20T01:02:33+00:00"
+            "time": "2023-03-01T18:03:56+00:00"
         },
         {
             "name": "phpseclib/phpseclib",
-            "version": "3.0.18",
+            "version": "3.0.19",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpseclib/phpseclib.git",
-                "reference": "f28693d38ba21bb0d9f0c411ee5dae2b178201da"
+                "reference": "cc181005cf548bfd8a4896383bb825d859259f95"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/f28693d38ba21bb0d9f0c411ee5dae2b178201da",
-                "reference": "f28693d38ba21bb0d9f0c411ee5dae2b178201da",
+                "url": "https://api.github.com/repos/phpseclib/phpseclib/zipball/cc181005cf548bfd8a4896383bb825d859259f95",
+                "reference": "cc181005cf548bfd8a4896383bb825d859259f95",
                 "shasum": ""
             },
             "require": {
@@ -493,7 +493,7 @@
             ],
             "support": {
                 "issues": "https://github.com/phpseclib/phpseclib/issues",
-                "source": "https://github.com/phpseclib/phpseclib/tree/3.0.18"
+                "source": "https://github.com/phpseclib/phpseclib/tree/3.0.19"
             },
             "funding": [
                 {
@@ -509,7 +509,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-12-17T18:26:50+00:00"
+            "time": "2023-03-05T17:13:09+00:00"
         },
         {
             "name": "psr/cache",
