@@ -7,3 +7,4 @@
 *.cache
 tests/Unit/Infrastructure/eventMapFile.php
 auto_*.php
+tests/SampleRepo/data/

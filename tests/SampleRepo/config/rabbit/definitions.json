@@ -40,7 +40,7 @@
   "queues": [],
   "exchanges": [
     {
-      "name": "test.eventBus",
+      "name": "teamsquad.eventBus",
       "vhost": "/",
       "type": "direct",
       "durable": true,

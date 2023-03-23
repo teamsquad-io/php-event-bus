@@ -5,19 +5,31 @@ declare(strict_types=1);
 use TeamSquad\EventBus\Domain\Consumer;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
-$controllerMap = require __DIR__ . '/SampleConfigPath/auto_controllerMap.php';
-$routes = require __DIR__ . '/SampleConfigPath/auto_routes.php';
-$consumerConf = require __DIR__ . '/SampleConfigPath/auto_consumerConf.php';
-
-die(var_export($consumerConf, true));
+$controllerMap = require __DIR__ . '/config/auto_controllerMap.php';
+$routes = require __DIR__ . '/config/auto_routes.php';
+$consumers = require __DIR__ . '/config/auto_consumerConf.php';
 
 if (empty($controllerMap)) {
     throw new RuntimeException('No controllers found');
 }
 
 $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
-if ($requestUri === '/') {
-    echo json_encode($consumerConf, JSON_THROW_ON_ERROR);
+if ($requestUri === '/amqpconf') {
+    echo json_encode(
+        [
+            'amqp'      => [
+                'url' => 'amqp://guest:guest@rabbitmq:5672/' . urlencode('/'),
+                'qos' => [
+                    'enabled'        => true,
+                    'prefetch_count' => 1,
+                    'prefetch_size'  => 0,
+                    'global'         => false,
+                ],
+            ],
+            'consumers' => $consumers,
+        ],
+        JSON_THROW_ON_ERROR
+    );
 } else {
     foreach ($routes as $route) {
         if ($route['pattern'] === $requestUri) {

@@ -5,7 +5,7 @@ services:
       context: .
       dockerfile: Dockerfile
     environment:
-      - rabbit_exchange=test.eventBus
+      - rabbit_exchange=teamsquad.eventBus
       - rabbit_event_listen=io.test.testservice
       - rabbit_host=rabbitmq
       - rabbit_port=5672
@@ -34,6 +34,6 @@ services:
       - "15672:15672"
       - "5672:5672"
     volumes:
-      - ./data/rabbitmq:/var/lib/rabbitmq:rw
-      - ./config/devel/rabbit/definitions.json:/opt/definitions.json:ro
-      - ./config/devel/rabbit/rabbitmq.config:/etc/rabbitmq/rabbitmq.config:ro
+      - ./tests/SampleRepo/data/rabbitmq:/var/lib/rabbitmq:rw
+      - ./tests/SampleRepo/config/rabbit/definitions.json:/opt/definitions.json:ro
+      - ./tests/SampleRepo/config/rabbit/rabbitmq.config:/etc/rabbitmq/rabbitmq.config:ro

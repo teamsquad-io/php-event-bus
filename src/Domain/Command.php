@@ -6,11 +6,16 @@ namespace TeamSquad\EventBus\Domain;
 
 abstract class Command
 {
-    protected string $queueToReply;
+    protected ?string $queueToReply = null;
 
     public function setQueueToReply(string $queueName): void
     {
         $this->queueToReply = $queueName;
+    }
+
+    public function getQueueToReply(): ?string
+    {
+        return $this->queueToReply;
     }
 
     abstract public function commandName(): string;

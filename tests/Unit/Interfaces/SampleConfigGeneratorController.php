@@ -25,17 +25,19 @@ class SampleConfigGeneratorController
     {
         $sut = new ConsumerConfigGenerator(
             __DIR__ . '/../../../vendor',
-            new AutoloadConfig([
-                                   'consumer_queue_listen_name'          => 'teamsquad.event.listen',
-                                   'event_bus_exchange_name'             => 'teamsquad.eventBus',
-                                   'configuration_path'                  => __DIR__ . '/../../SampleRepo/SampleConfigPath',
-                                   AutoloadConfig::WHITE_LIST_CONFIG_KEY => [
-                    'TeamSquad\\',
-                ],
-                                   AutoloadConfig::BLACK_LIST_CONFIG_KEY => [
-                    'Composer\\Plugin\\',
-                ],
-            ])
+            new AutoloadConfig(
+                [
+                    'consumer_queue_listen_name'          => 'teamsquad.event.listen',
+                    'event_bus_exchange_name'             => 'teamsquad.eventBus',
+                    'configuration_path'                  => __DIR__ . '/../../SampleRepo/config',
+                    AutoloadConfig::WHITE_LIST_CONFIG_KEY => [
+                        'TeamSquad\\',
+                    ],
+                    AutoloadConfig::BLACK_LIST_CONFIG_KEY => [
+                        'Composer\\Plugin\\',
+                    ],
+                ]
+            )
         );
         return $sut->generate();
     }
