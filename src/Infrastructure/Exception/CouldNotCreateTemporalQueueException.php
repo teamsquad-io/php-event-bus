@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace TeamSquad\EventBus\Infrastructure\Exception;
 
-class CouldNotCreateTemporalQueueException extends \Exception
-{
+use Exception;
 
+class CouldNotCreateTemporalQueueException extends Exception
+{
 }

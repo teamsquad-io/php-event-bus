@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace TeamSquad\Tests\Unit\Interfaces;
 
 use League\Tactician\CommandBus;
@@ -11,7 +13,7 @@ use TeamSquad\Tests\SampleVideoPermissionChangeCommand;
 class SampleCommandHandlerController
 {
     private CommandBus $commandBus;
-    
+
     public function __construct()
     {
         $this->commandBus = new CommandBus([
@@ -32,7 +34,7 @@ class SampleCommandHandlerController
             ),
         ]);
     }
-    
+
     public function handleSampleVideoPermissionsChange(SampleVideoPermissionChangeCommand $command): void
     {
         $this->commandBus->handle($command);

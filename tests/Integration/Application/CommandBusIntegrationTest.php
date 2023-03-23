@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace TeamSquad\Tests\Integration\Application;
 
 use League\Tactician\CommandBus;
@@ -9,7 +11,7 @@ use TeamSquad\EventBus\Infrastructure\Rabbit;
 
 class CommandBusIntegrationTest extends TestCase
 {
-    public function testCommandBus(): void
+    public function test_command_bus(): void
     {
         $channel = 'test';
         $queueName = 'test';
@@ -32,7 +34,7 @@ class CommandBusIntegrationTest extends TestCase
                 ),
             ]
         );
-        
+
         $commandBus->handle();
     }
 }

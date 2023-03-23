@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use TeamSquad\EventBus\Domain\Consumer;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
@@ -14,10 +16,10 @@ $requestUri = $_SERVER['REQUEST_URI'] ?? '/';
 foreach ($routes as $route) {
     if ($route['pattern'] === $requestUri) {
         $controller = $controllerMap[$route['route']];
-        if (!$controller || !is_string($controller)) {
+        if (!$controller || !\is_string($controller)) {
             throw new RuntimeException(sprintf('Controller not found for route %s', $route['route']));
         }
-        
+
         $controller = explode('::', $controller);
         /** @var class-string<Consumer> $class */
         $class = $controller[0];
@@ -27,6 +29,3 @@ foreach ($routes as $route) {
         break;
     }
 }
-
-
-
