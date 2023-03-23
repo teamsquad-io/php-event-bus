@@ -6,7 +6,7 @@ namespace TeamSquad\Tests;
 
 use TeamSquad\EventBus\Domain\Command;
 
-class SampleVideoPermissionChangeCommand implements Command
+class SampleVideoPermissionChangeCommand extends Command
 {
     private bool $canView;
     private string $userId;

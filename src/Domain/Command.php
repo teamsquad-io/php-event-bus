@@ -4,19 +4,26 @@ declare(strict_types=1);
 
 namespace TeamSquad\EventBus\Domain;
 
-interface Command
+abstract class Command
 {
-    public function commandName(): string;
+    protected string $queueToReply;
+
+    public function setQueueToReply(string $queueName): void
+    {
+        $this->queueToReply = $queueName;
+    }
+
+    abstract public function commandName(): string;
 
     /**
      * @param array<string, mixed> $array
      *
      * @return Command
      */
-    public static function fromArray(array $array): self;
+    abstract public static function fromArray(array $array): self;
 
     /**
      * @return array<string, mixed>
      */
-    public function toArray(): array;
+    abstract public function toArray(): array;
 }

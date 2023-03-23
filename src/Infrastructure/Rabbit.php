@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TeamSquad\EventBus\Infrastructure;
 
+use Closure;
 use DomainException;
 use Exception;
 use JsonException;
@@ -14,6 +15,7 @@ use PhpAmqpLib\Wire\AMQPTable;
 use RuntimeException;
 use TeamSquad\EventBus\Domain\Secrets;
 use TeamSquad\EventBus\Infrastructure\Exception\CouldNotCreateTemporalQueueException;
+
 use Throwable;
 
 use function array_key_exists;
@@ -139,7 +141,7 @@ class Rabbit
     /**
      * @throws CouldNotCreateTemporalQueueException
      */
-    public function createTemporalQueue(string $exchange): void
+    public function createTemporalQueue(string $exchange): string
     {
         $channel = $this->getChannel();
         if (!$channel) {
@@ -156,6 +158,18 @@ class Rabbit
             throw new CouldNotCreateTemporalQueueException('Invalid queue name in queue_declare response: ' . var_export($queueCreatedResult, true));
         }
         $channel->queue_bind($queueName, $exchange);
+
+        return $queueName;
+    }
+
+    public function consume(string $queueName, string $consumerTag, bool $noLocal, bool $noAck, bool $exclusive, bool $noWait, Closure $closure): void
+    {
+        $chan = $this->getChannel();
+        if (!$chan) {
+            throw new RuntimeException('No channel');
+        }
+
+        $chan->basic_consume($queueName, $consumerTag, $noLocal, $noAck, $exclusive, $noWait, $closure);
     }
 
     /**

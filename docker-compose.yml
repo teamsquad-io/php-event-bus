@@ -24,7 +24,7 @@ services:
     environment:
       - AMQP2FCGI_WORKERS=1
       - AMQP2FCGI_FCGI_ENDPOINT=consumers:9000
-      - AMQP2FCGI_FCGI_FILE=/app/src/tests/Utils/index.php
+      - AMQP2FCGI_FCGI_FILE=/app/tests/SampleRepo/index.php
       - AMQP2FCGI_LOGGER_DEVELOPMENT=true
     restart: on-failure
 
