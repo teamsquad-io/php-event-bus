@@ -49,7 +49,7 @@ class ConsumerConfigGeneratorTest extends TestCase
             __DIR__ . '/../../../vendor',
             new AutoloadConfig([
                 'consumer_queue_listen_name' => 'teamsquad.event.listen',
-                'event_bus_exchange_name'    => 'teamsquad.event_bus',
+                'event_bus_exchange_name'    => 'teamsquad.eventBus',
                 'configuration_path'         => __DIR__ . '/../config',
                 'white_list'                 => [
                     'TeamSquad\\',
@@ -70,7 +70,7 @@ class ConsumerConfigGeneratorTest extends TestCase
                     'unique'      => false,
                     'url'         => '/_/tests-sampleconsumer',
                     'queue'       => 'teamsquad.event.listen.Tests.SampleConsumer.listenSampleEvent',
-                    'exchange'    => 'teamsquad.event_bus',
+                    'exchange'    => 'teamsquad.eventBus',
                     'function'    => 'listenSampleEvent',
                     'params'      => [
                         'passive'     => false,

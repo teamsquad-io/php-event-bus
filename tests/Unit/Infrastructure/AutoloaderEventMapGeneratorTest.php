@@ -125,10 +125,10 @@ class AutoloaderEventMapGeneratorTest extends TestCase
             __DIR__ . '/../../../vendor',
             self::EVENT_MAP_FILE_PATH,
             array_merge([
-                AutoloadConfig::CONFIGURATION_PATH_KEY    => __DIR__ . '/../../Utils/SampleConfigPath',
-                AutoloadConfig::EVENT_BUS_EXCHANGE_NAME_KEY    => 'vts.eventBus',
-                AutoloadConfig::CONSUMER_QUEUE_LISTEN_NAME_KEY => 'consumer.queue.listen',
-                AutoloadConfig::WHITE_LIST_CONFIG_KEY          => 'TeamSquad',
+                            AutoloadConfig::CONFIGURATION_PATH_KEY    => __DIR__ . '/../../SampleRepo/SampleConfigPath',
+                            AutoloadConfig::EVENT_BUS_EXCHANGE_NAME_KEY    => 'vts.eventBus',
+                            AutoloadConfig::CONSUMER_QUEUE_LISTEN_NAME_KEY => 'consumer.queue.listen',
+                            AutoloadConfig::WHITE_LIST_CONFIG_KEY          => 'TeamSquad',
             ], $configuration)
         );
     }

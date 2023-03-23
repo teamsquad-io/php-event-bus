@@ -74,7 +74,7 @@ class AutoloadConfig
     public function eventBusExchangeName(): string
     {
         /** @var string $exchangeName */
-        $exchangeName = $this->config[self::EVENT_BUS_EXCHANGE_NAME_KEY] ?? 'my_company.event_bus';
+        $exchangeName = $this->config[self::EVENT_BUS_EXCHANGE_NAME_KEY] ?? 'my_company.eventBus';
         return $exchangeName;
     }
 

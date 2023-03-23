@@ -4,19 +4,36 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: php-event-bus
     environment:
-      DEBUG: "*"
-    ports:
-      - "8999:80"
+      - rabbit_exchange=test.eventBus
+      - rabbit_event_listen=io.test.testservice
+      - rabbit_host=rabbitmq
+      - rabbit_port=5672
+      - rabbit_user=guest
+      - rabbit_pass=guest
+    volumes:
+      - .:/app
+
   amqp2fcgi:
-    image: registry.vtsmedia.com/iflmedia/amqp2fcgi:0.2.5
+    image: usregistry.vtsmedia.com/iflmedia/amqp2fcgi:1.0.9
+    ports:
+      - "1111:1111"
+    depends_on:
+      - consumers
+      - rabbitmq
     environment:
       - AMQP2FCGI_WORKERS=1
-      - AMQP2FCGI_FCGI_ENDPOINT=consumers_v2:9000
+      - AMQP2FCGI_FCGI_ENDPOINT=consumers:9000
+      - AMQP2FCGI_FCGI_FILE=/app/src/tests/Utils/index.php
       - AMQP2FCGI_LOGGER_DEVELOPMENT=true
+    restart: on-failure
+
   rabbitmq:
     image: rabbitmq:3-management-alpine
     ports:
       - "15672:15672"
       - "5672:5672"
+    volumes:
+      - ./data/rabbitmq:/var/lib/rabbitmq:rw
+      - ./config/devel/rabbit/definitions.json:/opt/definitions.json:ro
+      - ./config/devel/rabbit/rabbitmq.config:/etc/rabbitmq/rabbitmq.config:ro

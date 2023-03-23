@@ -13,6 +13,7 @@ use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Wire\AMQPTable;
 use RuntimeException;
 use TeamSquad\EventBus\Domain\Secrets;
+use TeamSquad\EventBus\Infrastructure\Exception\CouldNotCreateTemporalQueueException;
 use Throwable;
 
 use function array_key_exists;
@@ -184,5 +185,27 @@ class Rabbit
             ++$retries;
             return $this->connect($retries);
         }
+    }
+    
+    /**
+     * @throws CouldNotCreateTemporalQueueException
+     */
+    public function createTemporalQueue(string $exchange): void
+    {
+        $channel = $this->getChannel();
+        if (!$channel) {
+            throw new RuntimeException('No channel');
+        }
+    
+        $queueCreatedResult = $channel->queue_declare("", false, true, false, false);
+        if (!$queueCreatedResult || !isset($queueCreatedResult[0])) {
+            throw new CouldNotCreateTemporalQueueException('No queue created');
+        }
+        
+        $queueName = $queueCreatedResult[0];
+        if (!$queueName || !is_string($queueName)) {
+            throw new CouldNotCreateTemporalQueueException('Invalid queue name in queue_declare response: ' . var_export($queueCreatedResult, true));
+        }
+        $channel->queue_bind($queueName, $exchange);
     }
 }
