@@ -6,7 +6,7 @@ namespace TeamSquad\Tests\Unit\Application\CommandHandler;
 
 use League\Tactician\CommandBus;
 use PHPUnit\Framework\TestCase;
-use TeamSquad\Tests\SampleVideoPermissionChangeCommand;
+use TeamSquad\EventBus\SampleRepo\SampleVideoPermissionChangeCommand;
 
 class CommandBusTest extends TestCase
 {

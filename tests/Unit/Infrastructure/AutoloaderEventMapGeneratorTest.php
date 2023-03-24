@@ -13,8 +13,8 @@ use TeamSquad\EventBus\Domain\Exception\InvalidArguments;
 use TeamSquad\EventBus\Domain\Exception\UnknownEventException;
 use TeamSquad\EventBus\Infrastructure\AutoloadConfig;
 use TeamSquad\EventBus\Infrastructure\AutoloaderEventMapGenerator;
-use TeamSquad\Tests\SampleEvent;
-use TeamSquad\Tests\SampleSecureEvent;
+use TeamSquad\EventBus\SampleRepo\SampleEvent;
+use TeamSquad\EventBus\SampleRepo\SampleSecureEvent;
 
 class AutoloaderEventMapGeneratorTest extends TestCase
 {

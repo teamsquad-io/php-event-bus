@@ -23,7 +23,6 @@ use Throwable;
 use function call_user_func_array;
 use function file_put_contents;
 use function get_class;
-use function gettype;
 use function is_string;
 
 use const FILE_APPEND;
@@ -54,13 +53,13 @@ trait GoAssistedConsumer
     public function actionIndex(): void
     {
         $methodName = $_SERVER['HTTP_FUNCTION'];
-        if (!is_string($methodName)) {
-            throw new InvalidArguments(sprintf('Invalid method name. Must be string. Got: %s', gettype($methodName)));
+        if (!$methodName) {
+            throw new InvalidArguments('Empty method name');
         }
 
         $routingKey = $_SERVER['HTTP_ROUTING_KEY'];
-        if (!is_string($routingKey)) {
-            throw new InvalidArguments(sprintf('Invalid routing key. Must be string. Got: %s', gettype($routingKey)));
+        if (!$routingKey) {
+            throw new InvalidArguments('Empty routing key');
         }
 
         $publishedAt = $_SERVER['HTTP_PUBLISHED_AT'] ?? null;

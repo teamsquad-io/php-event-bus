@@ -9,10 +9,10 @@ namespace TeamSquad\Tests\Unit\Interfaces\Consumer;
 use PHPUnit\Framework\TestCase;
 use TeamSquad\EventBus\Infrastructure\SimpleEncrypt;
 use TeamSquad\EventBus\Infrastructure\SimpleEventMapGenerator;
-use TeamSquad\Tests\SampleConsumer;
-use TeamSquad\Tests\SampleEvent;
-use TeamSquad\Tests\SampleSecureEvent;
-use TeamSquad\Tests\Unit\Interfaces\SampleController;
+use TeamSquad\EventBus\SampleRepo\SampleConsumer;
+use TeamSquad\EventBus\SampleRepo\SampleController;
+use TeamSquad\EventBus\SampleRepo\SampleEvent;
+use TeamSquad\EventBus\SampleRepo\SampleSecureEvent;
 
 final class GoAssistedConsumerTest extends TestCase
 {

@@ -12,6 +12,7 @@ use ReflectionException;
 use ReflectionMethod;
 use ReflectionNamedType;
 use RuntimeException;
+use TeamSquad\EventBus\Domain\Command;
 use TeamSquad\EventBus\Domain\Consumer;
 use TeamSquad\EventBus\Domain\Event;
 use TeamSquad\EventBus\Domain\Exception\FileNotFound;
@@ -89,24 +90,33 @@ class ConsumerConfigGenerator
                 $consumerName = get_class($reflectClass->newInstanceWithoutConstructor());
                 $controller = $this->classUniqueUrl($class);
                 foreach ($methods as $method) {
-                    if ($method->getNumberOfRequiredParameters() > 0 && strpos($method->getName(), 'listen') === 0) {
-                        $eventClass = $this->extractEventClassFromMethod($method);
-                        if (!$eventClass) {
+                    if ($method->getNumberOfRequiredParameters() > 0 && ($this->isListen($method) || $this->isHandle($method))) {
+                        $firstParameter = $this->extractEventClassFromMethod($method);
+                        if (!$firstParameter) {
                             continue;
                         }
 
-                        if ($eventClass->implementsInterface(Event::class) && $eventClass->isInstantiable()) {
-                            /** @var Event $evt */
-                            $evt = $eventClass->newInstanceWithoutConstructor();
-                            $rk = [$evt->eventName()];
-                            foreach ($annotationReader->getClassAnnotations($eventClass) as $annotation) {
+                        if ($firstParameter->isInstantiable() && ($this->isEvent($firstParameter) || $this->isCommand($firstParameter))) {
+                            /** @var Event|Command $evt */
+                            $evt = $firstParameter->newInstanceWithoutConstructor();
+                            $routingKey = [];
+                            if ($evt instanceof Event) {
+                                $routingKey = [
+                                    $evt->eventName(),
+                                ];
+                            } elseif ($evt instanceof Command) {
+                                $routingKey = [
+                                    $evt->commandName(),
+                                ];
+                            }
+                            foreach ($annotationReader->getClassAnnotations($firstParameter) as $annotation) {
                                 if ($annotation instanceof RenamedEvent) {
-                                    $rk[] = $annotation->old;
+                                    $routingKey[] = $annotation->old;
                                 }
                             }
                             $consumers[] = [
                                 'name'        => $consumerName . '::' . $method->getName(),
-                                'routing_key' => $rk,
+                                'routing_key' => $routingKey,
                                 'unique'      => false,
                                 'url'         => $this->generateUniqueUrl($method),
                                 'queue'       => $this->generateQueueName($method),
@@ -336,5 +346,35 @@ class ConsumerConfigGenerator
             $reason = 'and Blacklist is ' . implode(', ', $this->config->getBlackList());
         }
         return $reason;
+    }
+
+    private function isListen(ReflectionMethod $method): bool
+    {
+        return strpos($method->getName(), 'listen') === 0;
+    }
+
+    private function isHandle(ReflectionMethod $method): bool
+    {
+        return strpos($method->getName(), 'handle') === 0;
+    }
+
+    /**
+     * @param ReflectionClass<Event|object> $firstParameter
+     *
+     * @return bool
+     */
+    private function isEvent(ReflectionClass $firstParameter): bool
+    {
+        return $firstParameter->implementsInterface(Event::class);
+    }
+
+    /**
+     * @param ReflectionClass<Command|object> $firstParameter
+     *
+     * @return bool
+     */
+    private function isCommand(ReflectionClass $firstParameter): bool
+    {
+        return $firstParameter->implementsInterface(Command::class);
     }
 }

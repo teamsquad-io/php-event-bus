@@ -2,12 +2,15 @@
 
 declare(strict_types=1);
 
-namespace TeamSquad\Tests;
+namespace TeamSquad\EventBus\SampleRepo;
 
+use TeamSquad\EventBus\Domain\AsyncCommand;
 use TeamSquad\EventBus\Domain\Command;
 
-class SampleVideoPermissionChangeCommand extends Command
+class SampleVideoPermissionChangeCommand implements Command
 {
+    use AsyncCommand;
+
     private bool $canView;
     private string $userId;
 

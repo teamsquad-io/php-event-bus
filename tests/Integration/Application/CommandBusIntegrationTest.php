@@ -6,9 +6,10 @@ namespace TeamSquad\Tests\Integration\Application;
 
 use League\Tactician\CommandBus;
 use PHPUnit\Framework\TestCase;
+use TeamSquad\EventBus\Infrastructure\AsyncSendEventMiddleware;
 use TeamSquad\EventBus\Infrastructure\MemorySecrets;
 use TeamSquad\EventBus\Infrastructure\Rabbit;
-use TeamSquad\Tests\SampleVideoPermissionChangeCommand;
+use TeamSquad\EventBus\SampleRepo\SampleVideoPermissionChangeCommand;
 
 class CommandBusIntegrationTest extends TestCase
 {

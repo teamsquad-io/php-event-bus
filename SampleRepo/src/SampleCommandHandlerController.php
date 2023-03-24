@@ -2,13 +2,13 @@
 
 declare(strict_types=1);
 
-namespace TeamSquad\Tests\Unit\Interfaces;
+namespace TeamSquad\EventBus\SampleRepo;
 
 use League\Tactician\CommandBus;
+use TeamSquad\EventBus\Infrastructure\AsyncSendEventMiddleware;
 use TeamSquad\EventBus\Infrastructure\MemorySecrets;
 use TeamSquad\EventBus\Infrastructure\Rabbit;
-use TeamSquad\Tests\Integration\Application\AsyncSendEventMiddleware;
-use TeamSquad\Tests\SampleVideoPermissionChangeCommand;
+use TeamSquad\EventBus\SampleRepo\SampleVideoPermissionChangeCommand;
 
 class SampleCommandHandlerController
 {

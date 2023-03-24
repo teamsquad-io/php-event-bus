@@ -22,7 +22,8 @@
     },
     "autoload": {
         "psr-4": {
-            "TeamSquad\\EventBus\\": "src/"
+            "TeamSquad\\EventBus\\": "src/",
+            "TeamSquad\\EventBus\\SampleRepo\\": "SampleRepo/src/"
         }
     },
     "autoload-dev": {
@@ -47,7 +48,7 @@
         "csrun": "./tools/php-cs-fixer/vendor/bin/php-cs-fixer fix --dry-run || ./tools/php-cs-fixer/vendor/bin/php-cs-fixer fix",
         "generate-consumer-config": [
             "composer dump-autoload -o",
-            "TeamSquad\\Tests\\Unit\\Interfaces\\SampleConfigGeneratorController::generateConsumerConfig"
+            "TeamSquad\\EventBus\\SampleRepo\\SampleConfigGeneratorController::generateConsumerConfig"
         ]
     },
     "config": {

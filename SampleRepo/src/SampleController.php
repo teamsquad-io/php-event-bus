@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace TeamSquad\Tests\Unit\Interfaces;
+namespace TeamSquad\EventBus\SampleRepo;
 
 use JsonException;
-use TeamSquad\Tests\SampleEvent;
-use TeamSquad\Tests\SampleSecureEvent;
+use TeamSquad\EventBus\SampleRepo\SampleEvent;
+use TeamSquad\EventBus\SampleRepo\SampleSecureEvent;
 
 class SampleController
 {

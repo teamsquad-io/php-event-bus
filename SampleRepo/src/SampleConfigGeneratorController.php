@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TeamSquad\Tests\Unit\Interfaces;
+namespace TeamSquad\EventBus\SampleRepo;
 
 use Doctrine\Common\Annotations\AnnotationException;
 use ReflectionException;
@@ -11,6 +11,9 @@ use TeamSquad\EventBus\Domain\Exception\InvalidArguments;
 use TeamSquad\EventBus\Infrastructure\AutoloadConfig;
 use TeamSquad\EventBus\Infrastructure\ConsumerConfigGenerator;
 
+/**
+ * This is a sample class to generate the consumers, controllers and routes configuration files for the sample repo.
+ */
 class SampleConfigGeneratorController
 {
     /**
@@ -24,12 +27,12 @@ class SampleConfigGeneratorController
     public static function generateConsumerConfig(): array
     {
         $sut = new ConsumerConfigGenerator(
-            __DIR__ . '/../../../vendor',
+            __DIR__ . '/../../vendor',
             new AutoloadConfig(
                 [
                     'consumer_queue_listen_name'          => 'teamsquad.event.listen',
                     'event_bus_exchange_name'             => 'teamsquad.eventBus',
-                    'configuration_path'                  => __DIR__ . '/../../SampleRepo/config',
+                    'configuration_path'                  => __DIR__ . '/../config',
                     AutoloadConfig::WHITE_LIST_CONFIG_KEY => [
                         'TeamSquad\\',
                     ],
