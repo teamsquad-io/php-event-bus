@@ -26,7 +26,7 @@ class CommandBusIntegrationTest extends TestCase
                         new MemorySecrets(
                             [
                                 'rabbit_host'  => 'localhost',
-                                'rabbit_port'  => 5672,
+                                'rabbit_port'  => '5672',
                                 'rabbit_user'  => 'guest',
                                 'rabbit_pass'  => 'guest',
                                 'rabbit_vhost' => '/',

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 use TeamSquad\EventBus\Domain\Consumer;
 
-require_once __DIR__ . '/../../vendor/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 $controllerMap = require __DIR__ . '/config/auto_controllerMap.php';
 $routes = require __DIR__ . '/config/auto_routes.php';
 $consumers = require __DIR__ . '/config/auto_consumerConf.php';
