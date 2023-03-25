@@ -9,7 +9,6 @@ use TeamSquad\EventBus\Domain\EventMapGenerator;
 use TeamSquad\EventBus\Domain\StringEncrypt;
 use TeamSquad\EventBus\Infrastructure\Rabbit;
 use TeamSquad\EventBus\Interfaces\Consumer\GoAssistedConsumer;
-use TeamSquad\EventBus\SampleRepo\SampleVideoPermissionChangeCommand;
 
 /**
  * This is a sample command handler consumer

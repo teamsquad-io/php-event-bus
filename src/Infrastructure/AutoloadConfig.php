@@ -55,6 +55,51 @@ class AutoloadConfig
     }
 
     /**
+     * @param string $consumerQueueListenName
+     * @param string $eventBusExchangeName
+     * @param string $configurationPath
+     * @param array<string> $whiteList
+     * @param array<string> $blackList
+     * @param array<string, array<string>|string> $extraConfiguration
+     *
+     * @psalm-param array{
+     *      consumer_queue_listen_name?: string,
+     *      event_bus_exchange_name?: string,
+     *      configuration_path?: string,
+     *      white_list?: array<string>|string,
+     *      black_list?: array<string>|string
+     * } $extraConfiguration
+     *
+     * @throws InvalidArguments
+     *
+     * @return self
+     */
+    public static function create(
+        string $consumerQueueListenName,
+        string $eventBusExchangeName,
+        string $configurationPath,
+        array $whiteList = [],
+        array $blackList = [],
+        array $extraConfiguration = []
+    ): self {
+        $config = [
+            self::CONSUMER_QUEUE_LISTEN_NAME_KEY => $consumerQueueListenName,
+            self::EVENT_BUS_EXCHANGE_NAME_KEY => $eventBusExchangeName,
+            self::CONFIGURATION_PATH_KEY => $configurationPath,
+        ];
+        if (!empty($whiteList)) {
+            $config[self::WHITE_LIST_CONFIG_KEY] = $whiteList;
+        }
+        if (!empty($blackList)) {
+            $config[self::BLACK_LIST_CONFIG_KEY] = $blackList;
+        }
+
+        return new self(
+            array_merge($config, $extraConfiguration)
+        );
+    }
+
+    /**
      * Prefix to be added to the consumer that will be created by Amqp2fcgi
      *
      * @return string
@@ -162,6 +207,14 @@ class AutoloadConfig
     {
         $blackList = $this->getBlackList();
         return !empty($blackList);
+    }
+
+    /**
+     * @return array<string, array<string>|string>
+     */
+    public function toArray(): array
+    {
+        return $this->config;
     }
 
     /**

@@ -18,15 +18,14 @@ class SampleCommandHandlerController
     {
         $this->commandBus = new CommandBus([
             new AsyncSendEventMiddleware(
-                'test',
-                'test',
+                'teamsquad.eventBus',
                 Rabbit::getInstance(
                     new MemorySecrets(
                         [
                             'rabbit_host'  => 'localhost',
-                            'rabbit_port'  => '',
-                            'rabbit_user'  => '',
-                            'rabbit_pass'  => '',
+                            'rabbit_port'  => '5672',
+                            'rabbit_user'  => 'guest',
+                            'rabbit_pass'  => 'guest',
                             'rabbit_vhost' => '/',
                         ]
                     )

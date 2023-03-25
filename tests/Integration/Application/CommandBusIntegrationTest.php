@@ -15,13 +15,10 @@ class CommandBusIntegrationTest extends TestCase
 {
     public function test_command_bus(): void
     {
-        $channel = 'test';
-        $queueName = 'test';
         $commandBus = new CommandBus(
             [
                 new AsyncSendEventMiddleware(
-                    $channel,
-                    $queueName,
+                    'teamsquad.eventBus',
                     Rabbit::getInstance(
                         new MemorySecrets(
                             [

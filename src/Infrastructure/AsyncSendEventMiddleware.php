@@ -14,14 +14,12 @@ use TeamSquad\EventBus\Infrastructure\Exception\CouldNotCreateTemporalQueueExcep
 
 class AsyncSendEventMiddleware implements Middleware
 {
-    private string $routingKey;
     private string $exchangeName;
     private Rabbit $rabbit;
 
-    public function __construct(string $exchangeName, string $routingKey, Rabbit $rabbit)
+    public function __construct(string $exchangeName, Rabbit $rabbit)
     {
         $this->exchangeName = $exchangeName;
-        $this->routingKey = $routingKey;
         $this->rabbit = $rabbit;
     }
 
@@ -63,7 +61,7 @@ class AsyncSendEventMiddleware implements Middleware
              * @var array<array-key, mixed> $toArray
              */
             $toArray = $command->toArray();
-            $this->rabbit->publish($this->exchangeName, $this->routingKey, $toArray);
+            $this->rabbit->publish($this->exchangeName, $command->commandName(), $toArray);
             return $deferred->promise();
         }
         $deferred->resolve();

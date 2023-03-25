@@ -3,6 +3,10 @@
 declare(strict_types=1);
 
 use TeamSquad\EventBus\Domain\Consumer;
+use TeamSquad\EventBus\Domain\EventMapGenerator;
+use TeamSquad\EventBus\Domain\StringEncrypt;
+use TeamSquad\EventBus\Infrastructure\AutoloaderEventMapGenerator;
+use TeamSquad\EventBus\Infrastructure\Rabbit;
 
 require_once __DIR__ . '/../vendor/autoload.php';
 $controllerMap = require __DIR__ . '/config/auto_controllerMap.php';
@@ -33,16 +37,18 @@ if ($requestUri === '/amqpconf') {
 } else {
     foreach ($routes as $route) {
         if ($route['pattern'] === $requestUri) {
-            $controller = $controllerMap[$route['route']];
-            if (!$controller || !\is_string($controller)) {
+            [$controller, $method] = explode('/', $route['route']);
+            /** @var class-string<Consumer> $controller */
+            $controller = $controllerMap[$controller];
+            if (!$controller || !is_string($controller)) {
                 throw new RuntimeException(sprintf('Controller not found for route %s', $route['route']));
             }
-
-            $controller = explode('::', $controller);
-            /** @var class-string<Consumer> $class */
-            $class = $controller[0];
-            $method = $controller[1];
-            $class = new $class();
+    
+            $class = new $controller(
+                AutoloaderEventMapGenerator::createAutomatically(),
+                new StringEncrypt(),
+                new Rabbit()
+            );
             echo $class->$method();
             break;
         }

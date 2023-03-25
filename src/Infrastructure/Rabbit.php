@@ -148,7 +148,7 @@ class Rabbit
             throw new RuntimeException('No channel');
         }
 
-        $queueCreatedResult = $channel->queue_declare('', false, true, false, false);
+        $queueCreatedResult = $channel->queue_declare('', false, false, true, true);
         if (!$queueCreatedResult || !isset($queueCreatedResult[0])) {
             throw new CouldNotCreateTemporalQueueException('No queue created');
         }
