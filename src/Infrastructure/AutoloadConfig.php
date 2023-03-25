@@ -55,12 +55,12 @@ class AutoloadConfig
     }
 
     /**
-     * @param string $consumerQueueListenName
-     * @param string $eventBusExchangeName
-     * @param string $configurationPath
-     * @param array<string> $whiteList
-     * @param array<string> $blackList
-     * @param array<string, array<string>|string> $extraConfiguration
+     * @param string $consumerQueueListenName - Queue name to be listened by Amqp2fcgi
+     * @param string $eventBusExchangeName - Exchange name
+     * @param string $configurationPath - Path to the configuration directory (where the configuration files will be created)
+     * @param array<string> $whiteList - List of events namespaces or paths to be included in the event bus
+     * @param array<string> $blackList - List of events namespaces or paths to be excluded from the event bus
+     * @param array<string, array<string>|string> $extraConfiguration - Extra configuration
      *
      * @psalm-param array{
      *      consumer_queue_listen_name?: string,

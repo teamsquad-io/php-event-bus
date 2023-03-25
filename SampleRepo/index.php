@@ -3,14 +3,18 @@
 declare(strict_types=1);
 
 use TeamSquad\EventBus\Domain\Consumer;
-use TeamSquad\EventBus\Domain\EventMapGenerator;
-use TeamSquad\EventBus\Domain\StringEncrypt;
+use TeamSquad\EventBus\Infrastructure\AutoloadConfig;
 use TeamSquad\EventBus\Infrastructure\AutoloaderEventMapGenerator;
+use TeamSquad\EventBus\Infrastructure\EnvironmentSecrets;
 use TeamSquad\EventBus\Infrastructure\Rabbit;
+use TeamSquad\EventBus\Infrastructure\SimpleEncrypt;
 
 require_once __DIR__ . '/../vendor/autoload.php';
+/** @var array<string, class-string<Consumer>> $controllerMap */
 $controllerMap = require __DIR__ . '/config/auto_controllerMap.php';
+/** @var array<string, array<string, string>> $routes */
 $routes = require __DIR__ . '/config/auto_routes.php';
+/** @var array<string, array<string, string>> $consumers */
 $consumers = require __DIR__ . '/config/auto_consumerConf.php';
 
 if (empty($controllerMap)) {
@@ -35,21 +39,27 @@ if ($requestUri === '/amqpconf') {
         JSON_THROW_ON_ERROR
     );
 } else {
+    $secrets = new EnvironmentSecrets();
     foreach ($routes as $route) {
         if ($route['pattern'] === $requestUri) {
+            /**
+             * @var class-string<Consumer> $controller
+             * @see Consumer::actionIndex()
+             */
             [$controller, $method] = explode('/', $route['route']);
-            /** @var class-string<Consumer> $controller */
             $controller = $controllerMap[$controller];
-            if (!$controller || !is_string($controller)) {
-                throw new RuntimeException(sprintf('Controller not found for route %s', $route['route']));
-            }
-    
             $class = new $controller(
-                AutoloaderEventMapGenerator::createAutomatically(),
-                new StringEncrypt(),
-                new Rabbit()
+                AutoloaderEventMapGenerator::createAutomatically(
+                    AutoloadConfig::create(
+                        $secrets->get('rabbit_event_listen'),
+                        $secrets->get('rabbit_exchange'),
+                        __DIR__ . '/config',
+                    )
+                ),
+                new SimpleEncrypt(),
+                Rabbit::getInstance($secrets)
             );
-            echo $class->$method();
+            $class->$method();
             break;
         }
     }
