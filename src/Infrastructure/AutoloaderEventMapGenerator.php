@@ -9,6 +9,7 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use ReflectionClass;
 use ReflectionException;
 use RuntimeException;
+use TeamSquad\EventBus\Domain\Command;
 use TeamSquad\EventBus\Domain\Event;
 use TeamSquad\EventBus\Domain\EventMapGenerator;
 use TeamSquad\EventBus\Domain\Exception\InvalidArguments;
@@ -28,7 +29,7 @@ use function is_array;
  */
 class AutoloaderEventMapGenerator implements EventMapGenerator
 {
-    /** @var array<string, class-string<Event>> */
+    /** @var array<string, class-string<Event|Command>> */
     private static array $eventMap;
     private string $vendorPath;
     private ?string $eventMapFilePath;
@@ -96,7 +97,7 @@ class AutoloaderEventMapGenerator implements EventMapGenerator
      *
      * @throws UnknownEventException
      *
-     * @return class-string<Event>
+     * @return class-string<Event|Command>
      */
     public function get(string $routingKey): string
     {
@@ -121,7 +122,7 @@ class AutoloaderEventMapGenerator implements EventMapGenerator
     {
         /** @var ClassLoader $classLoader */
         $classLoader = require $this->vendorPath . '/autoload.php';
-        /** @var array<class-string<Event>, string> $classMap */
+        /** @var array<class-string<Event|Command>, string> $classMap */
         $classMap = $classLoader->getClassMap();
         $events = [];
         $annotationReader = new AnnotationReader();
@@ -137,8 +138,8 @@ class AutoloaderEventMapGenerator implements EventMapGenerator
                 $reflect = new ReflectionClass($class);
                 if ($class !== Listen::class &&
                     $reflect->isInstantiable() &&
-                    $reflect->implementsInterface(Event::class)) {
-                    /** @var Event $event */
+                    ($reflect->implementsInterface(Event::class) || $reflect->implementsInterface(Command::class))) {
+                    /** @var Command|Event $event */
                     $event = $reflect->newInstanceWithoutConstructor();
                     $eventName = $event->eventName();
                     $events[$eventName] = $class;

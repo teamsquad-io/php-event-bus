@@ -106,7 +106,7 @@ class ConsumerConfigGenerator
                                 ];
                             } elseif ($evt instanceof Command) {
                                 $routingKey = [
-                                    $evt->commandName(),
+                                    $evt->eventName(),
                                 ];
                             }
                             foreach ($annotationReader->getClassAnnotations($firstParameter) as $annotation) {

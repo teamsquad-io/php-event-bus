@@ -8,3 +8,4 @@
 tests/Unit/Infrastructure/eventMapFile.php
 auto_*.php
 SampleRepo/data/
+eventMapFile.php

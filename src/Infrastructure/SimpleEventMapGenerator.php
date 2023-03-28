@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TeamSquad\EventBus\Infrastructure;
 
 use InvalidArgumentException;
+use TeamSquad\EventBus\Domain\Command;
 use TeamSquad\EventBus\Domain\Event;
 use TeamSquad\EventBus\Domain\EventMapGenerator;
 
@@ -24,7 +25,7 @@ class SimpleEventMapGenerator implements EventMapGenerator
     /**
      * @param string $routingKey
      *
-     * @return class-string<Event>
+     * @return class-string<Event|Command>
      */
     public function get(string $routingKey): string
     {

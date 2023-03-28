@@ -6,6 +6,7 @@ namespace TeamSquad\EventBus\Infrastructure;
 
 use Amp\Deferred;
 use Amp\Promise;
+use InvalidArgumentException;
 use JsonException;
 use League\Tactician\Middleware;
 use PhpAmqpLib\Message\AMQPMessage;
@@ -34,40 +35,34 @@ class AsyncSendEventMiddleware implements Middleware
      */
     public function execute($command, callable $next): Promise
     {
-        $deferred = new Deferred();
-        if ($command instanceof Command) {
-            if (method_exists($command, 'setQueueToReply')) {
-                $queueName = $this->rabbit->createTemporalQueue($this->exchangeName);
-                $this->rabbit->consume(
-                    $queueName,
-                    '',
-                    false,
-                    true,
-                    false,
-                    false,
-                    static function (AMQPMessage $msg) use ($deferred, $next): void {
-                        $response = $msg->body;
-                        $deferred->resolve($response);
-                        $next($response);
-                    }
-                );
-                $command->setQueueToReply($queueName);
-            } else {
-                $deferred->resolve();
-                $next();
-            }
+        if (!$command instanceof Command) {
+            throw new InvalidArgumentException('Instance of Command expected at AsyncSendEventMiddleware');
+        }
 
-            /**
-             * @var array<array-key, mixed> $toArray
-             */
-            $toArray = $command->toArray();
-            $this->rabbit->publish($this->exchangeName, $command->commandName(), $toArray);
+        $deferred = new Deferred();
+        if (!method_exists($command, 'setQueueToReply')) {
+            $this->rabbit->publish($this->exchangeName, $command->eventName(), $command->toArray());
+            $deferred->resolve();
+            $next();
             return $deferred->promise();
         }
-        $deferred->resolve();
-        $next();
 
-
+        $queueName = $this->rabbit->createTemporalQueue($this->exchangeName);
+        $this->rabbit->consume(
+            $queueName,
+            '',
+            false,
+            true,
+            false,
+            false,
+            static function (AMQPMessage $msg) use ($deferred, $next): void {
+                $response = $msg->body;
+                $deferred->resolve($response);
+                $next($response);
+            }
+        );
+        $command->setQueueToReply($queueName);
+        $this->rabbit->publish($this->exchangeName, $command->eventName(), $command->toArray());
         return $deferred->promise();
     }
 }

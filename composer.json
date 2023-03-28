@@ -18,7 +18,8 @@
         "vimeo/psalm": "^5.8.0",
         "phpstan/phpstan": "^1.10.7",
         "symfony/var-dumper": "^5.4",
-        "psalm/plugin-phpunit": "^0.17.0 || ^0.18.0"
+        "psalm/plugin-phpunit": "^0.17.0 || ^0.18.0",
+        "amphp/phpunit-util": "^2.0"
     },
     "autoload": {
         "psr-4": {

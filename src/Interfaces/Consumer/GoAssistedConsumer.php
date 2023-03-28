@@ -9,6 +9,7 @@ use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
 use TeamSquad\EventBus\Domain\Clock;
+use TeamSquad\EventBus\Domain\Command;
 use TeamSquad\EventBus\Domain\Event;
 use TeamSquad\EventBus\Domain\EventMapGenerator;
 use TeamSquad\EventBus\Domain\Exception\InvalidArguments;
@@ -136,14 +137,14 @@ trait GoAssistedConsumer
      * @throws UnknownEventException
      * @throws ReflectionException
      *
-     * @return Event
+     * @return Event|Command
      */
-    private function unserialize(string $routingKey, array $eventData): Event
+    private function unserialize(string $routingKey, array $eventData)
     {
         $className = $this->eventMap->get($routingKey);
         $reflect = new ReflectionClass($className);
         $this->decryptProtectedFields($reflect, $eventData);
-        /** @var Event $event */
+        /** @var Command|Event $event */
         $event = $reflect->getMethod('fromArray')->invoke(null, $eventData);
         return $event;
     }

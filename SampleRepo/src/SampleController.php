@@ -27,4 +27,10 @@ class SampleController
         // do something
         return json_encode($event->toArray(), JSON_THROW_ON_ERROR);
     }
+    
+    public function handleSampleCommand(SampleVideoPermissionChangeCommand $command): string
+    {
+        // do something
+        return json_encode($command->toArray(), JSON_THROW_ON_ERROR);
+    }
 }

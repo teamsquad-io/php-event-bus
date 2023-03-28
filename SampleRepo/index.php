@@ -47,13 +47,26 @@ if ($requestUri === '/amqpconf') {
              * @see Consumer::actionIndex()
              */
             [$controller, $method] = explode('/', $route['route']);
+            if (strpos($method, 'action') !== 0) {
+                $method = 'action' . ucfirst($method);
+            }
             $controller = $controllerMap[$controller];
+            /**
+             * @var Consumer $class
+             */
             $class = new $controller(
                 AutoloaderEventMapGenerator::createAutomatically(
                     AutoloadConfig::create(
                         $secrets->get('rabbit_event_listen'),
                         $secrets->get('rabbit_exchange'),
                         __DIR__ . '/config',
+                        [
+                            'TeamSquad\\',
+                        ],
+                        [
+                            'Composer\\Plugin\\',
+                            'Tests\\',
+                        ]
                     )
                 ),
                 new SimpleEncrypt(),

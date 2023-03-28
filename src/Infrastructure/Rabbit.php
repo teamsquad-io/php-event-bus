@@ -15,7 +15,6 @@ use PhpAmqpLib\Wire\AMQPTable;
 use RuntimeException;
 use TeamSquad\EventBus\Domain\Secrets;
 use TeamSquad\EventBus\Infrastructure\Exception\CouldNotCreateTemporalQueueException;
-
 use Throwable;
 
 use function array_key_exists;
@@ -157,7 +156,7 @@ class Rabbit
         if (!$queueName || !is_string($queueName)) {
             throw new CouldNotCreateTemporalQueueException('Invalid queue name in queue_declare response: ' . var_export($queueCreatedResult, true));
         }
-        $channel->queue_bind($queueName, $exchange);
+        $channel->queue_bind($queueName, $exchange, $queueName);
 
         return $queueName;
     }
@@ -170,6 +169,17 @@ class Rabbit
         }
 
         $chan->basic_consume($queueName, $consumerTag, $noLocal, $noAck, $exclusive, $noWait, $closure);
+    }
+
+    public function wait(): void
+    {
+        if ($this->channel === null) {
+            throw new RuntimeException('No channel');
+        }
+
+        while ($this->channel->is_open()) {
+            $this->channel->wait();
+        }
     }
 
     /**
@@ -216,7 +226,9 @@ class Rabbit
             return $connection;
         } catch (Throwable $e) {
             if ($retries > 4) {
-                throw new RuntimeException(sprintf('No se ha podido conectar al rabbit después de %d intentos: %s', $retries, $e->getMessage()));
+                throw new RuntimeException(
+                    sprintf('No se ha podido conectar al rabbit después de %d intentos: %s', $retries, $e->getMessage())
+                );
             }
 
             ++$retries;

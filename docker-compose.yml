@@ -19,6 +19,7 @@ services:
       - rabbit_port=5672
       - rabbit_user=guest
       - rabbit_pass=guest
+      - PHP_IDE_CONFIG=serverName=amqp2fcgi
     volumes:
       - .:/app
 
@@ -34,6 +35,8 @@ services:
       - AMQP2FCGI_FCGI_ENDPOINT=consumers:9000
       - AMQP2FCGI_FCGI_FILE=/app/SampleRepo/index.php
       - AMQP2FCGI_LOGGER_DEVELOPMENT=true
+      - AMQP2FCGI_FCGI_XDEBUG=1
+      - AMQP2FCGI_FCGI_FAKEIP=192.168.0.33
     restart: on-failure
 
   rabbitmq:

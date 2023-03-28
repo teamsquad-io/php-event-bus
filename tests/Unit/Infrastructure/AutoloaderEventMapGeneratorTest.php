@@ -15,6 +15,7 @@ use TeamSquad\EventBus\Infrastructure\AutoloadConfig;
 use TeamSquad\EventBus\Infrastructure\AutoloaderEventMapGenerator;
 use TeamSquad\EventBus\SampleRepo\SampleEvent;
 use TeamSquad\EventBus\SampleRepo\SampleSecureEvent;
+use TeamSquad\EventBus\SampleRepo\SampleVideoPermissionChangeCommand;
 
 class AutoloaderEventMapGeneratorTest extends TestCase
 {
@@ -66,7 +67,8 @@ class AutoloaderEventMapGeneratorTest extends TestCase
         self::assertEquals([
             'sample_event'        => SampleEvent::class,
             'sample_secure_event' => SampleSecureEvent::class,
-        ], $sut->getAll());
+            'video_permission_change' => SampleVideoPermissionChangeCommand::class,
+       ], $sut->getAll());
     }
 
     public function test_generate_event_map_creates_file_with_correct_content(): void
@@ -81,6 +83,7 @@ class AutoloaderEventMapGeneratorTest extends TestCase
             self::assertEquals([
                 'sample_event'        => SampleEvent::class,
                 'sample_secure_event' => SampleSecureEvent::class,
+                'video_permission_change' => SampleVideoPermissionChangeCommand::class,
             ], $eventMap);
         } else {
             self::fail('File does not exist');
@@ -97,7 +100,8 @@ class AutoloaderEventMapGeneratorTest extends TestCase
         self::assertFileExists(self::EVENT_MAP_FILE_PATH);
         self::assertEquals([
             'sample_event' => SampleEvent::class,
-        ], $sut->getAll());
+            'video_permission_change' => SampleVideoPermissionChangeCommand::class,
+       ], $sut->getAll());
     }
 
     public function test_get_by_routing_key_returns_correct_class(): void
@@ -119,6 +123,22 @@ class AutoloaderEventMapGeneratorTest extends TestCase
         self::assertEquals(SampleEvent::class, $sut->get('sample_secure_event'));
     }
 
+    /**
+     * @param array<string, array<string>|string> $configuration
+     *
+     * @psalm-param array{
+     *      consumer_queue_listen_name?: string,
+     *      event_bus_exchange_name?: string,
+     *      configuration_path?: string,
+     *      white_list?: array<string>|string,
+     *      black_list?: array<string>|string
+     * } $configuration
+     *
+     * @throws InvalidArguments
+     * @throws UnknownEventException
+     *
+     * @return AutoloaderEventMapGenerator
+     */
     private function getAutoloaderEventMapGenerator(array $configuration = []): AutoloaderEventMapGenerator
     {
         return new AutoloaderEventMapGenerator(

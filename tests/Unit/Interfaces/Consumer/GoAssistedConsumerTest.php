@@ -13,6 +13,7 @@ use TeamSquad\EventBus\SampleRepo\SampleConsumer;
 use TeamSquad\EventBus\SampleRepo\SampleController;
 use TeamSquad\EventBus\SampleRepo\SampleEvent;
 use TeamSquad\EventBus\SampleRepo\SampleSecureEvent;
+use TeamSquad\EventBus\SampleRepo\SampleVideoPermissionChangeCommand;
 
 final class GoAssistedConsumerTest extends TestCase
 {
@@ -33,6 +34,26 @@ final class GoAssistedConsumerTest extends TestCase
             ], JSON_THROW_ON_ERROR)
         );
         self::assertSame('{"property":"value"}', $parseRequest);
+    }
+
+    public function test_command_parse_request(): void
+    {
+        $goAssistedConsumer = new SampleConsumer(
+            new SimpleEventMapGenerator([
+                'routing_key' => SampleVideoPermissionChangeCommand::class,
+            ]),
+            new SimpleEncrypt(),
+        );
+        $parseRequest = $goAssistedConsumer->parseRequest(
+            new SampleController(),
+            'handleSampleCommand',
+            'routing_key',
+            json_encode([
+                'userId' => 'value',
+                'canView' => 1,
+            ], JSON_THROW_ON_ERROR)
+        );
+        self::assertSame('{"userId":"value","canView":true}', $parseRequest);
     }
 
     public function test_parse_request_encrypted_fields(): void

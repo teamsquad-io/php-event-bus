@@ -31,6 +31,12 @@ class SampleConsumerForCommands implements Consumer
 
     public function handleSampleVideoPermissionChangeCommand(SampleVideoPermissionChangeCommand $event): string
     {
+        echo 'SampleVideoPermissionChangeCommand was handled' . PHP_EOL;
+        
+        if (!$event->getQueueToReply()) {
+            throw new \RuntimeException('Queue to reply is empty');
+        }
+        echo 'Publishing to queue: ' . $event->getQueueToReply() . PHP_EOL;
         $this->rabbit->publish(
             'teamsquad.eventBus',
             $event->getQueueToReply(),
@@ -38,6 +44,6 @@ class SampleConsumerForCommands implements Consumer
                 'result' => 'OK',
             ]
         );
-        return $event->commandName();
+        return $event->eventName();
     }
 }

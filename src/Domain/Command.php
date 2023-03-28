@@ -6,7 +6,7 @@ namespace TeamSquad\EventBus\Domain;
 
 interface Command
 {
-    public function commandName(): string;
+    public function eventName(): string;
 
     /**
      * @param array<array-key, mixed> $array

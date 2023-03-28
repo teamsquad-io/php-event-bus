@@ -22,7 +22,7 @@ class SampleVideoPermissionChangeCommand implements Command
         $this->userId = $userId;
     }
 
-    public function commandName(): string
+    public function eventName(): string
     {
         return 'video_permission_change';
     }
@@ -34,10 +34,15 @@ class SampleVideoPermissionChangeCommand implements Command
      */
     public static function fromArray(array $array): Command
     {
-        return new self(
+        $command = new self(
             (string)$array['userId'],
             (bool)$array['canView']
         );
+        if (isset($array['queueToReply'])) {
+            $command->setQueueToReply((string)$array['queueToReply']);
+        }
+        
+        return $command;
     }
 
     /**
@@ -45,9 +50,14 @@ class SampleVideoPermissionChangeCommand implements Command
      */
     public function toArray(): array
     {
-        return [
+        $result = [
             'userId' => $this->userId,
             'canView' => $this->canView,
         ];
+        if ($this->queueToReply !== null) {
+            $result['queueToReply'] = $this->queueToReply;
+        }
+        
+        return $result;
     }
 }
