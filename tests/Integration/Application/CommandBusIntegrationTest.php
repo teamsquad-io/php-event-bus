@@ -1,20 +1,21 @@
 <?php
 
+/** @noinspection PhpUnhandledExceptionInspection */
+
 declare(strict_types=1);
 
 namespace TeamSquad\Tests\Integration\Application;
 
-use Amp\Promise;
 use League\Tactician\CommandBus;
 use PHPUnit\Framework\TestCase;
-use TeamSquad\EventBus\Infrastructure\AsyncSendEventMiddleware;
 use TeamSquad\EventBus\Infrastructure\MemorySecrets;
 use TeamSquad\EventBus\Infrastructure\Rabbit;
+use TeamSquad\EventBus\Infrastructure\SynchronousSendEventMiddleware;
 use TeamSquad\EventBus\SampleRepo\SampleVideoPermissionChangeCommand;
 
 class CommandBusIntegrationTest extends TestCase
 {
-    public function test_command_bus(): void
+    public function test_synchronous_command_bus(): void
     {
         $rabbit = Rabbit::getInstance(
             new MemorySecrets(
@@ -29,14 +30,14 @@ class CommandBusIntegrationTest extends TestCase
         );
         $commandBus = new CommandBus(
             [
-                new AsyncSendEventMiddleware(
+                new SynchronousSendEventMiddleware(
                     'teamsquad.eventBus',
                     $rabbit
                 ),
             ]
         );
 
-        /** @var Promise<string> $promise */
+        /** @var string $promise */
         $promise = $commandBus->handle(
             new SampleVideoPermissionChangeCommand(
                 '123',
@@ -44,18 +45,11 @@ class CommandBusIntegrationTest extends TestCase
             )
         );
 
-        $promise->onResolve(
-            static function ($error, $value): void {
-                if ($error) {
-                    echo $error->getMessage();
-                }
-                echo $value;
-            }
+        self::assertEquals(
+            [
+                'result' => 'OK',
+            ],
+            json_decode($promise, true, 512, JSON_THROW_ON_ERROR)
         );
-
-        /** @var string $value */
-        $value = Promise\wait(Promise\timeout($promise, 10000));
-
-        self::assertEquals('123', $value);
     }
 }

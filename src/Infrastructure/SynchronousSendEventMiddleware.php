@@ -8,10 +8,11 @@ use InvalidArgumentException;
 use JsonException;
 use League\Tactician\Middleware;
 use PhpAmqpLib\Message\AMQPMessage;
+use RuntimeException;
 use TeamSquad\EventBus\Domain\Command;
 use TeamSquad\EventBus\Infrastructure\Exception\CouldNotCreateTemporalQueueException;
 
-class SyncSendEventMiddleware implements Middleware
+class SynchronousSendEventMiddleware implements Middleware
 {
     private string $exchangeName;
     private Rabbit $rabbit;
@@ -34,7 +35,7 @@ class SyncSendEventMiddleware implements Middleware
     public function execute($command, callable $next): ?string
     {
         if (!$command instanceof Command) {
-            throw new InvalidArgumentException('Instance of Command expected at SyncSendEventMiddleware');
+            throw new InvalidArgumentException('Instance of Command expected at SynchronousSendEventMiddleware');
         }
 
         if (method_exists($command, 'setQueueToReply')) {
@@ -52,12 +53,11 @@ class SyncSendEventMiddleware implements Middleware
                 true,
                 true,
                 false,
-                static function (AMQPMessage $msg) use ($next, &$stack): void {
+                static function (AMQPMessage $msg) use (&$stack): void {
                     $body = $msg->body;
                     echo "Received message: {$body}" . PHP_EOL;
                     /** @psalm-suppress MixedArrayAssignment  */
                     $stack[] = $body;
-                    $next($body);
                 }
             );
             $command->setQueueToReply($queueName);
@@ -69,15 +69,15 @@ class SyncSendEventMiddleware implements Middleware
 
             /** @psalm-suppress RedundantCondition  */
             if (empty($stack)) {
-                $result = '';
-            } else {
-                /**
-                 * @psalm-suppress NoValue
-                 *
-                 * @var string $result
-                 */
-                $result = array_pop($stack);
+                throw new RuntimeException('No response received from temporal queue');
             }
+
+            /**
+             * @psalm-suppress NoValue
+             *
+             * @var string $result
+             */
+            $result = array_pop($stack);
             $next($result);
             return $result;
         }
@@ -85,6 +85,6 @@ class SyncSendEventMiddleware implements Middleware
         $this->rabbit->publish($this->exchangeName, $command->eventName(), $command->toArray());
         $next();
 
-        return '';
+        return null;
     }
 }
