@@ -148,7 +148,7 @@ class Rabbit
         }
 
         $queueCreatedResult = $channel->queue_declare('', false, false, true, true);
-        if (!$queueCreatedResult || !isset($queueCreatedResult[0])) {
+        if ($queueCreatedResult === null || !isset($queueCreatedResult[0])) {
             throw new CouldNotCreateTemporalQueueException('No queue created');
         }
 
