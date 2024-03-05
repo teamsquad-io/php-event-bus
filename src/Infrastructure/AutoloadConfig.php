@@ -99,8 +99,7 @@ class AutoloadConfig
      */
     public function isIncludedInWhiteList(string $className): bool
     {
-        /** @var null|string|array<array-key, string> $includedClassNames */
-        $includedClassNames = $this->config[self::WHITE_LIST_CONFIG_KEY] ?? [];
+        $includedClassNames = $this->getWhiteList();
         if (empty($includedClassNames)) {
             return true;
         }
@@ -116,8 +115,7 @@ class AutoloadConfig
      */
     public function isIncludedInBlackList(string $className): bool
     {
-        /** @var null|string|array<array-key, string> $excludedClassNames */
-        $excludedClassNames = $this->config[self::BLACK_LIST_CONFIG_KEY] ?? [];
+        $excludedClassNames = $this->getBlackList();
         if (empty($excludedClassNames)) {
             return false;
         }
@@ -156,12 +154,14 @@ class AutoloadConfig
 
     public function hasWhiteList(): bool
     {
-        return !empty($this->config[self::WHITE_LIST_CONFIG_KEY]);
+        $whiteList = $this->getWhiteList();
+        return !empty($whiteList);
     }
 
     public function hasBlackList(): bool
     {
-        return !empty($this->config[self::BLACK_LIST_CONFIG_KEY]);
+        $blackList = $this->getBlackList();
+        return !empty($blackList);
     }
 
     /**

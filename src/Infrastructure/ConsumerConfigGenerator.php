@@ -246,19 +246,19 @@ class ConsumerConfigGenerator
     private function generateName(string $fullyQualifiedName, string $replacer = '.'): string
     {
         $positionClassName = strrpos($fullyQualifiedName, '\\');
-        if (!$positionClassName) {
+        if ($positionClassName === false || $positionClassName === 0) {
             return $fullyQualifiedName;
         }
 
         $className = substr($fullyQualifiedName, $positionClassName);
         $positionSeparator = strpos($fullyQualifiedName, '\\');
-        if (!$positionSeparator) {
+        if ($positionSeparator === false || $positionSeparator === 0) {
             return $className;
         }
 
         $context = substr($fullyQualifiedName, $positionSeparator + 1);
         $length = strpos($context, '\\');
-        if (!$length) {
+        if ($length === false || $length === 0) {
             return $context;
         }
 

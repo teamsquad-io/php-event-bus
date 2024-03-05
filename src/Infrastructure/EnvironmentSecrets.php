@@ -15,7 +15,7 @@ class EnvironmentSecrets implements Secrets
     public function get(string $key): string
     {
         $env = getenv($key);
-        if (!$env) {
+        if ($env === false || $env === '') {
             throw new NotFoundException(sprintf('Environment variable %s not found', $key));
         }
 
@@ -25,7 +25,7 @@ class EnvironmentSecrets implements Secrets
     public function findByKey(string $key, string $default): string
     {
         $env = getenv($key);
-        if (!$env) {
+        if ($env === false || $env === '') {
             return $default;
         }
 

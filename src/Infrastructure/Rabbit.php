@@ -97,7 +97,7 @@ class Rabbit
             'app_id'           => '',
             'delivery_mode'    => 2,
         ];
-        if ($expiration) {
+        if ($expiration > 0) {
             $properties['expiration'] = $expiration;
         }
 

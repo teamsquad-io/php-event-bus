@@ -139,7 +139,7 @@ class AutoloaderEventMapGenerator implements EventMapGenerator
      */
     private function save(): void
     {
-        if (!$this->eventMapFilePath) {
+        if ($this->eventMapFilePath === null || $this->eventMapFilePath === '') {
             throw new InvalidArguments('No config file defined');
         }
 
@@ -159,7 +159,7 @@ class AutoloaderEventMapGenerator implements EventMapGenerator
      */
     private function loadEventMapFile(?string $eventMapFilePath): bool
     {
-        if (!$eventMapFilePath) {
+        if ($eventMapFilePath === null || $eventMapFilePath === '') {
             return false;
         }
 
