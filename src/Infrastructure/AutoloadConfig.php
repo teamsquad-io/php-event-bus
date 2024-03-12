@@ -55,6 +55,51 @@ class AutoloadConfig
     }
 
     /**
+     * @param string $consumerQueueListenName - Queue name to be listened by Amqp2fcgi
+     * @param string $eventBusExchangeName - Exchange name
+     * @param string $configurationPath - Path to the configuration directory (where the configuration files will be created)
+     * @param array<string> $whiteList - List of events namespaces or paths to be included in the event bus
+     * @param array<string> $blackList - List of events namespaces or paths to be excluded from the event bus
+     * @param array<string, array<string>|string> $extraConfiguration - Extra configuration
+     *
+     * @psalm-param array{
+     *      consumer_queue_listen_name?: string,
+     *      event_bus_exchange_name?: string,
+     *      configuration_path?: string,
+     *      white_list?: array<string>|string,
+     *      black_list?: array<string>|string
+     * } $extraConfiguration
+     *
+     * @throws InvalidArguments
+     *
+     * @return self
+     */
+    public static function create(
+        string $consumerQueueListenName,
+        string $eventBusExchangeName,
+        string $configurationPath,
+        array $whiteList = [],
+        array $blackList = [],
+        array $extraConfiguration = []
+    ): self {
+        $config = [
+            self::CONSUMER_QUEUE_LISTEN_NAME_KEY => $consumerQueueListenName,
+            self::EVENT_BUS_EXCHANGE_NAME_KEY => $eventBusExchangeName,
+            self::CONFIGURATION_PATH_KEY => $configurationPath,
+        ];
+        if (!empty($whiteList)) {
+            $config[self::WHITE_LIST_CONFIG_KEY] = $whiteList;
+        }
+        if (!empty($blackList)) {
+            $config[self::BLACK_LIST_CONFIG_KEY] = $blackList;
+        }
+
+        return new self(
+            array_merge($config, $extraConfiguration)
+        );
+    }
+
+    /**
      * Prefix to be added to the consumer that will be created by Amqp2fcgi
      *
      * @return string
@@ -74,7 +119,7 @@ class AutoloadConfig
     public function eventBusExchangeName(): string
     {
         /** @var string $exchangeName */
-        $exchangeName = $this->config[self::EVENT_BUS_EXCHANGE_NAME_KEY] ?? 'my_company.event_bus';
+        $exchangeName = $this->config[self::EVENT_BUS_EXCHANGE_NAME_KEY] ?? 'my_company.eventBus';
         return $exchangeName;
     }
 
@@ -162,6 +207,14 @@ class AutoloadConfig
     {
         $blackList = $this->getBlackList();
         return !empty($blackList);
+    }
+
+    /**
+     * @return array<string, array<string>|string>
+     */
+    public function toArray(): array
+    {
+        return $this->config;
     }
 
     /**

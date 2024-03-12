@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace TeamSquad\Tests\Unit\Interfaces;
+namespace TeamSquad\EventBus\SampleRepo;
 
 use JsonException;
-use TeamSquad\Tests\SampleEvent;
-use TeamSquad\Tests\SampleSecureEvent;
+use TeamSquad\EventBus\SampleRepo\SampleEvent;
+use TeamSquad\EventBus\SampleRepo\SampleSecureEvent;
 
 class SampleController
 {
@@ -26,5 +26,11 @@ class SampleController
     {
         // do something
         return json_encode($event->toArray(), JSON_THROW_ON_ERROR);
+    }
+    
+    public function handleSampleCommand(SampleVideoPermissionChangeCommand $command): string
+    {
+        // do something
+        return json_encode($command->toArray(), JSON_THROW_ON_ERROR);
     }
 }

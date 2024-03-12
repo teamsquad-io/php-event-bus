@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace TeamSquad\Tests;
+namespace TeamSquad\EventBus\SampleRepo;
 
 use TeamSquad\EventBus\Domain\Event;
 

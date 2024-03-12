@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TeamSquad\EventBus\Infrastructure;
 
+use Closure;
 use DomainException;
 use Exception;
 use JsonException;
@@ -13,9 +14,11 @@ use PhpAmqpLib\Message\AMQPMessage;
 use PhpAmqpLib\Wire\AMQPTable;
 use RuntimeException;
 use TeamSquad\EventBus\Domain\Secrets;
+use TeamSquad\EventBus\Infrastructure\Exception\CouldNotCreateTemporalQueueException;
 use Throwable;
 
 use function array_key_exists;
+use function is_string;
 
 class Rabbit
 {
@@ -135,6 +138,51 @@ class Rabbit
     }
 
     /**
+     * @throws CouldNotCreateTemporalQueueException
+     */
+    public function createTemporalQueue(string $exchange): string
+    {
+        $channel = $this->getChannel();
+        if (!$channel) {
+            throw new RuntimeException('No channel');
+        }
+
+        $queueCreatedResult = $channel->queue_declare('', false, false, true, true);
+        if ($queueCreatedResult === null || !isset($queueCreatedResult[0])) {
+            throw new CouldNotCreateTemporalQueueException('No queue created');
+        }
+
+        $queueName = $queueCreatedResult[0];
+        if (!$queueName || !is_string($queueName)) {
+            throw new CouldNotCreateTemporalQueueException('Invalid queue name in queue_declare response: ' . var_export($queueCreatedResult, true));
+        }
+        $channel->queue_bind($queueName, $exchange, $queueName);
+
+        return $queueName;
+    }
+
+    public function consume(string $queueName, string $consumerTag, bool $noLocal, bool $noAck, bool $exclusive, bool $noWait, Closure $closure): void
+    {
+        $chan = $this->getChannel();
+        if (!$chan) {
+            throw new RuntimeException('No channel');
+        }
+
+        $chan->basic_consume($queueName, $consumerTag, $noLocal, $noAck, $exclusive, $noWait, $closure);
+    }
+
+    public function wait(): void
+    {
+        if ($this->channel === null) {
+            throw new RuntimeException('No channel');
+        }
+
+        while ($this->channel->is_open()) {
+            $this->channel->wait();
+        }
+    }
+
+    /**
      * @param array<string, int|bool> $qos
      *
      * @return bool
@@ -178,7 +226,9 @@ class Rabbit
             return $connection;
         } catch (Throwable $e) {
             if ($retries > 4) {
-                throw new RuntimeException(sprintf('No se ha podido conectar al rabbit después de %d intentos: %s', $retries, $e->getMessage()));
+                throw new RuntimeException(
+                    sprintf('No se ha podido conectar al rabbit después de %d intentos: %s', $retries, $e->getMessage())
+                );
             }
 
             ++$retries;

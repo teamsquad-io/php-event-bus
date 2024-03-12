@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 use TeamSquad\EventBus\Domain\Exception\InvalidArguments;
 use TeamSquad\EventBus\Domain\SecureEvent;
 use TeamSquad\EventBus\Infrastructure\AutoloadConfig;
-use TeamSquad\Tests\SampleEvent;
+use TeamSquad\EventBus\SampleRepo\SampleEvent;
 
 class AutoloadConfigTest extends TestCase
 {
@@ -85,7 +85,7 @@ class AutoloadConfigTest extends TestCase
                 AutoloadConfig::CONSUMER_QUEUE_LISTEN_NAME_KEY => 'some/path',
                 AutoloadConfig::EVENT_BUS_EXCHANGE_NAME_KEY    => 'exchange_name',
                 AutoloadConfig::WHITE_LIST_CONFIG_KEY          => [
-                    'TeamSquad\\Tests',
+                    'TeamSquad\\EventBus\\SampleRepo\\',
                 ],
                 AutoloadConfig::BLACK_LIST_CONFIG_KEY          => [],
             ]
@@ -114,7 +114,7 @@ class AutoloadConfigTest extends TestCase
                 AutoloadConfig::CONSUMER_QUEUE_LISTEN_NAME_KEY => 'some/path',
                 AutoloadConfig::EVENT_BUS_EXCHANGE_NAME_KEY    => 'exchange_name',
                 AutoloadConfig::WHITE_LIST_CONFIG_KEY          => [
-                    'TeamSquad\Tests',
+                    'TeamSquad\EventBus\SampleRepo',
                 ],
                 AutoloadConfig::BLACK_LIST_CONFIG_KEY          => [],
             ]

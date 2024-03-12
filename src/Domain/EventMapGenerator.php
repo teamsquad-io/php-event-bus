@@ -17,7 +17,7 @@ interface EventMapGenerator
      *
      * @throws UnknownEventException
      *
-     * @return class-string<Event>
+     * @return class-string<Event|Command>
      */
     public function get(string $routingKey): string;
 

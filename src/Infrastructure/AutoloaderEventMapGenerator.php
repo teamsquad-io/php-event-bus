@@ -9,6 +9,7 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use ReflectionClass;
 use ReflectionException;
 use RuntimeException;
+use TeamSquad\EventBus\Domain\Command;
 use TeamSquad\EventBus\Domain\Event;
 use TeamSquad\EventBus\Domain\EventMapGenerator;
 use TeamSquad\EventBus\Domain\Exception\InvalidArguments;
@@ -17,6 +18,8 @@ use TeamSquad\EventBus\Domain\Listen;
 use TeamSquad\EventBus\Domain\RenamedEvent;
 
 use function dirname;
+use function gettype;
+use function is_array;
 
 /**
  * AutoloaderEventMapGenerator generates an event map using autoloaded classes
@@ -26,7 +29,7 @@ use function dirname;
  */
 class AutoloaderEventMapGenerator implements EventMapGenerator
 {
-    /** @var array<string, class-string<Event>> */
+    /** @var array<string, class-string<Event|Command>> */
     private static array $eventMap;
     private string $vendorPath;
     private ?string $eventMapFilePath;
@@ -35,9 +38,9 @@ class AutoloaderEventMapGenerator implements EventMapGenerator
     /**
      * @param string $vendorFolder path to the composer vendor folder
      * @param string|null $eventMapFilePath if null, the event map will not be saved
-     * @param array<string, array<string>|string> $configuration
+     * @param AutoloadConfig|array<string, array<string>|string> $configuration
      *
-     * @psalm-param array{
+     * @psalm-param AutoloadConfig|array{
      *      consumer_queue_listen_name?: string,
      *      event_bus_exchange_name?: string,
      *      configuration_path?: string,
@@ -48,9 +51,16 @@ class AutoloaderEventMapGenerator implements EventMapGenerator
      * @throws UnknownEventException
      * @throws InvalidArguments
      */
-    public function __construct(string $vendorFolder, ?string $eventMapFilePath, array $configuration)
+    public function __construct(string $vendorFolder, ?string $eventMapFilePath, $configuration)
     {
-        $this->config = new AutoloadConfig($configuration);
+        if (is_array($configuration)) {
+            $this->config = new AutoloadConfig($configuration);
+        } elseif ($configuration instanceof AutoloadConfig) {
+            $this->config = $configuration;
+        } else {
+            throw new InvalidArguments(sprintf('Invalid configuration type %s. Expected array or %s', gettype($configuration), AutoloadConfig::class));
+        }
+
         $this->vendorPath = $vendorFolder;
         $this->eventMapFilePath = $eventMapFilePath;
         if (!$this->loadEventMapFile($this->eventMapFilePath)) {
@@ -59,11 +69,35 @@ class AutoloaderEventMapGenerator implements EventMapGenerator
     }
 
     /**
+     * @throws InvalidArguments
+     * @throws UnknownEventException
+     */
+    public static function createAutomatically(AutoloadConfig $config): self
+    {
+        // Find vendor folder automatically
+        $vendorDirPath = dirname(__DIR__, 2);
+        while (!file_exists($vendorDirPath . '/vendor/autoload.php')) {
+            /** @psalm-suppress TypeDoesNotContainType */
+            if ($vendorDirPath === '/') {
+                throw new RuntimeException('Could not find vendor folder');
+            }
+            chdir('..');
+            $vendorDirPath = dirname(__DIR__, 2);
+        }
+        chdir(__DIR__);
+        return new self(
+            $vendorDirPath . '/vendor',
+            $vendorDirPath . '/eventMapFile.php',
+            $config
+        );
+    }
+
+    /**
      * @param string $routingKey
      *
      * @throws UnknownEventException
      *
-     * @return class-string<Event>
+     * @return class-string<Event|Command>
      */
     public function get(string $routingKey): string
     {
@@ -88,7 +122,7 @@ class AutoloaderEventMapGenerator implements EventMapGenerator
     {
         /** @var ClassLoader $classLoader */
         $classLoader = require $this->vendorPath . '/autoload.php';
-        /** @var array<class-string<Event>, string> $classMap */
+        /** @var array<class-string<Event|Command>, string> $classMap */
         $classMap = $classLoader->getClassMap();
         $events = [];
         $annotationReader = new AnnotationReader();
@@ -104,8 +138,8 @@ class AutoloaderEventMapGenerator implements EventMapGenerator
                 $reflect = new ReflectionClass($class);
                 if ($class !== Listen::class &&
                     $reflect->isInstantiable() &&
-                    $reflect->implementsInterface(Event::class)) {
-                    /** @var Event $event */
+                    ($reflect->implementsInterface(Event::class) || $reflect->implementsInterface(Command::class))) {
+                    /** @var Command|Event $event */
                     $event = $reflect->newInstanceWithoutConstructor();
                     $eventName = $event->eventName();
                     $events[$eventName] = $class;
