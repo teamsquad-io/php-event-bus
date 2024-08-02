@@ -98,12 +98,14 @@ class ConsumerConfigGeneratorTest extends TestCase
                     'amqp'         => 'users',
                     'name'         => 'TeamSquad\Tests\SampleManualConsumer::listen',
                     'routing_key'  => [
+                        'user.online',
                     ],
                     'unique'       => false,
                     'url'          => '/_/tests-samplemanualconsumer',
                     'queue'        => 'user.online.queue',
                     'exchange'     => '',
                     'function'     => 'listen',
+                    'create_queue' => true,
                     'params'       => [
                         'passive'     => false,
                         'durable'     => false,
@@ -121,7 +123,6 @@ class ConsumerConfigGeneratorTest extends TestCase
                             ],
                         ],
                     ],
-                    'create_queue' => false,
                 ],
             ],
             'routes'      => [

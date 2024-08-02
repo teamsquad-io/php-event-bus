@@ -39,7 +39,7 @@ class SampleManualConsumer implements Consumer
     }
 
     /**
-     * @Manual(unserializer="raw", queue="user.online.queue", exchange="", createQueue=false)
+     * @Manual(unserializer="raw", queue="user.online.queue", exchange="", routingKey="user.online")
      */
     public function listen(array $event): string
     {
