@@ -10,11 +10,15 @@ use TeamSquad\EventBus\Domain\Consumer;
 use TeamSquad\EventBus\Domain\EventMapGenerator;
 use TeamSquad\EventBus\Domain\Input;
 use TeamSquad\EventBus\Domain\StringEncrypt;
+use TeamSquad\EventBus\Infrastructure\Manual;
 use TeamSquad\EventBus\Infrastructure\PhpInput;
 use TeamSquad\EventBus\Infrastructure\SystemClock;
 use TeamSquad\EventBus\Interfaces\Consumer\GoAssistedConsumer;
 
-class SampleConsumer implements Consumer
+/**
+ * @\TeamSquad\EventBus\Infrastructure\Bus(bus="users")
+ */
+class SampleManualConsumer implements Consumer
 {
     use GoAssistedConsumer;
 
@@ -34,8 +38,11 @@ class SampleConsumer implements Consumer
         $this->initializeConsumer($eventMap, $dataEncrypt, $this->annotationReader, $this->input, $this->clock);
     }
 
-    public function listenSampleEvent(SampleEvent $event): string
+    /**
+     * @Manual(unserializer="raw", queue="user.online.queue", exchange="", createQueue=false)
+     */
+    public function listen(array $event): string
     {
-        return $event->eventName();
+        return 'User online event received';
     }
 }

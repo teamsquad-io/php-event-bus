@@ -9,6 +9,8 @@ namespace TeamSquad\Tests\Unit\Infrastructure;
 use PHPUnit\Framework\TestCase;
 use TeamSquad\EventBus\Infrastructure\AutoloadConfig;
 use TeamSquad\EventBus\Infrastructure\ConsumerConfigGenerator;
+use TeamSquad\Tests\SampleConsumer;
+use TeamSquad\Tests\SampleManualConsumer;
 
 class ConsumerConfigGeneratorTest extends TestCase
 {
@@ -38,8 +40,8 @@ class ConsumerConfigGeneratorTest extends TestCase
     {
         $changeDirectoryToRoot = sprintf('cd %s/../../../', __DIR__);
         $composerScript = 'composer run generate-consumer-config';
-        $expectedOutput = 'Generated 1 consumers successfully';
-        $output         = shell_exec($changeDirectoryToRoot . ' & ' . $composerScript);
+        $expectedOutput = 'Generated 2 consumers successfully';
+        $output = shell_exec($changeDirectoryToRoot . ' & ' . $composerScript);
         self::assertStringContainsString($expectedOutput, $output);
     }
 
@@ -63,6 +65,7 @@ class ConsumerConfigGeneratorTest extends TestCase
         self::assertEquals([
             'consumers'   => [
                 [
+                    'amqp'        => 'default',
                     'name'        => 'TeamSquad\Tests\SampleConsumer::listenSampleEvent',
                     'routing_key' => [
                         'sample_event',
@@ -90,15 +93,49 @@ class ConsumerConfigGeneratorTest extends TestCase
                         ],
                     ],
                 ],
+                [
+                    'amqp'         => 'users',
+                    'name'         => 'TeamSquad\Tests\SampleManualConsumer::listen',
+                    'routing_key'  => [
+                    ],
+                    'unique'       => false,
+                    'url'          => '/_/tests-samplemanualconsumer',
+                    'queue'        => 'user.online.queue',
+                    'exchange'     => '',
+                    'function'     => 'listen',
+                    'params'       => [
+                        'passive'     => false,
+                        'durable'     => false,
+                        'exclusive'   => false,
+                        'auto_delete' => false,
+                        'nowait'      => false,
+                        'args'        => [
+                            'x-expires'   => [
+                                'type' => 'int',
+                                'val'  => 300000,
+                            ],
+                            'x-ha-policy' => [
+                                'type' => 'string',
+                                'val'  => 'all',
+                            ],
+                        ],
+                    ],
+                    'create_queue' => false,
+                ],
             ],
             'routes'      => [
                 [
                     'pattern' => '/_/tests-sampleconsumer',
                     'route'   => 'tests-sampleconsumer/index',
                 ],
+                [
+                    'pattern' => '/_/tests-samplemanualconsumer',
+                    'route'   => 'tests-samplemanualconsumer/index',
+                ],
             ],
             'controllers' => [
-                'tests-sampleconsumer' => 'TeamSquad\Tests\SampleConsumer',
+                'tests-sampleconsumer'       => SampleConsumer::class,
+                'tests-samplemanualconsumer' => SampleManualConsumer::class,
             ],
         ], $actual);
     }

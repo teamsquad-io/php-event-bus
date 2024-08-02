@@ -81,8 +81,6 @@ class AutoloaderEventMapGenerator implements EventMapGenerator
     /**
      * @throws InvalidArguments
      * @throws UnknownEventException
-     *
-     * @noinspection PhpRedundantVariableDocTypeInspection
      */
     public function generate(): void
     {

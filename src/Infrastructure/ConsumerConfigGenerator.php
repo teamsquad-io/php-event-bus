@@ -19,7 +19,6 @@ use TeamSquad\EventBus\Domain\Listen;
 use TeamSquad\EventBus\Domain\RenamedEvent;
 
 use function count;
-
 use function get_class;
 
 use const PHP_EOL;
@@ -46,9 +45,9 @@ class ConsumerConfigGenerator
     }
 
     /**
-     * @throws AnnotationException
      * @throws FileNotFound
      * @throws ReflectionException
+     * @throws AnnotationException
      *
      * @return array<array-key, mixed>
      *
@@ -85,85 +84,115 @@ class ConsumerConfigGenerator
                 $reflectClass->isInstantiable() &&
                 $reflectClass->isSubclassOf(Consumer::class)
             ) {
+                $amqp = 'default';
+                $bus = $annotationReader->getClassAnnotation($reflectClass, Bus::class);
+                if ($bus) {
+                    $amqp = $bus->bus;
+                }
                 $methods = $reflectClass->getMethods(ReflectionMethod::IS_PUBLIC);
                 $consumerName = get_class($reflectClass->newInstanceWithoutConstructor());
                 $controller = $this->classUniqueUrl($class);
                 foreach ($methods as $method) {
                     if ($method->getNumberOfRequiredParameters() > 0 && strpos($method->getName(), 'listen') === 0) {
-                        $eventClass = $this->extractEventClassFromMethod($method);
-                        if (!$eventClass) {
-                            continue;
-                        }
-
-                        if ($eventClass->implementsInterface(Event::class) && $eventClass->isInstantiable()) {
-                            /** @var Event $evt */
-                            $evt = $eventClass->newInstanceWithoutConstructor();
-                            $rk = [$evt->eventName()];
-                            foreach ($annotationReader->getClassAnnotations($eventClass) as $annotation) {
-                                if ($annotation instanceof RenamedEvent) {
-                                    $rk[] = $annotation->old;
-                                }
-                            }
+                        $manual = $annotationReader->getMethodAnnotation($method, Manual::class);
+                        if ($manual) {
                             $consumers[] = [
-                                'name'        => $consumerName . '::' . $method->getName(),
-                                'routing_key' => $rk,
-                                'unique'      => false,
-                                'url'         => $this->generateUniqueUrl($method),
-                                'queue'       => $this->generateQueueName($method),
-                                'exchange'    => $this->config->eventBusExchangeName(),
-                                'function'    => $method->getName(),
-                                'params'      => [
-                                    'passive'     => false,
-                                    'durable'     => false,
-                                    'exclusive'   => false,
-                                    'auto_delete' => false,
-                                    'nowait'      => false,
-                                    'args'        => [
-                                        'x-expires'   => [
-                                            'type' => 'int',
-                                            'val'  => 300000,
-                                        ],
-                                        'x-ha-policy' => [
-                                            'type' => 'string',
-                                            'val'  => 'all',
-                                        ],
-                                    ],
+                                'amqp'         => $amqp,
+                                'name'         => $consumerName . '::' . $method->getName(),
+                                'routing_key'  => $manual->routingKey,
+                                'unique'       => false,
+                                'url'          => $this->generateUniqueUrl($method),
+                                'queue'        => $manual->queue,
+                                'exchange'     => $manual->exchange,
+                                'function'     => $method->getName(),
+                                'create_queue' => $manual->createQueue,
+                                'params' => [
+                                    'passive'     => $manual->passive,
+                                    'durable'     => $manual->durable,
+                                    'exclusive'   => $manual->exclusive,
+                                    'auto_delete' => $manual->autoDelete,
+                                    'nowait'      => $manual->noWait,
+                                    'args'        => $manual->args,
                                 ],
                             ];
                         } else {
-                            echo $consumerName . '::' . $method->getName() . PHP_EOL;
-                            $listenAnnotation = $annotationReader->getMethodAnnotation($method, Listen::class);
-                            if (!$listenAnnotation) {
-                                throw new AnnotationException(
-                                    sprintf('Listening to a non Event class and missing %s Annotation', Listen::class)
-                                );
+                            $eventClass = $this->extractEventClassFromMethod($method);
+                            if (!$eventClass) {
+                                continue;
                             }
-                            $consumers[] = [
-                                'name'        => $consumerName . '::' . $method->getName(),
-                                'routing_key' => [$listenAnnotation->routingKey],
-                                'url'         => $this->generateUniqueUrl($method),
-                                'queue'       => $this->generateQueueName($method),
-                                'unique'      => false,
-                                'exchange'    => $this->config->eventBusExchangeName(),
-                                'function'    => $method->getName(),
-                                'params'      => [
-                                    'passive'     => false,
-                                    'durable'     => false,
-                                    'exclusive'   => false,
-                                    'auto_delete' => false,
-                                    'nowait'      => false,
-                                    'args'        => [
-                                        'x-expires'   => [
-                                            'type' => 'int',
-                                            'val'  => 300000,
-                                        ],
-                                        'x-ha-policy' => [
-                                            'type' => 'string',
-                                            'val'  => 'all',
+
+                            if ($eventClass->implementsInterface(Event::class) && $eventClass->isInstantiable()) {
+                                /** @var Event $evt */
+                                $evt = $eventClass->newInstanceWithoutConstructor();
+                                $rk = [$evt->eventName()];
+                                foreach ($annotationReader->getClassAnnotations($eventClass) as $annotation) {
+                                    if ($annotation instanceof RenamedEvent) {
+                                        $rk[] = $annotation->old;
+                                    }
+                                }
+                                $consumers[] = [
+                                    'amqp'        => $amqp,
+                                    'name'        => $consumerName . '::' . $method->getName(),
+                                    'routing_key' => $rk,
+                                    'unique'      => false,
+                                    'url'         => $this->generateUniqueUrl($method),
+                                    'queue'       => $this->generateQueueName($method),
+                                    'exchange'    => $this->config->eventBusExchangeName(),
+                                    'function'    => $method->getName(),
+                                    'params'      => [
+                                        'passive'     => false,
+                                        'durable'     => false,
+                                        'exclusive'   => false,
+                                        'auto_delete' => false,
+                                        'nowait'      => false,
+                                        'args'        => [
+                                            'x-expires'   => [
+                                                'type' => 'int',
+                                                'val'  => 300000,
+                                            ],
+                                            'x-ha-policy' => [
+                                                'type' => 'string',
+                                                'val'  => 'all',
+                                            ],
                                         ],
                                     ],
-                                ],
-                            ];
+                                ];
+                            } else {
+                                echo $consumerName . '::' . $method->getName() . PHP_EOL;
+                                $listenAnnotation = $annotationReader->getMethodAnnotation($method, Listen::class);
+                                if (!$listenAnnotation) {
+                                    throw new AnnotationException(
+                                        sprintf('Listening to a non Event class and missing %s Annotation', Listen::class)
+                                    );
+                                }
+                                $consumers[] = [
+                                    'amqp'        => $amqp,
+                                    'name'        => $consumerName . '::' . $method->getName(),
+                                    'routing_key' => [$listenAnnotation->routingKey],
+                                    'url'         => $this->generateUniqueUrl($method),
+                                    'queue'       => $this->generateQueueName($method),
+                                    'unique'      => false,
+                                    'exchange'    => $this->config->eventBusExchangeName(),
+                                    'function'    => $method->getName(),
+                                    'params'      => [
+                                        'passive'     => false,
+                                        'durable'     => false,
+                                        'exclusive'   => false,
+                                        'auto_delete' => false,
+                                        'nowait'      => false,
+                                        'args'        => [
+                                            'x-expires'   => [
+                                                'type' => 'int',
+                                                'val'  => 300000,
+                                            ],
+                                            'x-ha-policy' => [
+                                                'type' => 'string',
+                                                'val'  => 'all',
+                                            ],
+                                        ],
+                                    ],
+                                ];
+                            }
                         }
                         if (!isset($controllers[$controller])) {
                             $controllers[$controller] = $class;

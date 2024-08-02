@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TeamSquad\EventBus\Interfaces\Consumer;
 
+use Doctrine\Common\Annotations\AnnotationReader;
 use JsonException;
 use ReflectionClass;
 use ReflectionException;
@@ -16,6 +17,7 @@ use TeamSquad\EventBus\Domain\Exception\UnknownEventException;
 use TeamSquad\EventBus\Domain\Input;
 use TeamSquad\EventBus\Domain\SecureEvent;
 use TeamSquad\EventBus\Domain\StringEncrypt;
+use TeamSquad\EventBus\Infrastructure\Manual;
 use TeamSquad\EventBus\Infrastructure\PhpInput;
 use TeamSquad\EventBus\Infrastructure\SystemClock;
 use Throwable;
@@ -35,13 +37,20 @@ trait GoAssistedConsumer
     private Clock $clock;
     private StringEncrypt $encrypt;
     private Input $input;
+    private AnnotationReader $annotationReader;
 
-    public function initializeConsumer(EventMapGenerator $eventMap, StringEncrypt $dataEncrypt, ?Input $input = null): void
-    {
+    public function initializeConsumer(
+        EventMapGenerator $eventMap,
+        StringEncrypt $dataEncrypt,
+        ?AnnotationReader $annotationReader = null,
+        ?Input $input = null,
+        ?Clock $clock = null
+    ): void {
         $this->eventMap = $eventMap;
         $this->encrypt = $dataEncrypt;
         $this->input = $input ?: new PhpInput();
-        $this->clock = new SystemClock();
+        $this->clock = $clock ?: new SystemClock();
+        $this->annotationReader = $annotationReader ?: new AnnotationReader();
     }
 
     /**
@@ -53,12 +62,12 @@ trait GoAssistedConsumer
      */
     public function actionIndex(): void
     {
-        $methodName = $_SERVER['HTTP_FUNCTION'];
+        $methodName = $_SERVER['HTTP_FUNCTION'] ?? null;
         if (!is_string($methodName)) {
             throw new InvalidArguments(sprintf('Invalid method name. Must be string. Got: %s', gettype($methodName)));
         }
 
-        $routingKey = $_SERVER['HTTP_ROUTING_KEY'];
+        $routingKey = $_SERVER['HTTP_ROUTING_KEY'] ?? null;
         if (!is_string($routingKey)) {
             throw new InvalidArguments(sprintf('Invalid routing key. Must be string. Got: %s', gettype($routingKey)));
         }
@@ -99,12 +108,20 @@ trait GoAssistedConsumer
         }
 
         try {
-            /** @var array<array-key, string> $rawCommand */
-            $rawCommand = json_decode($body, true, 512, JSON_THROW_ON_ERROR);
-            $params = [
-                $this->unserialize($routingKey, $rawCommand),
-            ];
             $method = new ReflectionMethod($controllerInstance, $methodName);
+            $manualConfig = $this->annotationReader->getMethodAnnotation($method, Manual::class);
+            $unserializerRaw = $manualConfig && $manualConfig->unserializer === Manual::UNSERIALIZER_RAW;
+            if ($unserializerRaw) {
+                $params = [
+                    $body,
+                ];
+            } else {
+                /** @var array<array-key, string> $rawCommand */
+                $rawCommand = json_decode($body, true, 512, JSON_THROW_ON_ERROR);
+                $params = [
+                    $this->unserialize($routingKey, $rawCommand),
+                ];
+            }
             if ($method->getNumberOfRequiredParameters() > 1) {
                 if ($publishedAt !== null) {
                     $params[] = $publishedAt;
