@@ -75,6 +75,7 @@ class ConsumerConfigGeneratorTest extends TestCase
                     'queue'       => 'teamsquad.event.listen.Tests.SampleConsumer.listenSampleEvent',
                     'exchange'    => 'teamsquad.event_bus',
                     'function'    => 'listenSampleEvent',
+                    'create_queue' => true,
                     'params'      => [
                         'passive'     => false,
                         'durable'     => false,

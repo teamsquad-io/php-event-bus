@@ -139,6 +139,7 @@ class ConsumerConfigGenerator
                                     'queue'       => $this->generateQueueName($method),
                                     'exchange'    => $this->config->eventBusExchangeName(),
                                     'function'    => $method->getName(),
+                                    'create_queue' => true,
                                     'params'      => [
                                         'passive'     => false,
                                         'durable'     => false,
@@ -174,6 +175,7 @@ class ConsumerConfigGenerator
                                     'unique'      => false,
                                     'exchange'    => $this->config->eventBusExchangeName(),
                                     'function'    => $method->getName(),
+                                    'create_queue' => true,
                                     'params'      => [
                                         'passive'     => false,
                                         'durable'     => false,
