@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace TeamSquad\EventBus\Domain;
 
-abstract class SecureEvent implements Event
+/**
+ * @deprecated Use TeamSquad\EventBus\Domain\EncryptedEvent::class instead
+ */
+abstract class SecureEvent implements EncryptedEvent
 {
     /**
      * @return array<string>

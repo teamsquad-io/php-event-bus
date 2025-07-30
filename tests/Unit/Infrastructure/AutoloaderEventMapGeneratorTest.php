@@ -14,6 +14,7 @@ use TeamSquad\EventBus\Domain\Exception\UnknownEventException;
 use TeamSquad\EventBus\Infrastructure\AutoloadConfig;
 use TeamSquad\EventBus\Infrastructure\AutoloaderEventMapGenerator;
 use TeamSquad\Tests\SampleEvent;
+use TeamSquad\Tests\SampleEventEncrypted;
 use TeamSquad\Tests\SampleSecureEvent;
 
 class AutoloaderEventMapGeneratorTest extends TestCase
@@ -34,7 +35,7 @@ class AutoloaderEventMapGeneratorTest extends TestCase
         $this->expectExceptionMessage('No events found with whitelist "TeamSquad\NonExistent\" and blacklist ""');
 
         $this->getAutoloaderEventMapGenerator([
-            AutoloadConfig::WHITE_LIST_CONFIG_KEY          => 'TeamSquad\\NonExistent\\',
+            AutoloadConfig::WHITE_LIST_CONFIG_KEY => 'TeamSquad\\NonExistent\\',
         ]);
 
         self::assertFileDoesNotExist(self::EVENT_MAP_FILE_PATH);
@@ -64,8 +65,9 @@ class AutoloaderEventMapGeneratorTest extends TestCase
 
         self::assertFileExists(self::EVENT_MAP_FILE_PATH);
         self::assertEquals([
-            'sample_event'        => SampleEvent::class,
-            'sample_secure_event' => SampleSecureEvent::class,
+            'sample_event'           => SampleEvent::class,
+            'sample_secure_event'    => SampleSecureEvent::class,
+            'sample.encrypted.event' => SampleEventEncrypted::class,
         ], $sut->getAll());
     }
 
@@ -79,8 +81,9 @@ class AutoloaderEventMapGeneratorTest extends TestCase
             /** @var array<string, string> $eventMap */
             $eventMap = require self::EVENT_MAP_FILE_PATH;
             self::assertEquals([
-                'sample_event'        => SampleEvent::class,
-                'sample_secure_event' => SampleSecureEvent::class,
+                'sample_event'           => SampleEvent::class,
+                'sample_secure_event'    => SampleSecureEvent::class,
+                'sample.encrypted.event' => SampleEventEncrypted::class,
             ], $eventMap);
         } else {
             self::fail('File does not exist');
@@ -96,7 +99,8 @@ class AutoloaderEventMapGeneratorTest extends TestCase
 
         self::assertFileExists(self::EVENT_MAP_FILE_PATH);
         self::assertEquals([
-            'sample_event' => SampleEvent::class,
+            'sample_event'           => SampleEvent::class,
+            'sample.encrypted.event' => SampleEventEncrypted::class,
         ], $sut->getAll());
     }
 
@@ -125,7 +129,7 @@ class AutoloaderEventMapGeneratorTest extends TestCase
             __DIR__ . '/../../../vendor',
             self::EVENT_MAP_FILE_PATH,
             array_merge([
-                AutoloadConfig::CONFIGURATION_PATH_KEY    => __DIR__ . '/../../Utils/SampleConfigPath',
+                AutoloadConfig::CONFIGURATION_PATH_KEY         => __DIR__ . '/../../Utils/SampleConfigPath',
                 AutoloadConfig::EVENT_BUS_EXCHANGE_NAME_KEY    => 'vts.eventBus',
                 AutoloadConfig::CONSUMER_QUEUE_LISTEN_NAME_KEY => 'consumer.queue.listen',
                 AutoloadConfig::WHITE_LIST_CONFIG_KEY          => 'TeamSquad',
