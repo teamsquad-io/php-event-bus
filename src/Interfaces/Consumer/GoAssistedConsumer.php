@@ -10,6 +10,7 @@ use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
 use TeamSquad\EventBus\Domain\Clock;
+use TeamSquad\EventBus\Domain\EncryptedEvent;
 use TeamSquad\EventBus\Domain\Event;
 use TeamSquad\EventBus\Domain\EventMapGenerator;
 use TeamSquad\EventBus\Domain\Exception\InvalidArguments;
@@ -176,7 +177,7 @@ trait GoAssistedConsumer
      */
     private function decryptProtectedFields(ReflectionClass $reflect, array &$eventData): void
     {
-        if ($reflect->isSubclassOf(SecureEvent::class)) {
+        if ($reflect->isSubclassOf(EncryptedEvent::class)) {
             /** @var array<array-key, string> $protectedFields */
             $protectedFields = $reflect->getMethod('protectedFields')->invoke(null, null);
             foreach ($protectedFields as $protectedField) {

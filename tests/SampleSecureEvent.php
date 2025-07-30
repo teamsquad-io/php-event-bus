@@ -39,7 +39,7 @@ class SampleSecureEvent extends SecureEvent
     }
 
     /**
-     * @param array<string, string> $array
+     * @param array<string, mixed> $array
      *
      * @return Event
      */

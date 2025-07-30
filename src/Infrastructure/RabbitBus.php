@@ -7,9 +7,9 @@ namespace TeamSquad\EventBus\Infrastructure;
 use JsonException;
 use TeamSquad\EventBus\Domain\Bus;
 use TeamSquad\EventBus\Domain\Clock;
+use TeamSquad\EventBus\Domain\EncryptedEvent;
 use TeamSquad\EventBus\Domain\Event;
 use TeamSquad\EventBus\Domain\EventCollection;
-use TeamSquad\EventBus\Domain\SecureEvent;
 use TeamSquad\EventBus\Domain\StringEncrypt;
 
 use function is_string;
@@ -58,7 +58,7 @@ class RabbitBus implements Bus
      */
     private function encryptProtectedFields(Event $event, array &$eventDataToArray): void
     {
-        if ($event instanceof SecureEvent) {
+        if ($event instanceof EncryptedEvent) {
             foreach ($event::protectedFields() as $protectedField) {
                 if ($this->canBeSkipped($eventDataToArray, $protectedField)) {
                     continue;
