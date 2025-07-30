@@ -16,7 +16,6 @@ use TeamSquad\EventBus\Domain\EventMapGenerator;
 use TeamSquad\EventBus\Domain\Exception\InvalidArguments;
 use TeamSquad\EventBus\Domain\Exception\UnknownEventException;
 use TeamSquad\EventBus\Domain\Input;
-use TeamSquad\EventBus\Domain\SecureEvent;
 use TeamSquad\EventBus\Domain\StringEncrypt;
 use TeamSquad\EventBus\Infrastructure\Manual;
 use TeamSquad\EventBus\Infrastructure\PhpInput;

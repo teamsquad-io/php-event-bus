@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace TeamSquad\Tests;
 
+use RuntimeException;
 use TeamSquad\EventBus\Domain\EncryptedEvent;
-use TeamSquad\EventBus\Domain\Event;
+
+use function is_string;
 
 class SampleEventEncrypted implements EncryptedEvent
 {
@@ -43,10 +45,10 @@ class SampleEventEncrypted implements EncryptedEvent
      *
      * @return SampleEventEncrypted
      */
-    public static function fromArray(array $array): SampleEventEncrypted
+    public static function fromArray(array $array): self
     {
         if (!is_string($array['userId']) || !is_string($array['password'])) {
-            throw new \RuntimeException('Array must have string values');
+            throw new RuntimeException('Array must have string values');
         }
 
         return new self(
