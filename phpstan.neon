@@ -6,3 +6,5 @@ parameters:
         - %currentWorkingDirectory%/src/
     excludePaths:
         - %currentWorkingDirectory%/tests/
+    ignoreErrors:
+        - '#Trait TeamSquad\\EventBus\\Interfaces\\Consumer\\GoAssistedConsumer is used zero times and is not analysed#'
