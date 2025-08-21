@@ -11,6 +11,7 @@ use TeamSquad\EventBus\Infrastructure\AutoloadConfig;
 use TeamSquad\EventBus\Infrastructure\ConsumerConfigGenerator;
 use TeamSquad\Tests\SampleConsumer;
 use TeamSquad\Tests\SampleManualConsumer;
+use function sprintf;
 
 class ConsumerConfigGeneratorTest extends TestCase
 {
@@ -65,18 +66,19 @@ class ConsumerConfigGeneratorTest extends TestCase
         self::assertEquals([
             'consumers'   => [
                 [
-                    'amqp'        => 'default',
-                    'name'        => 'TeamSquad\Tests\SampleConsumer::listenSampleEvent',
-                    'routing_key' => [
+                    'amqp'         => 'default',
+                    'name'         => 'TeamSquad\Tests\SampleConsumer::listenSampleEvent',
+                    'routing_key'  => [
                         'sample_event',
                     ],
-                    'unique'      => false,
-                    'url'         => '/_/tests-sampleconsumer',
-                    'queue'       => 'teamsquad.event.listen.Tests.SampleConsumer.listenSampleEvent',
-                    'exchange'    => 'teamsquad.event_bus',
-                    'function'    => 'listenSampleEvent',
+                    'unique'       => false,
+                    'url'          => '/_/tests-sampleconsumer',
+                    'queue'        => 'teamsquad.event.listen.Tests.SampleConsumer.listenSampleEvent',
+                    'exchange'     => 'teamsquad.event_bus',
+                    'function'     => 'listenSampleEvent',
                     'create_queue' => true,
-                    'params'      => [
+                    'workers'      => 1,
+                    'params'       => [
                         'passive'     => false,
                         'durable'     => false,
                         'exclusive'   => false,
@@ -106,6 +108,7 @@ class ConsumerConfigGeneratorTest extends TestCase
                     'exchange'     => '',
                     'function'     => 'listen',
                     'create_queue' => true,
+                    'workers'      => 1,
                     'params'       => [
                         'passive'     => false,
                         'durable'     => false,

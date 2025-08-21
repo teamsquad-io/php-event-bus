@@ -20,6 +20,7 @@ use TeamSquad\EventBus\Domain\RenamedEvent;
 
 use function count;
 use function get_class;
+use function sprintf;
 
 use const PHP_EOL;
 
@@ -45,13 +46,11 @@ class ConsumerConfigGenerator
     }
 
     /**
-     * @throws FileNotFound
      * @throws ReflectionException
      * @throws AnnotationException
+     * @throws FileNotFound
      *
      * @return array<array-key, mixed>
-     *
-     * @noinspection PhpRedundantVariableDocTypeInspection
      */
     public function generate(): array
     {
@@ -106,7 +105,8 @@ class ConsumerConfigGenerator
                                 'exchange'     => $manual->exchange,
                                 'function'     => $method->getName(),
                                 'create_queue' => $manual->createQueue,
-                                'params' => [
+                                'workers'      => $manual->workers ?? 1,
+                                'params'       => [
                                     'passive'     => $manual->passive,
                                     'durable'     => $manual->durable,
                                     'exclusive'   => $manual->exclusive,
@@ -131,16 +131,17 @@ class ConsumerConfigGenerator
                                     }
                                 }
                                 $consumers[] = [
-                                    'amqp'        => $amqp,
-                                    'name'        => $consumerName . '::' . $method->getName(),
-                                    'routing_key' => $rk,
-                                    'unique'      => false,
-                                    'url'         => $this->generateUniqueUrl($method),
-                                    'queue'       => $this->generateQueueName($method),
-                                    'exchange'    => $this->config->eventBusExchangeName(),
-                                    'function'    => $method->getName(),
+                                    'amqp'         => $amqp,
+                                    'name'         => $consumerName . '::' . $method->getName(),
+                                    'routing_key'  => $rk,
+                                    'unique'       => false,
+                                    'url'          => $this->generateUniqueUrl($method),
+                                    'queue'        => $this->generateQueueName($method),
+                                    'exchange'     => $this->config->eventBusExchangeName(),
+                                    'function'     => $method->getName(),
                                     'create_queue' => true,
-                                    'params'      => [
+                                    'workers'      => 1,
+                                    'params'       => [
                                         'passive'     => false,
                                         'durable'     => false,
                                         'exclusive'   => false,
@@ -167,16 +168,17 @@ class ConsumerConfigGenerator
                                     );
                                 }
                                 $consumers[] = [
-                                    'amqp'        => $amqp,
-                                    'name'        => $consumerName . '::' . $method->getName(),
-                                    'routing_key' => [$listenAnnotation->routingKey],
-                                    'url'         => $this->generateUniqueUrl($method),
-                                    'queue'       => $this->generateQueueName($method),
-                                    'unique'      => false,
-                                    'exchange'    => $this->config->eventBusExchangeName(),
-                                    'function'    => $method->getName(),
+                                    'amqp'         => $amqp,
+                                    'name'         => $consumerName . '::' . $method->getName(),
+                                    'routing_key'  => [$listenAnnotation->routingKey],
+                                    'url'          => $this->generateUniqueUrl($method),
+                                    'queue'        => $this->generateQueueName($method),
+                                    'unique'       => false,
+                                    'exchange'     => $this->config->eventBusExchangeName(),
+                                    'function'     => $method->getName(),
                                     'create_queue' => true,
-                                    'params'      => [
+                                    'workers'      => 1,
+                                    'params'       => [
                                         'passive'     => false,
                                         'durable'     => false,
                                         'exclusive'   => false,

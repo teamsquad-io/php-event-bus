@@ -37,9 +37,6 @@ final class PhpUnitMockShortWillReturnFixer extends AbstractPhpUnitFixer
         'returnvaluemap' => 'willReturnMap',
     ];
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDefinition(): FixerDefinitionInterface
     {
         return new FixerDefinition(
@@ -65,17 +62,11 @@ final class MyTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isRisky(): bool
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function applyPhpUnitClassFix(Tokens $tokens, int $startIndex, int $endIndex): void
     {
         $functionsAnalyzer = new FunctionsAnalyzer();
@@ -86,7 +77,7 @@ final class MyTest extends \PHPUnit_Framework_TestCase
             }
 
             $functionToReplaceIndex = $tokens->getNextMeaningfulToken($index);
-            if (!$tokens[$functionToReplaceIndex]->equals([T_STRING, 'will'], false)) {
+            if (!$tokens[$functionToReplaceIndex]->equals([\T_STRING, 'will'], false)) {
                 continue;
             }
 
@@ -110,22 +101,23 @@ final class MyTest extends \PHPUnit_Framework_TestCase
 
             $openingBraceIndex = $tokens->getNextMeaningfulToken($functionToRemoveIndex);
 
-            if (!$tokens[$openingBraceIndex]->equals('(')) {
-                continue;
-            }
-
             if ($tokens[$tokens->getNextMeaningfulToken($openingBraceIndex)]->isGivenKind(CT::T_FIRST_CLASS_CALLABLE)) {
                 continue;
             }
 
             $closingBraceIndex = $tokens->findBlockEnd(Tokens::BLOCK_TYPE_PARENTHESIS_BRACE, $openingBraceIndex);
 
-            $tokens[$functionToReplaceIndex] = new Token([T_STRING, self::RETURN_METHODS_MAP[strtolower($tokens[$functionToRemoveIndex]->getContent())]]);
+            $tokens[$functionToReplaceIndex] = new Token([\T_STRING, self::RETURN_METHODS_MAP[strtolower($tokens[$functionToRemoveIndex]->getContent())]]);
             $tokens->clearTokenAndMergeSurroundingWhitespace($classReferenceIndex);
             $tokens->clearTokenAndMergeSurroundingWhitespace($objectOperatorIndex);
             $tokens->clearTokenAndMergeSurroundingWhitespace($functionToRemoveIndex);
             $tokens->clearTokenAndMergeSurroundingWhitespace($openingBraceIndex);
             $tokens->clearTokenAndMergeSurroundingWhitespace($closingBraceIndex);
+
+            $commaAfterClosingBraceIndex = $tokens->getNextMeaningfulToken($closingBraceIndex);
+            if ($tokens[$commaAfterClosingBraceIndex]->equals(',')) {
+                $tokens->clearTokenAndMergeSurroundingWhitespace($commaAfterClosingBraceIndex);
+            }
         }
     }
 }

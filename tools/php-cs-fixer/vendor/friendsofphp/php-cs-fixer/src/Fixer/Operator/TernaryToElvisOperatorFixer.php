@@ -33,8 +33,8 @@ final class TernaryToElvisOperatorFixer extends AbstractFixer
      */
     private const VALID_BEFORE_ENDTYPES = [
         '=',
-        [T_OPEN_TAG],
-        [T_OPEN_TAG_WITH_ECHO],
+        [\T_OPEN_TAG],
+        [\T_OPEN_TAG_WITH_ECHO],
         '(',
         ',',
         ';',
@@ -42,23 +42,20 @@ final class TernaryToElvisOperatorFixer extends AbstractFixer
         '{',
         '}',
         [CT::T_ARRAY_INDEX_CURLY_BRACE_OPEN],
-        [T_AND_EQUAL],    // &=
-        [T_CONCAT_EQUAL], // .=
-        [T_DIV_EQUAL],    // /=
-        [T_MINUS_EQUAL],  // -=
-        [T_MOD_EQUAL],    // %=
-        [T_MUL_EQUAL],    // *=
-        [T_OR_EQUAL],     // |=
-        [T_PLUS_EQUAL],   // +=
-        [T_POW_EQUAL],    // **=
-        [T_SL_EQUAL],     // <<=
-        [T_SR_EQUAL],     // >>=
-        [T_XOR_EQUAL],    // ^=
+        [\T_AND_EQUAL],    // &=
+        [\T_CONCAT_EQUAL], // .=
+        [\T_DIV_EQUAL],    // /=
+        [\T_MINUS_EQUAL],  // -=
+        [\T_MOD_EQUAL],    // %=
+        [\T_MUL_EQUAL],    // *=
+        [\T_OR_EQUAL],     // |=
+        [\T_PLUS_EQUAL],   // +=
+        [\T_POW_EQUAL],    // **=
+        [\T_SL_EQUAL],     // <<=
+        [\T_SR_EQUAL],     // >>=
+        [\T_XOR_EQUAL],    // ^=
     ];
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDefinition(): FixerDefinitionInterface
     {
         return new FixerDefinition(
@@ -83,32 +80,21 @@ final class TernaryToElvisOperatorFixer extends AbstractFixer
      */
     public function getPriority(): int
     {
-        return 1;
+        return 2;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isCandidate(Tokens $tokens): bool
     {
         return $tokens->isTokenKindFound('?');
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isRisky(): bool
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function applyFix(\SplFileInfo $file, Tokens $tokens): void
     {
-        $blockEdgeDefinitions = Tokens::getBlockEdgeDefinitions();
-
         for ($index = \count($tokens) - 5; $index > 1; --$index) {
             if (!$tokens[$index]->equals('?')) {
                 continue;
@@ -122,7 +108,7 @@ final class TernaryToElvisOperatorFixer extends AbstractFixer
 
             // get and check what is before the `?` operator
 
-            $beforeOperator = $this->getBeforeOperator($tokens, $index, $blockEdgeDefinitions);
+            $beforeOperator = $this->getBeforeOperator($tokens, $index);
 
             if (null === $beforeOperator) {
                 continue; // contains something we cannot fix because of priorities
@@ -141,34 +127,36 @@ final class TernaryToElvisOperatorFixer extends AbstractFixer
     }
 
     /**
-     * @return null|array{start: int, end: int} null if contains ++/-- operator
+     * @return ?array{start: int, end: int} null if contains ++/-- operator
      */
-    private function getBeforeOperator(Tokens $tokens, int $index, array $blockEdgeDefinitions): ?array
+    private function getBeforeOperator(Tokens $tokens, int $index): ?array
     {
+        $blockEdgeDefinitions = Tokens::getBlockEdgeDefinitions();
         $index = $tokens->getPrevMeaningfulToken($index);
         $before = ['end' => $index];
 
         while (!$tokens[$index]->equalsAny(self::VALID_BEFORE_ENDTYPES)) {
-            if ($tokens[$index]->isGivenKind([T_INC, T_DEC])) {
+            if ($tokens[$index]->isGivenKind([\T_INC, \T_DEC])) {
                 return null;
             }
 
-            $blockType = Tokens::detectBlockType($tokens[$index]);
+            $detectedBlockType = Tokens::detectBlockType($tokens[$index]);
 
-            if (null === $blockType || $blockType['isStart']) {
+            if (null === $detectedBlockType || $detectedBlockType['isStart']) {
                 $before['start'] = $index;
                 $index = $tokens->getPrevMeaningfulToken($index);
 
                 continue;
             }
 
-            $blockType = $blockEdgeDefinitions[$blockType['type']];
+            /** @phpstan-ignore-next-line offsetAccess.notFound (we just detected block type, we know it's definition exists under given PHP runtime) */
+            $blockType = $blockEdgeDefinitions[$detectedBlockType['type']];
             $openCount = 1;
 
             do {
                 $index = $tokens->getPrevMeaningfulToken($index);
 
-                if ($tokens[$index]->isGivenKind([T_INC, T_DEC])) {
+                if ($tokens[$index]->isGivenKind([\T_INC, \T_DEC])) {
                     return null;
                 }
 
@@ -202,7 +190,7 @@ final class TernaryToElvisOperatorFixer extends AbstractFixer
         $index = $tokens->getNextMeaningfulToken($index);
         $after = ['start' => $index];
 
-        while (!$tokens[$index]->equals(':')) {
+        do {
             $blockType = Tokens::detectBlockType($tokens[$index]);
 
             if (null !== $blockType) {
@@ -211,7 +199,7 @@ final class TernaryToElvisOperatorFixer extends AbstractFixer
 
             $after['end'] = $index;
             $index = $tokens->getNextMeaningfulToken($index);
-        }
+        } while (!$tokens[$index]->equals(':'));
 
         return $after;
     }

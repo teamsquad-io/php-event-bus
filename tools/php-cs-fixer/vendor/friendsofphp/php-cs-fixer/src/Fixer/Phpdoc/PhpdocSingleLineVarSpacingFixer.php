@@ -27,9 +27,6 @@ use PhpCsFixer\Tokenizer\Tokens;
  */
 final class PhpdocSingleLineVarSpacingFixer extends AbstractFixer
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getDefinition(): FixerDefinitionInterface
     {
         return new FixerDefinition(
@@ -49,20 +46,13 @@ final class PhpdocSingleLineVarSpacingFixer extends AbstractFixer
         return -10;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isCandidate(Tokens $tokens): bool
     {
-        return $tokens->isAnyTokenKindsFound([T_COMMENT, T_DOC_COMMENT]);
+        return $tokens->isAnyTokenKindsFound([\T_COMMENT, \T_DOC_COMMENT]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function applyFix(\SplFileInfo $file, Tokens $tokens): void
     {
-        /** @var Token $token */
         foreach ($tokens as $index => $token) {
             if (!$token->isComment()) {
                 continue;
@@ -72,7 +62,7 @@ final class PhpdocSingleLineVarSpacingFixer extends AbstractFixer
             $fixedContent = $this->fixTokenContent($content);
 
             if ($content !== $fixedContent) {
-                $tokens[$index] = new Token([T_DOC_COMMENT, $fixedContent]);
+                $tokens[$index] = new Token([\T_DOC_COMMENT, $fixedContent]);
             }
         }
     }

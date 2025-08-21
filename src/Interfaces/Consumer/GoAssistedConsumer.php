@@ -27,6 +27,7 @@ use function file_put_contents;
 use function get_class;
 use function gettype;
 use function is_string;
+use function sprintf;
 
 use const FILE_APPEND;
 use const PHP_EOL;
@@ -72,6 +73,7 @@ trait GoAssistedConsumer
             throw new InvalidArguments(sprintf('Invalid routing key. Must be string. Got: %s', gettype($routingKey)));
         }
 
+        /** @var string|null $publishedAt */
         $publishedAt = $_SERVER['HTTP_PUBLISHED_AT'] ?? null;
 
         echo $this->parseRequest(

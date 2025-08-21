@@ -29,9 +29,6 @@ use PhpCsFixer\Tokenizer\Tokens;
  */
 final class FullOpeningTagFixer extends AbstractFixer
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getDefinition(): FixerDefinitionInterface
     {
         return new FixerDefinition(
@@ -43,30 +40,27 @@ final class FullOpeningTagFixer extends AbstractFixer
 echo "Hello!";
 '
                 ),
+                new CodeSample(
+                    '<?PHP
+
+echo "Hello!";
+'
+                ),
             ]
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getPriority(): int
     {
         // must run before all Token-based fixers
         return 98;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isCandidate(Tokens $tokens): bool
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function applyFix(\SplFileInfo $file, Tokens $tokens): void
     {
         $content = $tokens->generateCode();
@@ -74,7 +68,7 @@ echo "Hello!";
         // replace all <? with <?php to replace all short open tags even without short_open_tag option enabled
         $newContent = Preg::replace('/<\?(?:phP|pHp|pHP|Php|PhP|PHp|PHP)?(\s|$)/', '<?php$1', $content, -1, $count);
 
-        if (!$count) {
+        if (0 === $count) {
             return;
         }
 
@@ -88,7 +82,7 @@ echo "Hello!";
         $tokensOldContentLength = 0;
 
         foreach ($newTokens as $index => $token) {
-            if ($token->isGivenKind(T_OPEN_TAG)) {
+            if ($token->isGivenKind(\T_OPEN_TAG)) {
                 $tokenContent = $token->getContent();
                 $possibleOpenContent = substr($content, $tokensOldContentLength, 5);
 
@@ -101,7 +95,7 @@ echo "Hello!";
                 continue;
             }
 
-            if ($token->isGivenKind([T_COMMENT, T_DOC_COMMENT, T_CONSTANT_ENCAPSED_STRING, T_ENCAPSED_AND_WHITESPACE, T_STRING])) {
+            if ($token->isGivenKind([\T_COMMENT, \T_DOC_COMMENT, \T_CONSTANT_ENCAPSED_STRING, \T_ENCAPSED_AND_WHITESPACE, \T_STRING])) {
                 $tokenContent = '';
                 $tokenContentLength = 0;
                 $parts = explode('<?php', $token->getContent());

@@ -35,12 +35,9 @@ final class StandardizeIncrementFixer extends AbstractIncrementOperatorFixer
         ':',
         [CT::T_DYNAMIC_PROP_BRACE_CLOSE],
         [CT::T_DYNAMIC_VAR_BRACE_CLOSE],
-        [T_CLOSE_TAG],
+        [\T_CLOSE_TAG],
     ];
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDefinition(): FixerDefinitionInterface
     {
         return new FixerDefinition(
@@ -56,23 +53,18 @@ final class StandardizeIncrementFixer extends AbstractIncrementOperatorFixer
      * {@inheritdoc}
      *
      * Must run before IncrementStyleFixer.
+     * Must run after LongToShorthandOperatorFixer.
      */
     public function getPriority(): int
     {
         return 16;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isCandidate(Tokens $tokens): bool
     {
-        return $tokens->isAnyTokenKindsFound([T_PLUS_EQUAL, T_MINUS_EQUAL]);
+        return $tokens->isAnyTokenKindsFound([\T_PLUS_EQUAL, \T_MINUS_EQUAL]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function applyFix(\SplFileInfo $file, Tokens $tokens): void
     {
         for ($index = $tokens->count() - 1; $index > 0; --$index) {
@@ -83,13 +75,13 @@ final class StandardizeIncrementFixer extends AbstractIncrementOperatorFixer
 
             $numberIndex = $tokens->getPrevMeaningfulToken($index);
             $number = $tokens[$numberIndex];
-            if (!$number->isGivenKind(T_LNUMBER) || '1' !== $number->getContent()) {
+            if (!$number->isGivenKind(\T_LNUMBER) || '1' !== $number->getContent()) {
                 continue;
             }
 
             $operatorIndex = $tokens->getPrevMeaningfulToken($numberIndex);
             $operator = $tokens[$operatorIndex];
-            if (!$operator->isGivenKind([T_PLUS_EQUAL, T_MINUS_EQUAL])) {
+            if (!$operator->isGivenKind([\T_PLUS_EQUAL, \T_MINUS_EQUAL])) {
                 continue;
             }
 
@@ -103,7 +95,7 @@ final class StandardizeIncrementFixer extends AbstractIncrementOperatorFixer
 
             $tokens->insertAt(
                 $startIndex,
-                new Token($operator->isGivenKind(T_PLUS_EQUAL) ? [T_INC, '++'] : [T_DEC, '--'])
+                new Token($operator->isGivenKind(\T_PLUS_EQUAL) ? [\T_INC, '++'] : [\T_DEC, '--'])
             );
         }
     }

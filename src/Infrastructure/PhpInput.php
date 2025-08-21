@@ -9,6 +9,7 @@ use TeamSquad\EventBus\Domain\Input;
 
 use function gettype;
 use function is_string;
+use function sprintf;
 
 class PhpInput implements Input
 {

@@ -18,24 +18,23 @@ use PhpCsFixer\AbstractFixer;
 use PhpCsFixer\FixerDefinition\CodeSample;
 use PhpCsFixer\FixerDefinition\FixerDefinition;
 use PhpCsFixer\FixerDefinition\FixerDefinitionInterface;
+use PhpCsFixer\FixerDefinition\VersionSpecification;
+use PhpCsFixer\FixerDefinition\VersionSpecificCodeSample;
+use PhpCsFixer\Tokenizer\FCT;
 use PhpCsFixer\Tokenizer\Token;
 use PhpCsFixer\Tokenizer\Tokens;
 use PhpCsFixer\Tokenizer\TokensAnalyzer;
 
 final class SelfStaticAccessorFixer extends AbstractFixer
 {
-    /**
-     * @var TokensAnalyzer
-     */
-    private $tokensAnalyzer;
+    private const CLASSY_TYPES = [\T_CLASS, FCT::T_ENUM];
+    private const CLASSY_TOKENS_OF_INTEREST = [[\T_CLASS], [FCT::T_ENUM]];
+    private TokensAnalyzer $tokensAnalyzer;
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDefinition(): FixerDefinitionInterface
     {
         return new FixerDefinition(
-            'Inside a `final` class or anonymous class `self` should be preferred to `static`.',
+            'Inside an enum or `final`/anonymous class, `self` should be preferred over `static`.',
             [
                 new CodeSample(
                     '<?php
@@ -87,50 +86,65 @@ $a = new class() {
 };
 '
                 ),
+                new VersionSpecificCodeSample(
+                    '<?php
+enum Foo
+{
+    public const A = 123;
+
+    public static function bar(): void
+    {
+        echo static::A;
+    }
+}
+',
+                    new VersionSpecification(8_01_00)
+                ),
             ]
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isCandidate(Tokens $tokens): bool
     {
-        return $tokens->isAllTokenKindsFound([T_CLASS, T_STATIC]) && $tokens->isAnyTokenKindsFound([T_DOUBLE_COLON, T_NEW, T_INSTANCEOF]);
+        return $tokens->isTokenKindFound(\T_STATIC)
+            && $tokens->isAnyTokenKindsFound(self::CLASSY_TYPES)
+            && $tokens->isAnyTokenKindsFound([\T_DOUBLE_COLON, \T_NEW, \T_INSTANCEOF]);
     }
 
     /**
      * {@inheritdoc}
      *
-     * Must run after FinalInternalClassFixer, FunctionToConstantFixer, PhpUnitTestCaseStaticMethodCallsFixer.
+     * Must run after FinalClassFixer, FinalInternalClassFixer, FunctionToConstantFixer, PhpUnitTestCaseStaticMethodCallsFixer.
      */
     public function getPriority(): int
     {
         return -10;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function applyFix(\SplFileInfo $file, Tokens $tokens): void
     {
         $this->tokensAnalyzer = new TokensAnalyzer($tokens);
+        $classyIndex = $tokens->getNextTokenOfKind(0, self::CLASSY_TOKENS_OF_INTEREST);
 
-        $classIndex = $tokens->getNextTokenOfKind(0, [[T_CLASS]]);
+        while (null !== $classyIndex) {
+            if ($tokens[$classyIndex]->isGivenKind(\T_CLASS)) {
+                $modifiers = $this->tokensAnalyzer->getClassyModifiers($classyIndex);
 
-        while (null !== $classIndex) {
-            if (
-                $this->tokensAnalyzer->isAnonymousClass($classIndex)
-                || $tokens[$tokens->getPrevMeaningfulToken($classIndex)]->isGivenKind(T_FINAL)
-            ) {
-                $classIndex = $this->fixClass($tokens, $classIndex);
+                if (
+                    isset($modifiers['final'])
+                    || $this->tokensAnalyzer->isAnonymousClass($classyIndex)
+                ) {
+                    $classyIndex = $this->fixClassy($tokens, $classyIndex);
+                }
+            } else {
+                $classyIndex = $this->fixClassy($tokens, $classyIndex);
             }
 
-            $classIndex = $tokens->getNextTokenOfKind($classIndex, [[T_CLASS]]);
+            $classyIndex = $tokens->getNextTokenOfKind($classyIndex, self::CLASSY_TOKENS_OF_INTEREST);
         }
     }
 
-    private function fixClass(Tokens $tokens, int $index): int
+    private function fixClassy(Tokens $tokens, int $index): int
     {
         $index = $tokens->getNextTokenOfKind($index, ['{']);
         $classOpenCount = 1;
@@ -150,7 +164,7 @@ $a = new class() {
                 continue;
             }
 
-            if ($tokens[$index]->isGivenKind(T_FUNCTION)) {
+            if ($tokens[$index]->isGivenKind(\T_FUNCTION)) {
                 // do not fix inside lambda
                 if ($this->tokensAnalyzer->isLambda($index)) {
                     // figure out where the lambda starts
@@ -158,13 +172,13 @@ $a = new class() {
                     $openCount = 1;
 
                     do {
-                        $index = $tokens->getNextTokenOfKind($index, ['}', '{', [T_CLASS]]);
+                        $index = $tokens->getNextTokenOfKind($index, ['}', '{', [\T_CLASS]]);
                         if ($tokens[$index]->equals('}')) {
                             --$openCount;
                         } elseif ($tokens[$index]->equals('{')) {
                             ++$openCount;
                         } else {
-                            $index = $this->fixClass($tokens, $index);
+                            $index = $this->fixClassy($tokens, $index);
                         }
                     } while ($openCount > 0);
                 }
@@ -172,28 +186,28 @@ $a = new class() {
                 continue;
             }
 
-            if ($tokens[$index]->isGivenKind([T_NEW, T_INSTANCEOF])) {
+            if ($tokens[$index]->isGivenKind([\T_NEW, \T_INSTANCEOF])) {
                 $index = $tokens->getNextMeaningfulToken($index);
 
-                if ($tokens[$index]->isGivenKind(T_STATIC)) {
-                    $tokens[$index] = new Token([T_STRING, 'self']);
+                if ($tokens[$index]->isGivenKind(\T_STATIC)) {
+                    $tokens[$index] = new Token([\T_STRING, 'self']);
                 }
 
                 continue;
             }
 
-            if (!$tokens[$index]->isGivenKind(T_STATIC)) {
+            if (!$tokens[$index]->isGivenKind(\T_STATIC)) {
                 continue;
             }
 
             $staticIndex = $index;
             $index = $tokens->getNextMeaningfulToken($index);
 
-            if (!$tokens[$index]->isGivenKind(T_DOUBLE_COLON)) {
+            if (!$tokens[$index]->isGivenKind(\T_DOUBLE_COLON)) {
                 continue;
             }
 
-            $tokens[$staticIndex] = new Token([T_STRING, 'self']);
+            $tokens[$staticIndex] = new Token([\T_STRING, 'self']);
         }
 
         return $index;

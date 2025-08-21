@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace PhpCsFixer\Console\Command;
 
+use PhpCsFixer\Console\Application;
 use PhpCsFixer\Console\SelfUpdate\NewVersionCheckerInterface;
 use PhpCsFixer\PharCheckerInterface;
 use PhpCsFixer\Preg;
@@ -33,13 +34,14 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * @internal
  */
-#[AsCommand(name: 'self-update')]
+#[AsCommand(name: 'self-update', description: 'Update php-cs-fixer.phar to the latest stable version.')]
 final class SelfUpdateCommand extends Command
 {
-    /**
-     * @var string
-     */
+    /** @TODO PHP 8.0 - remove the property */
     protected static $defaultName = 'self-update';
+
+    /** @TODO PHP 8.0 - remove the property */
+    protected static $defaultDescription = 'Update php-cs-fixer.phar to the latest stable version.';
 
     private NewVersionCheckerInterface $versionChecker;
 
@@ -61,7 +63,21 @@ final class SelfUpdateCommand extends Command
 
     /**
      * {@inheritdoc}
+     *
+     * Override here to only generate the help copy when used.
      */
+    public function getHelp(): string
+    {
+        return <<<'EOT'
+            The <info>%command.name%</info> command replace your php-cs-fixer.phar by the
+            latest version released on:
+            <comment>https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/releases</comment>
+
+            <info>$ php php-cs-fixer.phar %command.name%</info>
+
+            EOT;
+    }
+
     protected function configure(): void
     {
         $this
@@ -71,28 +87,14 @@ final class SelfUpdateCommand extends Command
                     new InputOption('--force', '-f', InputOption::VALUE_NONE, 'Force update to next major version if available.'),
                 ]
             )
-            ->setDescription('Update php-cs-fixer.phar to the latest stable version.')
-            ->setHelp(
-                <<<'EOT'
-The <info>%command.name%</info> command replace your php-cs-fixer.phar by the
-latest version released on:
-<comment>https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/releases</comment>
-
-<info>$ php php-cs-fixer.phar %command.name%</info>
-
-EOT
-            )
         ;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        if (OutputInterface::VERBOSITY_VERBOSE <= $output->getVerbosity() && $output instanceof ConsoleOutputInterface) {
+        if ($output instanceof ConsoleOutputInterface) {
             $stdErr = $output->getErrorOutput();
-            $stdErr->writeln($this->getApplication()->getLongVersion());
+            $stdErr->writeln(Application::getAboutWithRuntime(true));
         }
 
         if (!$this->toolInfo->isInstalledAsPhar()) {
@@ -109,7 +111,7 @@ EOT
             $latestVersion = $this->versionChecker->getLatestVersion();
             $latestVersionOfCurrentMajor = $this->versionChecker->getLatestVersionOfMajor($currentMajor);
         } catch (\Exception $exception) {
-            $output->writeln(sprintf(
+            $output->writeln(\sprintf(
                 '<error>Unable to determine newest version: %s</error>',
                 $exception->getMessage()
             ));
@@ -129,8 +131,8 @@ EOT
             0 !== $this->versionChecker->compareVersions($latestVersionOfCurrentMajor, $latestVersion)
             && true !== $input->getOption('force')
         ) {
-            $output->writeln(sprintf('<info>A new major version of PHP CS Fixer is available</info> (<comment>%s</comment>)', $latestVersion));
-            $output->writeln(sprintf('<info>Before upgrading please read</info> https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/blob/%s/UPGRADE-v%s.md', $latestVersion, $currentMajor + 1));
+            $output->writeln(\sprintf('<info>A new major version of PHP CS Fixer is available</info> (<comment>%s</comment>)', $latestVersion));
+            $output->writeln(\sprintf('<info>Before upgrading please read</info> https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/blob/%s/UPGRADE-v%s.md', $latestVersion, $currentMajor + 1));
             $output->writeln('<info>If you are ready to upgrade run this command with</info> <comment>-f</comment>');
             $output->writeln('<info>Checking for new minor/patch version...</info>');
 
@@ -143,10 +145,14 @@ EOT
             $remoteTag = $latestVersionOfCurrentMajor;
         }
 
-        $localFilename = realpath($_SERVER['argv'][0]) ?: $_SERVER['argv'][0];
+        $localFilename = $_SERVER['argv'][0];
+        $realPath = realpath($localFilename);
+        if (false !== $realPath) {
+            $localFilename = $realPath;
+        }
 
         if (!is_writable($localFilename)) {
-            $output->writeln(sprintf('<error>No permission to update</error> "%s" <error>file.</error>', $localFilename));
+            $output->writeln(\sprintf('<error>No permission to update</error> "%s" <error>file.</error>', $localFilename));
 
             return 1;
         }
@@ -155,7 +161,7 @@ EOT
         $remoteFilename = $this->toolInfo->getPharDownloadUri($remoteTag);
 
         if (false === @copy($remoteFilename, $tempFilename)) {
-            $output->writeln(sprintf('<error>Unable to download new version</error> %s <error>from the server.</error>', $remoteTag));
+            $output->writeln(\sprintf('<error>Unable to download new version</error> %s <error>from the server.</error>', $remoteTag));
 
             return 1;
         }
@@ -165,7 +171,7 @@ EOT
         $pharInvalidityReason = $this->pharChecker->checkFileValidity($tempFilename);
         if (null !== $pharInvalidityReason) {
             unlink($tempFilename);
-            $output->writeln(sprintf('<error>The download of</error> %s <error>is corrupt (%s).</error>', $remoteTag, $pharInvalidityReason));
+            $output->writeln(\sprintf('<error>The download of</error> %s <error>is corrupt (%s).</error>', $remoteTag, $pharInvalidityReason));
             $output->writeln('<error>Please re-run the "self-update" command to try again.</error>');
 
             return 1;
@@ -173,7 +179,7 @@ EOT
 
         rename($tempFilename, $localFilename);
 
-        $output->writeln(sprintf('<info>PHP CS Fixer updated</info> (<comment>%s</comment> -> <comment>%s</comment>)', $currentVersion, $remoteTag));
+        $output->writeln(\sprintf('<info>PHP CS Fixer updated</info> (<comment>%s</comment> -> <comment>%s</comment>)', $currentVersion, $remoteTag));
 
         return 0;
     }

@@ -15,7 +15,6 @@ declare(strict_types=1);
 namespace PhpCsFixer\Tokenizer;
 
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Finder\SplFileInfo;
 
 /**
  * Collection of Transformer classes.
@@ -40,9 +39,7 @@ final class Transformers
     {
         $this->registerBuiltInTransformers();
 
-        usort($this->items, static function (TransformerInterface $a, TransformerInterface $b): int {
-            return $b->getPriority() <=> $a->getPriority();
-        });
+        usort($this->items, static fn (TransformerInterface $a, TransformerInterface $b): int => $b->getPriority() <=> $a->getPriority());
     }
 
     public static function createSingleton(): self
@@ -100,12 +97,15 @@ final class Transformers
      */
     private function findBuiltInTransformers(): iterable
     {
-        /** @var SplFileInfo $file */
         foreach (Finder::create()->files()->in(__DIR__.'/Transformer') as $file) {
             $relativeNamespace = $file->getRelativePath();
-            $class = __NAMESPACE__.'\\Transformer\\'.($relativeNamespace ? $relativeNamespace.'\\' : '').$file->getBasename('.php');
+            $class = __NAMESPACE__.'\Transformer\\'.('' !== $relativeNamespace ? $relativeNamespace.'\\' : '').$file->getBasename('.php');
 
-            yield new $class();
+            $instance = new $class();
+
+            \assert($instance instanceof TransformerInterface);
+
+            yield $instance;
         }
     }
 }

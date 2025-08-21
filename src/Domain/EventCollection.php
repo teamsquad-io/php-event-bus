@@ -7,6 +7,8 @@ namespace TeamSquad\EventBus\Domain;
 use ArrayObject;
 use InvalidArgumentException;
 
+use function sprintf;
+
 /**
  * @extends ArrayObject<int, Event>
  */

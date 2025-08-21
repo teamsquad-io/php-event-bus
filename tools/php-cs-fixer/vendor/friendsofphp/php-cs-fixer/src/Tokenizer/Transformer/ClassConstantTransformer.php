@@ -28,22 +28,16 @@ use PhpCsFixer\Tokenizer\Tokens;
  */
 final class ClassConstantTransformer extends AbstractTransformer
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getRequiredPhpVersionId(): int
     {
-        return 50500;
+        return 5_05_00;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function process(Tokens $tokens, Token $token, int $index): void
     {
         if (!$token->equalsAny([
-            [T_CLASS, 'class'],
-            [T_STRING, 'class'],
+            [\T_CLASS, 'class'],
+            [\T_STRING, 'class'],
         ], false)) {
             return;
         }
@@ -51,14 +45,11 @@ final class ClassConstantTransformer extends AbstractTransformer
         $prevIndex = $tokens->getPrevMeaningfulToken($index);
         $prevToken = $tokens[$prevIndex];
 
-        if ($prevToken->isGivenKind(T_DOUBLE_COLON)) {
+        if ($prevToken->isGivenKind(\T_DOUBLE_COLON)) {
             $tokens[$index] = new Token([CT::T_CLASS_CONSTANT, $token->getContent()]);
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getCustomTokens(): array
     {
         return [CT::T_CLASS_CONSTANT];

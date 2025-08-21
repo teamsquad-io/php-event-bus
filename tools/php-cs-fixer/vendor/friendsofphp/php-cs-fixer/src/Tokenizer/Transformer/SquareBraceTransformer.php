@@ -32,29 +32,20 @@ use PhpCsFixer\Tokenizer\Tokens;
  */
 final class SquareBraceTransformer extends AbstractTransformer
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getPriority(): int
     {
         // must run after CurlyBraceTransformer and AttributeTransformer
         return -1;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRequiredPhpVersionId(): int
     {
         // Short array syntax was introduced in PHP 5.4, but the fixer is smart
         // enough to handle it even before 5.4.
         // Same for array destructing syntax sugar `[` introduced in PHP 7.1.
-        return 50000;
+        return 5_00_00;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function process(Tokens $tokens, Token $token, int $index): void
     {
         if ($this->isArrayDestructing($tokens, $index)) {
@@ -68,9 +59,6 @@ final class SquareBraceTransformer extends AbstractTransformer
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getCustomTokens(): array
     {
         return [
@@ -119,23 +107,21 @@ final class SquareBraceTransformer extends AbstractTransformer
             return false;
         }
 
-        static $disallowedPrevTokens = [
+        $prevToken = $tokens[$tokens->getPrevMeaningfulToken($index)];
+        if ($prevToken->equalsAny([
             ')',
             ']',
             '}',
             '"',
-            [T_CONSTANT_ENCAPSED_STRING],
-            [T_STRING],
-            [T_STRING_VARNAME],
-            [T_VARIABLE],
+            [\T_CONSTANT_ENCAPSED_STRING],
+            [\T_STRING],
+            [\T_STRING_VARNAME],
+            [\T_VARIABLE],
             [CT::T_ARRAY_SQUARE_BRACE_CLOSE],
             [CT::T_DYNAMIC_PROP_BRACE_CLOSE],
             [CT::T_DYNAMIC_VAR_BRACE_CLOSE],
             [CT::T_ARRAY_INDEX_CURLY_BRACE_CLOSE],
-        ];
-
-        $prevToken = $tokens[$tokens->getPrevMeaningfulToken($index)];
-        if ($prevToken->equalsAny($disallowedPrevTokens)) {
+        ])) {
             return false;
         }
 
@@ -153,38 +139,36 @@ final class SquareBraceTransformer extends AbstractTransformer
             return false;
         }
 
-        static $disallowedPrevTokens = [
+        $prevIndex = $tokens->getPrevMeaningfulToken($index);
+        $prevToken = $tokens[$prevIndex];
+        if ($prevToken->equalsAny([
             ')',
             ']',
             '"',
-            [T_CONSTANT_ENCAPSED_STRING],
-            [T_STRING],
-            [T_STRING_VARNAME],
-            [T_VARIABLE],
+            [\T_CONSTANT_ENCAPSED_STRING],
+            [\T_STRING],
+            [\T_STRING_VARNAME],
+            [\T_VARIABLE],
             [CT::T_ARRAY_SQUARE_BRACE_CLOSE],
             [CT::T_DYNAMIC_PROP_BRACE_CLOSE],
             [CT::T_DYNAMIC_VAR_BRACE_CLOSE],
             [CT::T_ARRAY_INDEX_CURLY_BRACE_CLOSE],
-        ];
-
-        $prevIndex = $tokens->getPrevMeaningfulToken($index);
-        $prevToken = $tokens[$prevIndex];
-        if ($prevToken->equalsAny($disallowedPrevTokens)) {
+        ])) {
             return false;
         }
 
-        if ($prevToken->isGivenKind(T_AS)) {
+        if ($prevToken->isGivenKind(\T_AS)) {
             return true;
         }
 
-        if ($prevToken->isGivenKind(T_DOUBLE_ARROW)) {
+        if ($prevToken->isGivenKind(\T_DOUBLE_ARROW)) {
             $variableIndex = $tokens->getPrevMeaningfulToken($prevIndex);
-            if (!$tokens[$variableIndex]->isGivenKind(T_VARIABLE)) {
+            if (!$tokens[$variableIndex]->isGivenKind(\T_VARIABLE)) {
                 return false;
             }
 
             $prevVariableIndex = $tokens->getPrevMeaningfulToken($variableIndex);
-            if ($tokens[$prevVariableIndex]->isGivenKind(T_AS)) {
+            if ($tokens[$prevVariableIndex]->isGivenKind(\T_AS)) {
                 return true;
             }
         }

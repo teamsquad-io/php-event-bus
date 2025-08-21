@@ -16,6 +16,7 @@ use TeamSquad\EventBus\Domain\Secrets;
 use Throwable;
 
 use function array_key_exists;
+use function sprintf;
 
 class Rabbit
 {

@@ -15,10 +15,9 @@ declare(strict_types=1);
 namespace PhpCsFixer\Fixer\FunctionNotation;
 
 use PhpCsFixer\AbstractFixer;
+use PhpCsFixer\FixerDefinition\CodeSample;
 use PhpCsFixer\FixerDefinition\FixerDefinition;
 use PhpCsFixer\FixerDefinition\FixerDefinitionInterface;
-use PhpCsFixer\FixerDefinition\VersionSpecification;
-use PhpCsFixer\FixerDefinition\VersionSpecificCodeSample;
 use PhpCsFixer\Tokenizer\CT;
 use PhpCsFixer\Tokenizer\Token;
 use PhpCsFixer\Tokenizer\Tokens;
@@ -29,24 +28,19 @@ use PhpCsFixer\Tokenizer\TokensAnalyzer;
  */
 final class UseArrowFunctionsFixer extends AbstractFixer
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getDefinition(): FixerDefinitionInterface
     {
         return new FixerDefinition(
-            'Anonymous functions with one-liner return statement must use arrow functions.',
+            'Anonymous functions with return as the only statement must use arrow functions.',
             [
-                new VersionSpecificCodeSample(
+                new CodeSample(
                     <<<'SAMPLE'
-<?php
-foo(function ($a) use ($b) {
-    return $a + $b;
-});
+                        <?php
+                        foo(function ($a) use ($b) {
+                            return $a + $b;
+                        });
 
-SAMPLE
-                    ,
-                    new VersionSpecification(70400)
+                        SAMPLE,
                 ),
             ],
             null,
@@ -54,17 +48,11 @@ SAMPLE
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isCandidate(Tokens $tokens): bool
     {
-        return $tokens->isAllTokenKindsFound([T_FUNCTION, T_RETURN]);
+        return $tokens->isAllTokenKindsFound([\T_FUNCTION, \T_RETURN]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isRisky(): bool
     {
         return true;
@@ -72,18 +60,24 @@ SAMPLE
 
     /**
      * {@inheritdoc}
+     *
+     * Must run before FunctionDeclarationFixer.
      */
+    public function getPriority(): int
+    {
+        return 32;
+    }
+
     protected function applyFix(\SplFileInfo $file, Tokens $tokens): void
     {
         $analyzer = new TokensAnalyzer($tokens);
 
         for ($index = $tokens->count() - 1; $index > 0; --$index) {
-            if (!$tokens[$index]->isGivenKind(T_FUNCTION) || !$analyzer->isLambda($index)) {
+            if (!$tokens[$index]->isGivenKind(\T_FUNCTION) || !$analyzer->isLambda($index)) {
                 continue;
             }
 
-            // Find parameters end
-            // Abort if they are multilined
+            // Find parameters
 
             $parametersStart = $tokens->getNextMeaningfulToken($index);
 
@@ -92,10 +86,6 @@ SAMPLE
             }
 
             $parametersEnd = $tokens->findBlockEnd(Tokens::BLOCK_TYPE_PARENTHESIS_BRACE, $parametersStart);
-
-            if ($this->isMultilined($tokens, $parametersStart, $parametersEnd)) {
-                continue;
-            }
 
             // Find `use ()` start and end
             // Abort if it contains reference variables
@@ -108,7 +98,7 @@ SAMPLE
             if ($tokens[$next]->isGivenKind(CT::T_USE_LAMBDA)) {
                 $useStart = $next;
 
-                if ($tokens[$useStart - 1]->isGivenKind(T_WHITESPACE)) {
+                if ($tokens[$useStart - 1]->isGivenKind(\T_WHITESPACE)) {
                     --$useStart;
                 }
 
@@ -133,11 +123,11 @@ SAMPLE
             $braceOpen = $tokens[$next]->equals('{') ? $next : $tokens->getNextTokenOfKind($next, ['{']);
             $return = $braceOpen + 1;
 
-            if ($tokens[$return]->isGivenKind(T_WHITESPACE)) {
+            if ($tokens[$return]->isGivenKind(\T_WHITESPACE)) {
                 ++$return;
             }
 
-            if (!$tokens[$return]->isGivenKind(T_RETURN)) {
+            if (!$tokens[$return]->isGivenKind(\T_RETURN)) {
                 continue;
             }
 
@@ -154,17 +144,11 @@ SAMPLE
 
             $braceClose = $semicolon + 1;
 
-            if ($tokens[$braceClose]->isGivenKind(T_WHITESPACE)) {
+            if ($tokens[$braceClose]->isGivenKind(\T_WHITESPACE)) {
                 ++$braceClose;
             }
 
             if (!$tokens[$braceClose]->equals('}')) {
-                continue;
-            }
-
-            // Abort if the `return` statement is multilined
-
-            if ($this->isMultilined($tokens, $return, $semicolon)) {
                 continue;
             }
 
@@ -174,24 +158,13 @@ SAMPLE
         }
     }
 
-    private function isMultilined(Tokens $tokens, int $start, int $end): bool
-    {
-        for ($i = $start; $i < $end; ++$i) {
-            if (str_contains($tokens[$i]->getContent(), "\n")) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     private function transform(Tokens $tokens, int $index, ?int $useStart, ?int $useEnd, int $braceOpen, int $return, int $semicolon, int $braceClose): void
     {
-        $tokensToInsert = [new Token([T_DOUBLE_ARROW, '=>'])];
+        $tokensToInsert = [new Token([\T_DOUBLE_ARROW, '=>'])];
 
         if ($tokens->getNextMeaningfulToken($return) === $semicolon) {
-            $tokensToInsert[] = new Token([T_WHITESPACE, ' ']);
-            $tokensToInsert[] = new Token([T_STRING, 'null']);
+            $tokensToInsert[] = new Token([\T_WHITESPACE, ' ']);
+            $tokensToInsert[] = new Token([\T_STRING, 'null']);
         }
 
         $tokens->clearRange($semicolon, $braceClose);
@@ -202,6 +175,6 @@ SAMPLE
             $tokens->clearRange($useStart, $useEnd);
         }
 
-        $tokens[$index] = new Token([T_FN, 'fn']);
+        $tokens[$index] = new Token([\T_FN, 'fn']);
     }
 }

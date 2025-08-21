@@ -16,6 +16,7 @@ namespace PhpCsFixer\Tokenizer\Transformer;
 
 use PhpCsFixer\Tokenizer\AbstractTransformer;
 use PhpCsFixer\Tokenizer\CT;
+use PhpCsFixer\Tokenizer\FCT;
 use PhpCsFixer\Tokenizer\Token;
 use PhpCsFixer\Tokenizer\Tokens;
 
@@ -28,9 +29,6 @@ use PhpCsFixer\Tokenizer\Tokens;
  */
 final class TypeColonTransformer extends AbstractTransformer
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getPriority(): int
     {
         // needs to run after ReturnRefTransformer and UseTransformer
@@ -38,17 +36,11 @@ final class TypeColonTransformer extends AbstractTransformer
         return -10;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getRequiredPhpVersionId(): int
     {
-        return 70000;
+        return 7_00_00;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function process(Tokens $tokens, Token $token, int $index): void
     {
         if (!$token->equals(':')) {
@@ -57,10 +49,7 @@ final class TypeColonTransformer extends AbstractTransformer
 
         $endIndex = $tokens->getPrevMeaningfulToken($index);
 
-        if (
-            \defined('T_ENUM') // @TODO: drop condition when PHP 8.1+ is required
-            && $tokens[$tokens->getPrevMeaningfulToken($endIndex)]->isGivenKind(T_ENUM)
-        ) {
+        if ($tokens[$tokens->getPrevMeaningfulToken($endIndex)]->isGivenKind(FCT::T_ENUM)) {
             $tokens[$index] = new Token([CT::T_TYPE_COLON, ':']);
 
             return;
@@ -75,19 +64,16 @@ final class TypeColonTransformer extends AbstractTransformer
         $prevToken = $tokens[$prevIndex];
 
         // if this could be a function name we need to take one more step
-        if ($prevToken->isGivenKind(T_STRING)) {
+        if ($prevToken->isGivenKind(\T_STRING)) {
             $prevIndex = $tokens->getPrevMeaningfulToken($prevIndex);
             $prevToken = $tokens[$prevIndex];
         }
 
-        if ($prevToken->isGivenKind([T_FUNCTION, CT::T_RETURN_REF, CT::T_USE_LAMBDA, T_FN])) {
+        if ($prevToken->isGivenKind([\T_FUNCTION, CT::T_RETURN_REF, CT::T_USE_LAMBDA, \T_FN])) {
             $tokens[$index] = new Token([CT::T_TYPE_COLON, ':']);
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getCustomTokens(): array
     {
         return [CT::T_TYPE_COLON];

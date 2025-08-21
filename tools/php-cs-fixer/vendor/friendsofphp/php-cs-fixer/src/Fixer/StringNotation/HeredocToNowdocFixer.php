@@ -27,9 +27,6 @@ use PhpCsFixer\Tokenizer\Tokens;
  */
 final class HeredocToNowdocFixer extends AbstractFixer
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getDefinition(): FixerDefinitionInterface
     {
         return new FixerDefinition(
@@ -37,11 +34,11 @@ final class HeredocToNowdocFixer extends AbstractFixer
             [
                 new CodeSample(
                     <<<'EOF'
-<?php $a = <<<"TEST"
-Foo
-TEST;
+                        <?php $a = <<<"TEST"
+                        Foo
+                        TEST;
 
-EOF
+                        EOF
                 ),
             ]
         );
@@ -50,52 +47,46 @@ EOF
     /**
      * {@inheritdoc}
      *
-     * Must run after EscapeImplicitBackslashesFixer.
+     * Must run after EscapeImplicitBackslashesFixer, StringImplicitBackslashesFixer.
      */
     public function getPriority(): int
     {
         return 0;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isCandidate(Tokens $tokens): bool
     {
-        return $tokens->isTokenKindFound(T_START_HEREDOC);
+        return $tokens->isTokenKindFound(\T_START_HEREDOC);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function applyFix(\SplFileInfo $file, Tokens $tokens): void
     {
         foreach ($tokens as $index => $token) {
-            if (!$token->isGivenKind(T_START_HEREDOC) || str_contains($token->getContent(), "'")) {
+            if (!$token->isGivenKind(\T_START_HEREDOC) || str_contains($token->getContent(), "'")) {
                 continue;
             }
 
-            if ($tokens[$index + 1]->isGivenKind(T_END_HEREDOC)) {
+            if ($tokens[$index + 1]->isGivenKind(\T_END_HEREDOC)) {
                 $tokens[$index] = $this->convertToNowdoc($token);
 
                 continue;
             }
 
             if (
-                !$tokens[$index + 1]->isGivenKind(T_ENCAPSED_AND_WHITESPACE)
-                || !$tokens[$index + 2]->isGivenKind(T_END_HEREDOC)
+                !$tokens[$index + 1]->isGivenKind(\T_ENCAPSED_AND_WHITESPACE)
+                || !$tokens[$index + 2]->isGivenKind(\T_END_HEREDOC)
             ) {
                 continue;
             }
 
             $content = $tokens[$index + 1]->getContent();
             // regex: odd number of backslashes, not followed by dollar
-            if (Preg::match('/(?<!\\\\)(?:\\\\{2})*\\\\(?![$\\\\])/', $content)) {
+            if (Preg::match('/(?<!\\\)(?:\\\{2})*\\\(?![$\\\])/', $content)) {
                 continue;
             }
 
             $tokens[$index] = $this->convertToNowdoc($token);
-            $content = str_replace(['\\\\', '\\$'], ['\\', '$'], $content);
+            $content = str_replace(['\\\\', '\$'], ['\\', '$'], $content);
             $tokens[$index + 1] = new Token([
                 $tokens[$index + 1]->getId(),
                 $content,

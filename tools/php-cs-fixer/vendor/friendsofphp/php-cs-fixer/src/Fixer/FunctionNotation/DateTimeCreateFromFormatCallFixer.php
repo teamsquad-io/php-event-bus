@@ -19,7 +19,6 @@ use PhpCsFixer\FixerDefinition\CodeSample;
 use PhpCsFixer\FixerDefinition\FixerDefinition;
 use PhpCsFixer\FixerDefinition\FixerDefinitionInterface;
 use PhpCsFixer\Tokenizer\Analyzer\ArgumentsAnalyzer;
-use PhpCsFixer\Tokenizer\Analyzer\NamespacesAnalyzer;
 use PhpCsFixer\Tokenizer\Analyzer\NamespaceUsesAnalyzer;
 use PhpCsFixer\Tokenizer\Token;
 use PhpCsFixer\Tokenizer\Tokens;
@@ -35,7 +34,8 @@ final class DateTimeCreateFromFormatCallFixer extends AbstractFixer
             ],
             "Consider this code:
     `DateTime::createFromFormat('Y-m-d', '2022-02-11')`.
-    What value will be returned? '2022-02-11 00:00:00.0'? No, actual return value has 'H:i:s' section like '2022-02-11 16:55:37.0'.
+    What value will be returned? '2022-02-11 00:00:00.0'?
+    No, actual return value has 'H:i:s' section like '2022-02-11 16:55:37.0'.
     Change 'Y-m-d' to '!Y-m-d', return value will be '2022-02-11 00:00:00.0'.
     So, adding `!` to format string will make return value more intuitive.",
             'Risky when depending on the actual timings being used even when not explicit set in format.'
@@ -54,7 +54,7 @@ final class DateTimeCreateFromFormatCallFixer extends AbstractFixer
 
     public function isCandidate(Tokens $tokens): bool
     {
-        return $tokens->isTokenKindFound(T_DOUBLE_COLON);
+        return $tokens->isTokenKindFound(\T_DOUBLE_COLON);
     }
 
     public function isRisky(): bool
@@ -65,21 +65,20 @@ final class DateTimeCreateFromFormatCallFixer extends AbstractFixer
     protected function applyFix(\SplFileInfo $file, Tokens $tokens): void
     {
         $argumentsAnalyzer = new ArgumentsAnalyzer();
-        $namespacesAnalyzer = new NamespacesAnalyzer();
         $namespaceUsesAnalyzer = new NamespaceUsesAnalyzer();
 
-        foreach ($namespacesAnalyzer->getDeclarations($tokens) as $namespace) {
+        foreach ($tokens->getNamespaceDeclarations() as $namespace) {
             $scopeStartIndex = $namespace->getScopeStartIndex();
             $useDeclarations = $namespaceUsesAnalyzer->getDeclarationsInNamespace($tokens, $namespace);
 
             for ($index = $namespace->getScopeEndIndex(); $index > $scopeStartIndex; --$index) {
-                if (!$tokens[$index]->isGivenKind(T_DOUBLE_COLON)) {
+                if (!$tokens[$index]->isGivenKind(\T_DOUBLE_COLON)) {
                     continue;
                 }
 
                 $functionNameIndex = $tokens->getNextMeaningfulToken($index);
 
-                if (!$tokens[$functionNameIndex]->equals([T_STRING, 'createFromFormat'], false)) {
+                if (!$tokens[$functionNameIndex]->equals([\T_STRING, 'createFromFormat'], false)) {
                     continue;
                 }
 
@@ -89,14 +88,14 @@ final class DateTimeCreateFromFormatCallFixer extends AbstractFixer
 
                 $classNameIndex = $tokens->getPrevMeaningfulToken($index);
 
-                if (!$tokens[$classNameIndex]->equalsAny([[T_STRING, 'DateTime'], [T_STRING, 'DateTimeImmutable']], false)) {
+                if (!$tokens[$classNameIndex]->equalsAny([[\T_STRING, \DateTime::class], [\T_STRING, \DateTimeImmutable::class]], false)) {
                     continue;
                 }
 
                 $preClassNameIndex = $tokens->getPrevMeaningfulToken($classNameIndex);
 
-                if ($tokens[$preClassNameIndex]->isGivenKind(T_NS_SEPARATOR)) {
-                    if ($tokens[$tokens->getPrevMeaningfulToken($preClassNameIndex)]->isGivenKind(T_STRING)) {
+                if ($tokens[$preClassNameIndex]->isGivenKind(\T_NS_SEPARATOR)) {
+                    if ($tokens[$tokens->getPrevMeaningfulToken($preClassNameIndex)]->isGivenKind(\T_STRING)) {
                         continue;
                     }
                 } elseif (!$namespace->isGlobalNamespace()) {
@@ -133,7 +132,7 @@ final class DateTimeCreateFromFormatCallFixer extends AbstractFixer
                 }
 
                 $tokens->clearAt($argumentIndex);
-                $tokens->insertAt($argumentIndex, new Token([T_CONSTANT_ENCAPSED_STRING, substr_replace($format, '!', $offset, 0)]));
+                $tokens->insertAt($argumentIndex, new Token([\T_CONSTANT_ENCAPSED_STRING, substr_replace($format, '!', $offset, 0)]));
             }
         }
     }
@@ -158,7 +157,7 @@ final class DateTimeCreateFromFormatCallFixer extends AbstractFixer
             return null; // argument is not a simple single string
         }
 
-        return !$tokens[$argumentStartIndex]->isGivenKind(T_CONSTANT_ENCAPSED_STRING)
+        return !$tokens[$argumentStartIndex]->isGivenKind(\T_CONSTANT_ENCAPSED_STRING)
             ? null // first argument is not a string
             : $argumentStartIndex;
     }

@@ -28,9 +28,6 @@ use PhpCsFixer\Tokenizer\Tokens;
  */
 final class NoUnreachableDefaultArgumentValueFixer extends AbstractFixer
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getDefinition(): FixerDefinitionInterface
     {
         return new FixerDefinition(
@@ -57,28 +54,19 @@ function example($foo = "two words", $bar) {}
         return 0;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isCandidate(Tokens $tokens): bool
     {
-        return $tokens->isAnyTokenKindsFound([T_FUNCTION, T_FN]);
+        return $tokens->isAnyTokenKindsFound([\T_FUNCTION, \T_FN]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isRisky(): bool
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function applyFix(\SplFileInfo $file, Tokens $tokens): void
     {
-        $functionKinds = [T_FUNCTION, T_FN];
+        $functionKinds = [\T_FUNCTION, \T_FN];
 
         for ($i = 0, $l = $tokens->count(); $i < $l; ++$i) {
             if (!$tokens[$i]->isGivenKind($functionKinds)) {
@@ -103,8 +91,14 @@ function example($foo = "two words", $bar) {}
         for ($i = $lastArgumentIndex; $i > $startIndex; --$i) {
             $token = $tokens[$i];
 
-            if ($token->isGivenKind(T_VARIABLE)) {
+            if ($token->isGivenKind(\T_VARIABLE)) {
                 $lastArgumentIndex = $i;
+
+                continue;
+            }
+
+            if ($token->isGivenKind(CT::T_PROPERTY_HOOK_BRACE_CLOSE)) {
+                $i = $tokens->findBlockStart(Tokens::BLOCK_TYPE_PROPERTY_HOOK, $i);
 
                 continue;
             }
@@ -128,7 +122,13 @@ function example($foo = "two words", $bar) {}
                 continue;
             }
 
-            if ($token->isGivenKind(T_VARIABLE) && !$this->isEllipsis($tokens, $i)) {
+            if ($token->isGivenKind(CT::T_PROPERTY_HOOK_BRACE_CLOSE)) {
+                $i = $tokens->findBlockStart(Tokens::BLOCK_TYPE_PROPERTY_HOOK, $i);
+
+                continue;
+            }
+
+            if ($token->isGivenKind(\T_VARIABLE) && !$this->isEllipsis($tokens, $i)) {
                 return $i;
             }
         }
@@ -138,7 +138,7 @@ function example($foo = "two words", $bar) {}
 
     private function isEllipsis(Tokens $tokens, int $variableIndex): bool
     {
-        return $tokens[$tokens->getPrevMeaningfulToken($variableIndex)]->isGivenKind(T_ELLIPSIS);
+        return $tokens[$tokens->getPrevMeaningfulToken($variableIndex)]->isGivenKind(\T_ELLIPSIS);
     }
 
     private function getDefaultValueEndIndex(Tokens $tokens, int $index): int
@@ -170,14 +170,14 @@ function example($foo = "two words", $bar) {}
     {
         $nextToken = $tokens[$tokens->getNextMeaningfulToken($index)];
 
-        if (!$nextToken->equals([T_STRING, 'null'], false)) {
+        if (!$nextToken->equals([\T_STRING, 'null'], false)) {
             return false;
         }
 
         $variableIndex = $tokens->getPrevMeaningfulToken($index);
 
-        $searchTokens = [',', '(', [T_STRING], [CT::T_ARRAY_TYPEHINT], [T_CALLABLE]];
-        $typehintKinds = [T_STRING, CT::T_ARRAY_TYPEHINT, T_CALLABLE];
+        $searchTokens = [',', '(', [\T_STRING], [CT::T_ARRAY_TYPEHINT], [\T_CALLABLE]];
+        $typehintKinds = [\T_STRING, CT::T_ARRAY_TYPEHINT, \T_CALLABLE];
 
         $prevIndex = $tokens->getPrevTokenOfKind($variableIndex, $searchTokens);
 

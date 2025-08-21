@@ -17,6 +17,7 @@ use TeamSquad\EventBus\Domain\Listen;
 use TeamSquad\EventBus\Domain\RenamedEvent;
 
 use function dirname;
+use function sprintf;
 
 /**
  * AutoloaderEventMapGenerator generates an event map using autoloaded classes

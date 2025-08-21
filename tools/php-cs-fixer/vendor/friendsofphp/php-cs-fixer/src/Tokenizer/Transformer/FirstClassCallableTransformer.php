@@ -24,21 +24,15 @@ use PhpCsFixer\Tokenizer\Tokens;
  */
 final class FirstClassCallableTransformer extends AbstractTransformer
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getRequiredPhpVersionId(): int
     {
-        return 80100;
+        return 8_01_00;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function process(Tokens $tokens, Token $token, int $index): void
     {
         if (
-            $token->isGivenKind(T_ELLIPSIS)
+            $token->isGivenKind(\T_ELLIPSIS)
             && $tokens[$tokens->getPrevMeaningfulToken($index)]->equals('(')
             && $tokens[$tokens->getNextMeaningfulToken($index)]->equals(')')
         ) {
@@ -46,9 +40,6 @@ final class FirstClassCallableTransformer extends AbstractTransformer
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getCustomTokens(): array
     {
         return [

@@ -27,9 +27,6 @@ use PhpCsFixer\Tokenizer\Tokens;
  */
 final class MultilineCommentOpeningClosingFixer extends AbstractFixer
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getDefinition(): FixerDefinitionInterface
     {
         return new FixerDefinition(
@@ -37,45 +34,39 @@ final class MultilineCommentOpeningClosingFixer extends AbstractFixer
             [
                 new CodeSample(
                     <<<'EOT'
-<?php
+                        <?php
 
-/******
- * Multiline comment with arbitrary asterisks count
- ******/
+                        /******
+                         * Multiline comment with arbitrary asterisks count
+                         ******/
 
-/**\
- * Multiline comment that seems a DocBlock
- */
+                        /**\
+                         * Multiline comment that seems a DocBlock
+                         */
 
-/**
- * DocBlock with arbitrary asterisk count at the end
- **/
+                        /**
+                         * DocBlock with arbitrary asterisk count at the end
+                         **/
 
-EOT
+                        EOT
                 ),
             ]
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isCandidate(Tokens $tokens): bool
     {
-        return $tokens->isAnyTokenKindsFound([T_COMMENT, T_DOC_COMMENT]);
+        return $tokens->isAnyTokenKindsFound([\T_COMMENT, \T_DOC_COMMENT]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function applyFix(\SplFileInfo $file, Tokens $tokens): void
     {
         foreach ($tokens as $index => $token) {
             $originalContent = $token->getContent();
 
             if (
-                !$token->isGivenKind(T_DOC_COMMENT)
-                && !($token->isGivenKind(T_COMMENT) && str_starts_with($originalContent, '/*'))
+                !$token->isGivenKind(\T_DOC_COMMENT)
+                && !($token->isGivenKind(\T_COMMENT) && str_starts_with($originalContent, '/*'))
             ) {
                 continue;
             }
@@ -83,12 +74,12 @@ EOT
             $newContent = $originalContent;
 
             // Fix opening
-            if ($token->isGivenKind(T_COMMENT)) {
-                $newContent = Preg::replace('/^\\/\\*{2,}(?!\\/)/', '/*', $newContent);
+            if ($token->isGivenKind(\T_COMMENT)) {
+                $newContent = Preg::replace('/^\/\*{2,}(?!\/)/', '/*', $newContent);
             }
 
             // Fix closing
-            $newContent = Preg::replace('/(?<!\\/)\\*{2,}\\/$/', '*/', $newContent);
+            $newContent = Preg::replace('/(?<!\/)\*{2,}\/$/', '*/', $newContent);
 
             if ($newContent !== $originalContent) {
                 $tokens[$index] = new Token([$token->getId(), $newContent]);

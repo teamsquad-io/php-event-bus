@@ -17,10 +17,12 @@ namespace PhpCsFixer\Fixer\Phpdoc;
 use PhpCsFixer\AbstractFixer;
 use PhpCsFixer\DocBlock\DocBlock;
 use PhpCsFixer\DocBlock\Line;
+use PhpCsFixer\DocBlock\TypeExpression;
 use PhpCsFixer\FixerDefinition\CodeSample;
 use PhpCsFixer\FixerDefinition\FixerDefinition;
 use PhpCsFixer\FixerDefinition\FixerDefinitionInterface;
 use PhpCsFixer\Preg;
+use PhpCsFixer\Tokenizer\FCT;
 use PhpCsFixer\Tokenizer\Token;
 use PhpCsFixer\Tokenizer\Tokens;
 
@@ -30,9 +32,8 @@ use PhpCsFixer\Tokenizer\Tokens;
  */
 final class PhpdocVarWithoutNameFixer extends AbstractFixer
 {
-    /**
-     * {@inheritdoc}
-     */
+    private const PROPERTY_MODIFIER_KINDS = [\T_PRIVATE, \T_PROTECTED, \T_PUBLIC, \T_VAR, FCT::T_READONLY, FCT::T_PRIVATE_SET, FCT::T_PROTECTED_SET, FCT::T_PUBLIC_SET];
+
     public function getDefinition(): FixerDefinitionInterface
     {
         return new FixerDefinition(
@@ -65,21 +66,15 @@ final class Foo
         return 0;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isCandidate(Tokens $tokens): bool
     {
-        return $tokens->isTokenKindFound(T_DOC_COMMENT) && $tokens->isAnyTokenKindsFound([T_CLASS, T_TRAIT]);
+        return $tokens->isTokenKindFound(\T_DOC_COMMENT) && $tokens->isAnyTokenKindsFound([\T_CLASS, \T_TRAIT]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function applyFix(\SplFileInfo $file, Tokens $tokens): void
     {
         foreach ($tokens as $index => $token) {
-            if (!$token->isGivenKind(T_DOC_COMMENT)) {
+            if (!$token->isGivenKind(\T_DOC_COMMENT)) {
                 continue;
             }
 
@@ -90,18 +85,12 @@ final class Foo
             }
 
             // For people writing "static public $foo" instead of "public static $foo"
-            if ($tokens[$nextIndex]->isGivenKind(T_STATIC)) {
+            if ($tokens[$nextIndex]->isGivenKind(\T_STATIC)) {
                 $nextIndex = $tokens->getNextMeaningfulToken($nextIndex);
             }
 
             // We want only doc blocks that are for properties and thus have specified access modifiers next
-            $propertyModifierKinds = [T_PRIVATE, T_PROTECTED, T_PUBLIC, T_VAR];
-
-            if (\defined('T_READONLY')) { // @TODO: drop condition when PHP 8.1+ is required
-                $propertyModifierKinds[] = T_READONLY;
-            }
-
-            if (!$tokens[$nextIndex]->isGivenKind($propertyModifierKinds)) {
+            if (!$tokens[$nextIndex]->isGivenKind(self::PROPERTY_MODIFIER_KINDS)) {
                 continue;
             }
 
@@ -116,23 +105,21 @@ final class Foo
                 }
             }
 
-            $tokens[$index] = new Token([T_DOC_COMMENT, $doc->getContent()]);
+            $tokens[$index] = new Token([\T_DOC_COMMENT, $doc->getContent()]);
         }
     }
 
     private function fixLine(Line $line): void
     {
-        $content = $line->getContent();
+        Preg::matchAll('/ \$'.TypeExpression::REGEX_IDENTIFIER.'(?<!\$this)/', $line->getContent(), $matches);
 
-        Preg::matchAll('/ \$[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*/', $content, $matches);
-
-        if (isset($matches[0][0])) {
-            $line->setContent(str_replace($matches[0][0], '', $content));
+        foreach ($matches[0] as $match) {
+            $line->setContent(str_replace($match, '', $line->getContent()));
         }
     }
 
     /**
-     * @return Line[]
+     * @return array<int, Line>
      */
     private function getFirstLevelLines(DocBlock $docBlock): array
     {

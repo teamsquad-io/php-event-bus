@@ -31,17 +31,11 @@ use PhpCsFixer\Tokenizer\Tokens;
  */
 final class LineEndingFixer extends AbstractFixer implements WhitespacesAwareFixerInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function isCandidate(Tokens $tokens): bool
     {
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDefinition(): FixerDefinitionInterface
     {
         return new FixerDefinition(
@@ -54,9 +48,6 @@ final class LineEndingFixer extends AbstractFixer implements WhitespacesAwareFix
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function applyFix(\SplFileInfo $file, Tokens $tokens): void
     {
         $ending = $this->whitespacesConfig->getLineEnding();
@@ -64,8 +55,8 @@ final class LineEndingFixer extends AbstractFixer implements WhitespacesAwareFix
         for ($index = 0, $count = \count($tokens); $index < $count; ++$index) {
             $token = $tokens[$index];
 
-            if ($token->isGivenKind(T_ENCAPSED_AND_WHITESPACE)) {
-                if ($tokens[$tokens->getNextMeaningfulToken($index)]->isGivenKind(T_END_HEREDOC)) {
+            if ($token->isGivenKind(\T_ENCAPSED_AND_WHITESPACE)) {
+                if ($tokens[$tokens->getNextMeaningfulToken($index)]->isGivenKind(\T_END_HEREDOC)) {
                     $tokens[$index] = new Token([
                         $token->getId(),
                         Preg::replace(
@@ -79,7 +70,7 @@ final class LineEndingFixer extends AbstractFixer implements WhitespacesAwareFix
                 continue;
             }
 
-            if ($token->isGivenKind([T_CLOSE_TAG, T_COMMENT, T_DOC_COMMENT, T_OPEN_TAG, T_START_HEREDOC, T_WHITESPACE])) {
+            if ($token->isGivenKind([\T_CLOSE_TAG, \T_COMMENT, \T_DOC_COMMENT, \T_OPEN_TAG, \T_START_HEREDOC, \T_WHITESPACE])) {
                 $tokens[$index] = new Token([
                     $token->getId(),
                     Preg::replace(

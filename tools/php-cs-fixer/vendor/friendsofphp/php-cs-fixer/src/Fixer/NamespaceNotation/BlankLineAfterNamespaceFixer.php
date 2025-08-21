@@ -30,9 +30,6 @@ use PhpCsFixer\Tokenizer\Tokens;
  */
 final class BlankLineAfterNamespaceFixer extends AbstractFixer implements WhitespacesAwareFixerInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function getDefinition(): FixerDefinitionInterface
     {
         return new FixerDefinition(
@@ -54,17 +51,11 @@ final class BlankLineAfterNamespaceFixer extends AbstractFixer implements Whites
         return -20;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isCandidate(Tokens $tokens): bool
     {
-        return $tokens->isTokenKindFound(T_NAMESPACE);
+        return $tokens->isTokenKindFound(\T_NAMESPACE);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function applyFix(\SplFileInfo $file, Tokens $tokens): void
     {
         $lastIndex = $tokens->count() - 1;
@@ -72,11 +63,11 @@ final class BlankLineAfterNamespaceFixer extends AbstractFixer implements Whites
         for ($index = $lastIndex; $index >= 0; --$index) {
             $token = $tokens[$index];
 
-            if (!$token->isGivenKind(T_NAMESPACE)) {
+            if (!$token->isGivenKind(\T_NAMESPACE)) {
                 continue;
             }
 
-            $semicolonIndex = $tokens->getNextTokenOfKind($index, [';', '{', [T_CLOSE_TAG]]);
+            $semicolonIndex = $tokens->getNextTokenOfKind($index, [';', '{', [\T_CLOSE_TAG]]);
             $semicolonToken = $tokens[$semicolonIndex];
 
             if (!$semicolonToken->equals(';')) {
@@ -103,7 +94,7 @@ final class BlankLineAfterNamespaceFixer extends AbstractFixer implements Whites
             $token = $tokens[$nextIndex];
 
             if ($token->isWhitespace()) {
-                if (1 === Preg::match('/\R/', $token->getContent())) {
+                if (Preg::match('/\R/', $token->getContent())) {
                     break;
                 }
                 $nextNextIndex = $tokens->getNonEmptySibling($nextIndex, 1);
@@ -129,8 +120,8 @@ final class BlankLineAfterNamespaceFixer extends AbstractFixer implements Whites
         $ending = $this->whitespacesConfig->getLineEnding();
 
         $emptyLines = $isLastIndex ? $ending : $ending.$ending;
-        $indent = 1 === Preg::match('/^.*\R( *)$/s', $currentContent, $matches) ? $matches[1] : '';
+        $indent = Preg::match('/^.*\R( *)$/s', $currentContent, $matches) ? $matches[1] : '';
 
-        return new Token([T_WHITESPACE, $emptyLines.$indent]);
+        return new Token([\T_WHITESPACE, $emptyLines.$indent]);
     }
 }

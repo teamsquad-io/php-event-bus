@@ -28,17 +28,11 @@ use PhpCsFixer\Tokenizer\Tokens;
  */
 final class NoLeadingNamespaceWhitespaceFixer extends AbstractFixer implements WhitespacesAwareFixerInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function isCandidate(Tokens $tokens): bool
     {
-        return $tokens->isTokenKindFound(T_NAMESPACE);
+        return $tokens->isTokenKindFound(\T_NAMESPACE);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDefinition(): FixerDefinitionInterface
     {
         return new FixerDefinition(
@@ -54,15 +48,12 @@ final class NoLeadingNamespaceWhitespaceFixer extends AbstractFixer implements W
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function applyFix(\SplFileInfo $file, Tokens $tokens): void
     {
         for ($index = \count($tokens) - 1; 0 <= $index; --$index) {
             $token = $tokens[$index];
 
-            if (!$token->isGivenKind(T_NAMESPACE)) {
+            if (!$token->isGivenKind(\T_NAMESPACE)) {
                 continue;
             }
 
@@ -71,7 +62,7 @@ final class NoLeadingNamespaceWhitespaceFixer extends AbstractFixer implements W
 
             if (!$beforeNamespace->isWhitespace()) {
                 if (!self::endsWithWhitespace($beforeNamespace->getContent())) {
-                    $tokens->insertAt($index, new Token([T_WHITESPACE, $this->whitespacesConfig->getLineEnding()]));
+                    $tokens->insertAt($index, new Token([\T_WHITESPACE, $this->whitespacesConfig->getLineEnding()]));
                 }
 
                 continue;
@@ -85,10 +76,10 @@ final class NoLeadingNamespaceWhitespaceFixer extends AbstractFixer implements W
                 if (self::endsWithWhitespace($beforeBeforeNamespace->getContent())) {
                     $tokens->clearAt($beforeNamespaceIndex);
                 } else {
-                    $tokens[$beforeNamespaceIndex] = new Token([T_WHITESPACE, ' ']);
+                    $tokens[$beforeNamespaceIndex] = new Token([\T_WHITESPACE, ' ']);
                 }
             } else {
-                $tokens[$beforeNamespaceIndex] = new Token([T_WHITESPACE, substr($beforeNamespace->getContent(), 0, $lastNewline + 1)]);
+                $tokens[$beforeNamespaceIndex] = new Token([\T_WHITESPACE, substr($beforeNamespace->getContent(), 0, $lastNewline + 1)]);
             }
         }
     }

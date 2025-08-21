@@ -24,9 +24,21 @@ use PhpCsFixer\Tokenizer\Tokens;
 
 final class ControlStructureBracesFixer extends AbstractFixer
 {
-    /**
-     * {@inheritdoc}
-     */
+    private const CONTROL_TOKENS = [
+        \T_DECLARE,
+        \T_DO,
+        \T_ELSE,
+        \T_ELSEIF,
+        \T_FINALLY,
+        \T_FOR,
+        \T_FOREACH,
+        \T_IF,
+        \T_WHILE,
+        \T_TRY,
+        \T_CATCH,
+        \T_SWITCH,
+    ];
+
     public function getDefinition(): FixerDefinitionInterface
     {
         return new FixerDefinition(
@@ -35,9 +47,6 @@ final class ControlStructureBracesFixer extends AbstractFixer
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function isCandidate(Tokens $tokens): bool
     {
         return true;
@@ -46,31 +55,27 @@ final class ControlStructureBracesFixer extends AbstractFixer
     /**
      * {@inheritdoc}
      *
-     * Must run before ControlStructureContinuationPositionFixer, CurlyBracesPositionFixer, NoMultipleStatementsPerLineFixer.
+     * Must run before BracesPositionFixer, ControlStructureContinuationPositionFixer, CurlyBracesPositionFixer, NoMultipleStatementsPerLineFixer.
      */
     public function getPriority(): int
     {
         return 1;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function applyFix(\SplFileInfo $file, Tokens $tokens): void
     {
         $alternativeSyntaxAnalyzer = new AlternativeSyntaxAnalyzer();
-        $controlTokens = $this->getControlTokens();
 
         for ($index = $tokens->count() - 1; 0 <= $index; --$index) {
             $token = $tokens[$index];
 
-            if (!$token->isGivenKind($controlTokens)) {
+            if (!$token->isGivenKind(self::CONTROL_TOKENS)) {
                 continue;
             }
 
             if (
-                $token->isGivenKind(T_ELSE)
-                && $tokens[$tokens->getNextMeaningfulToken($index)]->isGivenKind(T_IF)
+                $token->isGivenKind(\T_ELSE)
+                && $tokens[$tokens->getNextMeaningfulToken($index)]->isGivenKind(\T_IF)
             ) {
                 continue;
             }
@@ -79,13 +84,13 @@ final class ControlStructureBracesFixer extends AbstractFixer
             $nextAfterParenthesisEndIndex = $tokens->getNextMeaningfulToken($parenthesisEndIndex);
             $tokenAfterParenthesis = $tokens[$nextAfterParenthesisEndIndex];
 
-            if ($tokenAfterParenthesis->equalsAny([';', '{', ':'])) {
+            if ($tokenAfterParenthesis->equalsAny([';', '{', ':', [\T_CLOSE_TAG]])) {
                 continue;
             }
 
             $statementEndIndex = null;
 
-            if ($tokenAfterParenthesis->isGivenKind([T_IF, T_FOR, T_FOREACH, T_SWITCH, T_WHILE])) {
+            if ($tokenAfterParenthesis->isGivenKind([\T_IF, \T_FOR, \T_FOREACH, \T_SWITCH, \T_WHILE])) {
                 $tokenAfterParenthesisBlockEnd = $tokens->findBlockEnd( // go to ')'
                     Tokens::BLOCK_TYPE_PARENTHESIS_BRACE,
                     $tokens->getNextMeaningfulToken($nextAfterParenthesisEndIndex)
@@ -106,7 +111,7 @@ final class ControlStructureBracesFixer extends AbstractFixer
             }
 
             $tokensToInsertAfterStatement = [
-                new Token([T_WHITESPACE, ' ']),
+                new Token([\T_WHITESPACE, ' ']),
                 new Token('}'),
             ];
 
@@ -118,7 +123,7 @@ final class ControlStructureBracesFixer extends AbstractFixer
 
             // insert opening brace
             $tokens->insertSlices([$parenthesisEndIndex + 1 => [
-                new Token([T_WHITESPACE, ' ']),
+                new Token([\T_WHITESPACE, ' ']),
                 new Token('{'),
             ]]);
         }
@@ -139,33 +144,32 @@ final class ControlStructureBracesFixer extends AbstractFixer
     private function findStatementEnd(Tokens $tokens, int $parenthesisEndIndex): int
     {
         $nextIndex = $tokens->getNextMeaningfulToken($parenthesisEndIndex);
-        $nextToken = $tokens[$nextIndex];
-
-        if (!$nextToken) {
+        if (null === $nextIndex) {
             return $parenthesisEndIndex;
         }
+
+        $nextToken = $tokens[$nextIndex];
 
         if ($nextToken->equals('{')) {
             return $tokens->findBlockEnd(Tokens::BLOCK_TYPE_CURLY_BRACE, $nextIndex);
         }
 
-        if ($nextToken->isGivenKind($this->getControlTokens())) {
+        if ($nextToken->isGivenKind(self::CONTROL_TOKENS)) {
             $parenthesisEndIndex = $this->findParenthesisEnd($tokens, $nextIndex);
 
             $endIndex = $this->findStatementEnd($tokens, $parenthesisEndIndex);
 
-            if ($nextToken->isGivenKind([T_IF, T_TRY, T_DO])) {
+            if ($nextToken->isGivenKind([\T_IF, \T_TRY, \T_DO])) {
                 $openingTokenKind = $nextToken->getId();
 
                 while (true) {
                     $nextIndex = $tokens->getNextMeaningfulToken($endIndex);
-                    $nextToken = isset($nextIndex) ? $tokens[$nextIndex] : null;
-                    if ($nextToken && $nextToken->isGivenKind($this->getControlContinuationTokensForOpeningToken($openingTokenKind))) {
+                    if (null !== $nextIndex && $tokens[$nextIndex]->isGivenKind($this->getControlContinuationTokensForOpeningToken($openingTokenKind))) {
                         $parenthesisEndIndex = $this->findParenthesisEnd($tokens, $nextIndex);
 
                         $endIndex = $this->findStatementEnd($tokens, $parenthesisEndIndex);
 
-                        if ($nextToken->isGivenKind($this->getFinalControlContinuationTokensForOpeningToken($openingTokenKind))) {
+                        if ($tokens[$nextIndex]->isGivenKind($this->getFinalControlContinuationTokensForOpeningToken($openingTokenKind))) {
                             return $endIndex;
                         }
                     } else {
@@ -193,7 +197,7 @@ final class ControlStructureBracesFixer extends AbstractFixer
                 return $index;
             }
 
-            if ($token->isGivenKind(T_CLOSE_TAG)) {
+            if ($token->isGivenKind(\T_CLOSE_TAG)) {
                 return $tokens->getPrevNonWhitespace($index);
             }
         }
@@ -202,46 +206,23 @@ final class ControlStructureBracesFixer extends AbstractFixer
     /**
      * @return list<int>
      */
-    private function getControlTokens(): array
-    {
-        static $tokens = [
-            T_DECLARE,
-            T_DO,
-            T_ELSE,
-            T_ELSEIF,
-            T_FINALLY,
-            T_FOR,
-            T_FOREACH,
-            T_IF,
-            T_WHILE,
-            T_TRY,
-            T_CATCH,
-            T_SWITCH,
-        ];
-
-        return $tokens;
-    }
-
-    /**
-     * @return list<int>
-     */
     private function getControlContinuationTokensForOpeningToken(int $openingTokenKind): array
     {
-        if (T_IF === $openingTokenKind) {
+        if (\T_IF === $openingTokenKind) {
             return [
-                T_ELSE,
-                T_ELSEIF,
+                \T_ELSE,
+                \T_ELSEIF,
             ];
         }
 
-        if (T_DO === $openingTokenKind) {
-            return [T_WHILE];
+        if (\T_DO === $openingTokenKind) {
+            return [\T_WHILE];
         }
 
-        if (T_TRY === $openingTokenKind) {
+        if (\T_TRY === $openingTokenKind) {
             return [
-                T_CATCH,
-                T_FINALLY,
+                \T_CATCH,
+                \T_FINALLY,
             ];
         }
 
@@ -253,12 +234,12 @@ final class ControlStructureBracesFixer extends AbstractFixer
      */
     private function getFinalControlContinuationTokensForOpeningToken(int $openingTokenKind): array
     {
-        if (T_IF === $openingTokenKind) {
-            return [T_ELSE];
+        if (\T_IF === $openingTokenKind) {
+            return [\T_ELSE];
         }
 
-        if (T_TRY === $openingTokenKind) {
-            return [T_FINALLY];
+        if (\T_TRY === $openingTokenKind) {
+            return [\T_FINALLY];
         }
 
         return [];

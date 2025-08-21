@@ -26,23 +26,17 @@ use PhpCsFixer\Tokenizer\Tokens;
  */
 final class NoBinaryStringFixer extends AbstractFixer
 {
-    /**
-     * {@inheritdoc}
-     */
     public function isCandidate(Tokens $tokens): bool
     {
         return $tokens->isAnyTokenKindsFound(
             [
-                T_CONSTANT_ENCAPSED_STRING,
-                T_START_HEREDOC,
+                \T_CONSTANT_ENCAPSED_STRING,
+                \T_START_HEREDOC,
                 'b"',
             ]
         );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDefinition(): FixerDefinitionInterface
     {
         return new FixerDefinition(
@@ -64,13 +58,10 @@ final class NoBinaryStringFixer extends AbstractFixer
         return 40;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function applyFix(\SplFileInfo $file, Tokens $tokens): void
     {
         foreach ($tokens as $index => $token) {
-            if ($token->isGivenKind([T_CONSTANT_ENCAPSED_STRING, T_START_HEREDOC])) {
+            if ($token->isGivenKind([\T_CONSTANT_ENCAPSED_STRING, \T_START_HEREDOC])) {
                 $content = $token->getContent();
 
                 if ('b' === strtolower($content[0])) {

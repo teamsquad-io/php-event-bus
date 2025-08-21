@@ -23,19 +23,21 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Filesystem\Path;
 
 /**
  * @author Markus Staab <markus.staab@redaxo.org>
  *
  * @internal
  */
-#[AsCommand(name: 'list-files')]
+#[AsCommand(name: 'list-files', description: 'List all files being fixed by the given config.')]
 final class ListFilesCommand extends Command
 {
-    /**
-     * @var string
-     */
+    /** @TODO PHP 8.0 - remove the property */
     protected static $defaultName = 'list-files';
+
+    /** @TODO PHP 8.0 - remove the property */
+    protected static $defaultDescription = 'List all files being fixed by the given config.';
 
     private ConfigInterface $defaultConfig;
 
@@ -49,19 +51,13 @@ final class ListFilesCommand extends Command
         $this->toolInfo = $toolInfo;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function configure(): void
     {
-        $this
-            ->setDefinition(
-                [
-                    new InputOption('config', '', InputOption::VALUE_REQUIRED, 'The path to a .php-cs-fixer.php file.'),
-                ]
-            )
-            ->setDescription('List all files being fixed by the given config.')
-        ;
+        $this->setDefinition(
+            [
+                new InputOption('config', '', InputOption::VALUE_REQUIRED, 'The path to a .php-cs-fixer.php file.'),
+            ]
+        );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -80,10 +76,9 @@ final class ListFilesCommand extends Command
 
         $finder = $resolver->getFinder();
 
-        /** @var \SplFileInfo $file */
         foreach ($finder as $file) {
             if ($file->isFile()) {
-                $relativePath = str_replace($cwd, '.', $file->getRealPath());
+                $relativePath = './'.Path::makeRelative($file->getRealPath(), $cwd);
                 // unify directory separators across operating system
                 $relativePath = str_replace('/', \DIRECTORY_SEPARATOR, $relativePath);
 

@@ -22,17 +22,11 @@ use PhpCsFixer\Tokenizer\Tokens;
 
 final class NoUselessReturnFixer extends AbstractFixer
 {
-    /**
-     * {@inheritdoc}
-     */
     public function isCandidate(Tokens $tokens): bool
     {
-        return $tokens->isAllTokenKindsFound([T_FUNCTION, T_RETURN]);
+        return $tokens->isAllTokenKindsFound([\T_FUNCTION, \T_RETURN]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getDefinition(): FixerDefinitionInterface
     {
         return new FixerDefinition(
@@ -55,21 +49,18 @@ function example($b) {
     /**
      * {@inheritdoc}
      *
-     * Must run before BlankLineBeforeStatementFixer, NoExtraBlankLinesFixer, NoWhitespaceInBlankLineFixer, SingleLineCommentStyleFixer.
-     * Must run after NoEmptyStatementFixer, NoUnneededCurlyBracesFixer, NoUselessElseFixer, SimplifiedNullReturnFixer.
+     * Must run before BlankLineBeforeStatementFixer, NoExtraBlankLinesFixer, NoWhitespaceInBlankLineFixer, SingleLineCommentStyleFixer, SingleLineEmptyBodyFixer.
+     * Must run after NoEmptyStatementFixer, NoUnneededBracesFixer, NoUnneededCurlyBracesFixer, NoUselessElseFixer, SimplifiedNullReturnFixer.
      */
     public function getPriority(): int
     {
         return -18;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     protected function applyFix(\SplFileInfo $file, Tokens $tokens): void
     {
         foreach ($tokens as $index => $token) {
-            if (!$token->isGivenKind(T_FUNCTION)) {
+            if (!$token->isGivenKind(\T_FUNCTION)) {
                 continue;
             }
 
@@ -87,7 +78,7 @@ function example($b) {
     private function fixFunction(Tokens $tokens, int $start, int $end): void
     {
         for ($index = $end; $index > $start; --$index) {
-            if (!$tokens[$index]->isGivenKind(T_RETURN)) {
+            if (!$tokens[$index]->isGivenKind(\T_RETURN)) {
                 continue;
             }
 
@@ -101,7 +92,7 @@ function example($b) {
             }
 
             $previous = $tokens->getPrevMeaningfulToken($index);
-            if ($tokens[$previous]->equalsAny([[T_ELSE], ')'])) {
+            if ($tokens[$previous]->equalsAny([[\T_ELSE], ')'])) {
                 continue;
             }
 
