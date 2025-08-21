@@ -71,7 +71,7 @@ class Rabbit
         string $exchangeName,
         string $routingKey,
         array $message,
-        int $expiration = null,
+        ?int $expiration = null,
         array $applicationHeaders = []
     ): void {
         if ($expiration !== null && $expiration < 0) {

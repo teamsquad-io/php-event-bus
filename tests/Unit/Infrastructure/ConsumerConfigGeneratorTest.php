@@ -10,6 +10,7 @@ use PHPUnit\Framework\TestCase;
 use TeamSquad\EventBus\Infrastructure\AutoloadConfig;
 use TeamSquad\EventBus\Infrastructure\ConsumerConfigGenerator;
 use TeamSquad\Tests\SampleConsumer;
+use TeamSquad\Tests\SampleConsumerWithWorkers;
 use TeamSquad\Tests\SampleManualConsumer;
 
 use function sprintf;
@@ -42,7 +43,7 @@ class ConsumerConfigGeneratorTest extends TestCase
     {
         $changeDirectoryToRoot = sprintf('cd %s/../../../', __DIR__);
         $composerScript = 'composer run generate-consumer-config';
-        $expectedOutput = 'Generated 2 consumers successfully';
+        $expectedOutput = 'Generated 3 consumers successfully';
         $output = shell_exec($changeDirectoryToRoot . ' & ' . $composerScript);
         self::assertStringContainsString($expectedOutput, $output);
     }
@@ -79,6 +80,37 @@ class ConsumerConfigGeneratorTest extends TestCase
                     'function'     => 'listenSampleEvent',
                     'create_queue' => true,
                     'workers'      => 1,
+                    'params'       => [
+                        'passive'     => false,
+                        'durable'     => false,
+                        'exclusive'   => false,
+                        'auto_delete' => false,
+                        'nowait'      => false,
+                        'args'        => [
+                            'x-expires'   => [
+                                'type' => 'int',
+                                'val'  => 300000,
+                            ],
+                            'x-ha-policy' => [
+                                'type' => 'string',
+                                'val'  => 'all',
+                            ],
+                        ],
+                    ],
+                ],
+                [
+                    'amqp'         => 'default',
+                    'name'         => 'TeamSquad\Tests\SampleConsumerWithWorkers::listenSampleHighThroughputEvent',
+                    'routing_key'  => [
+                        'high.throughput.event',
+                    ],
+                    'unique'       => false,
+                    'url'          => '/_/tests-sampleconsumerwithworkers',
+                    'queue'        => 'high.throughput.queue',
+                    'exchange'     => 'teamsquad.event_bus',
+                    'function'     => 'listenSampleHighThroughputEvent',
+                    'create_queue' => true,
+                    'workers'      => 10,
                     'params'       => [
                         'passive'     => false,
                         'durable'     => false,
@@ -135,6 +167,10 @@ class ConsumerConfigGeneratorTest extends TestCase
                     'route'   => 'tests-sampleconsumer/index',
                 ],
                 [
+                    'pattern' => '/_/tests-sampleconsumerwithworkers',
+                    'route'   => 'tests-sampleconsumerwithworkers/index',
+                ],
+                [
                     'pattern' => '/_/tests-samplemanualconsumer',
                     'route'   => 'tests-samplemanualconsumer/index',
                 ],
@@ -142,6 +178,7 @@ class ConsumerConfigGeneratorTest extends TestCase
             'controllers' => [
                 'tests-sampleconsumer'       => SampleConsumer::class,
                 'tests-samplemanualconsumer' => SampleManualConsumer::class,
+                'tests-sampleconsumerwithworkers' => SampleConsumerWithWorkers::class,
             ],
         ], $actual);
     }

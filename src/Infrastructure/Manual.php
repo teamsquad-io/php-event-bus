@@ -43,6 +43,7 @@ final class Manual
     public bool $durable = false;
     public bool $autoDelete = false;
     public bool $noWait = false;
+    public int $workers = 1;
 
     /** @var array<string, array{type: string, val: int|string}> */
     public array $args = [

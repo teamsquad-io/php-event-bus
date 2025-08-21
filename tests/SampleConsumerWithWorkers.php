@@ -7,18 +7,15 @@ namespace TeamSquad\Tests;
 use Doctrine\Common\Annotations\AnnotationReader;
 use TeamSquad\EventBus\Domain\Clock;
 use TeamSquad\EventBus\Domain\Consumer;
+use TeamSquad\EventBus\Domain\ConsumerConfig;
 use TeamSquad\EventBus\Domain\EventMapGenerator;
 use TeamSquad\EventBus\Domain\Input;
 use TeamSquad\EventBus\Domain\StringEncrypt;
-use TeamSquad\EventBus\Infrastructure\Manual;
 use TeamSquad\EventBus\Infrastructure\PhpInput;
 use TeamSquad\EventBus\Infrastructure\SystemClock;
 use TeamSquad\EventBus\Interfaces\Consumer\GoAssistedConsumer;
 
-/**
- * @\TeamSquad\EventBus\Infrastructure\Bus(bus="users")
- */
-class SampleManualConsumer implements Consumer
+class SampleConsumerWithWorkers implements Consumer
 {
     use GoAssistedConsumer;
 
@@ -38,13 +35,12 @@ class SampleManualConsumer implements Consumer
         $this->initializeConsumer($eventMap, $dataEncrypt, $this->annotationReader, $this->input, $this->clock);
     }
 
-    /**
-     * @Manual(unserializer="raw", queue="user.online.queue", exchange="", routingKey="user.online")
-     *
-     * @param array<string, mixed> $event
-     */
-    public function listen(array $event): string
+    #[ConsumerConfig(
+        queue: 'high.throughput.queue',
+        workers: 10,
+    )]
+    public function listenSampleHighThroughputEvent(HighThroughputEvent $event): string
     {
-        return 'User online event received';
+        return $event->eventName();
     }
 }

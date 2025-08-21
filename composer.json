@@ -7,7 +7,7 @@
         "event-bus"
     ],
     "require": {
-        "php": ">=7.4",
+        "php": ">=8.0",
         "ext-json": "*",
         "php-amqplib/php-amqplib": "^v3.7.3",
         "doctrine/annotations": "^2.0.2"
@@ -52,7 +52,7 @@
     },
     "config": {
         "platform": {
-            "php": "7.4.29"
+            "php": "8.0"
         },
         "allow-plugins": {
             "composer/package-versions-deprecated": true
