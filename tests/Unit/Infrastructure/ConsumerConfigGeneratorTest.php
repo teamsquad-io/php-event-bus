@@ -10,9 +10,9 @@ use PHPUnit\Framework\TestCase;
 use TeamSquad\EventBus\Infrastructure\AutoloadConfig;
 use TeamSquad\EventBus\Infrastructure\ConsumerConfigGenerator;
 use TeamSquad\Tests\SampleConsumer;
+use TeamSquad\Tests\SampleConsumerWithAttributes;
 use TeamSquad\Tests\SampleConsumerWithWorkers;
 use TeamSquad\Tests\SampleManualConsumer;
-
 use function sprintf;
 
 class ConsumerConfigGeneratorTest extends TestCase
@@ -43,7 +43,7 @@ class ConsumerConfigGeneratorTest extends TestCase
     {
         $changeDirectoryToRoot = sprintf('cd %s/../../../', __DIR__);
         $composerScript = 'composer run generate-consumer-config';
-        $expectedOutput = 'Generated 3 consumers successfully';
+        $expectedOutput = 'Generated 4 consumers successfully';
         $output = shell_exec($changeDirectoryToRoot . ' & ' . $composerScript);
         self::assertStringContainsString($expectedOutput, $output);
     }
@@ -94,6 +94,34 @@ class ConsumerConfigGeneratorTest extends TestCase
                             'x-ha-policy' => [
                                 'type' => 'string',
                                 'val'  => 'all',
+                            ],
+                        ],
+                    ],
+                ],
+                [
+                    'amqp'         => 'chat',
+                    'name'         => 'listenWithAttributesName',
+                    'routing_key'  => [
+                        'routing.key.1',
+                        'routing.key.2',
+                    ],
+                    'unique'       => false,
+                    'url'          => '/api/v1/sample/high/throughput',
+                    'queue'        => 'high.throughput.queue.1',
+                    'exchange'     => 'exchange.name',
+                    'function'     => 'listenSampleHighThroughputEvent1',
+                    'create_queue' => false,
+                    'workers'      => 9,
+                    'params'       => [
+                        'passive'     => true,
+                        'durable'     => true,
+                        'exclusive'   => true,
+                        'auto_delete' => true,
+                        'nowait'      => true,
+                        'args'        => [
+                            'x-expires' => [
+                                'type' => 'int',
+                                'val'  => 100000,
                             ],
                         ],
                     ],
@@ -167,6 +195,10 @@ class ConsumerConfigGeneratorTest extends TestCase
                     'route'   => 'tests-sampleconsumer/index',
                 ],
                 [
+                    'pattern' => '/_/tests-sampleconsumerwithattributes',
+                    'route'   => 'tests-sampleconsumerwithattributes/index',
+                ],
+                [
                     'pattern' => '/_/tests-sampleconsumerwithworkers',
                     'route'   => 'tests-sampleconsumerwithworkers/index',
                 ],
@@ -176,9 +208,10 @@ class ConsumerConfigGeneratorTest extends TestCase
                 ],
             ],
             'controllers' => [
-                'tests-sampleconsumer'       => SampleConsumer::class,
-                'tests-samplemanualconsumer' => SampleManualConsumer::class,
-                'tests-sampleconsumerwithworkers' => SampleConsumerWithWorkers::class,
+                'tests-sampleconsumer'               => SampleConsumer::class,
+                'tests-samplemanualconsumer'         => SampleManualConsumer::class,
+                'tests-sampleconsumerwithworkers'    => SampleConsumerWithWorkers::class,
+                'tests-sampleconsumerwithattributes' => SampleConsumerWithAttributes::class,
             ],
         ], $actual);
     }

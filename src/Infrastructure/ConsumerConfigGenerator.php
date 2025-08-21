@@ -144,10 +144,10 @@ class ConsumerConfigGenerator
 
                         $consumers[] = [
                             'amqp'         => $this->getUserConfig('amqp', $userConfiguration, $amqp),
-                            'name'         => $consumerName . '::' . $method->getName(),
+                            'name'         => $this->getUserConfig('name', $userConfiguration, $consumerName . '::' . $method->getName()),
                             'routing_key'  => $this->getUserConfig('routingKey', $userConfiguration, $routingKey),
                             'unique'       => $this->getUserConfig('unique', $userConfiguration, false),
-                            'url'          => $this->generateUniqueUrl($method),
+                            'url'          => $this->getUserConfig('url', $userConfiguration, $this->generateUniqueUrl($method)),
                             'queue'        => $this->getUserConfig('queue', $userConfiguration, $this->generateQueueName($method)),
                             'exchange'     => $this->getUserConfig('exchange', $userConfiguration, $this->config->eventBusExchangeName()),
                             'function'     => $this->getUserConfig('function', $userConfiguration, $method->getName()),

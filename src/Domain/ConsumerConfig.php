@@ -13,7 +13,7 @@ class ConsumerConfig
      * @param string|null $amqp
      * @param string|null $name
      * @param array<string>|null $routingKey
-     * @param bool|null $unique
+     * @param bool $unique
      * @param string|null $url
      * @param string|null $queue
      * @param string|null $exchange
@@ -31,7 +31,7 @@ class ConsumerConfig
         private ?string $amqp = null,
         private ?string $name = null,
         private ?array $routingKey = null,
-        private ?bool $unique = null,
+        private bool $unique = false,
         private ?string $url = null,
         private ?string $queue = null,
         private ?string $exchange = null,
@@ -67,7 +67,7 @@ class ConsumerConfig
 
     public function unique(): bool
     {
-        return $this->unique ?? false;
+        return $this->unique;
     }
 
     public function url(): ?string
