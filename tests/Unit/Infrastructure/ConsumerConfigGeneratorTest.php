@@ -196,7 +196,7 @@ class ConsumerConfigGeneratorTest extends TestCase
                     'route'   => 'tests-sampleconsumer/index',
                 ],
                 [
-                    'pattern' => '/_/tests-sampleconsumerwithattributes',
+                    'pattern' => '/api/v1/sample/high/throughput',
                     'route'   => 'tests-sampleconsumerwithattributes/index',
                 ],
                 [

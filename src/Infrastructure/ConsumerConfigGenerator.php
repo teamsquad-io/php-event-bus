@@ -142,12 +142,14 @@ class ConsumerConfigGenerator
                             }
                         }
 
+                        /** @var string $url */
+                        $url = $this->getUserConfig('url', $userConfiguration, $this->generateUniqueUrl($controller));
                         $consumers[] = [
                             'amqp'         => $this->getUserConfig('amqp', $userConfiguration, $amqp),
                             'name'         => $this->getUserConfig('name', $userConfiguration, $consumerName . '::' . $method->getName()),
                             'routing_key'  => $this->getUserConfig('routingKey', $userConfiguration, $routingKey),
                             'unique'       => $this->getUserConfig('unique', $userConfiguration, false),
-                            'url'          => $this->getUserConfig('url', $userConfiguration, $this->generateUniqueUrl($method)),
+                            'url'          => $url,
                             'queue'        => $this->getUserConfig('queue', $userConfiguration, $this->generateQueueName($method)),
                             'exchange'     => $this->getUserConfig('exchange', $userConfiguration, $this->config->eventBusExchangeName()),
                             'function'     => $this->getUserConfig('function', $userConfiguration, $method->getName()),
@@ -175,7 +177,7 @@ class ConsumerConfigGenerator
                         if (!isset($controllers[$controller])) {
                             $controllers[$controller] = $class;
                             $routes[] = [
-                                'pattern' => '/_/' . $controller,
+                                'pattern' => $url,
                                 'route'   => $controller . '/index',
                             ];
                         }
@@ -273,9 +275,9 @@ class ConsumerConfigGenerator
         return str_replace('\\', $replacer, $context . $className);
     }
 
-    private function generateUniqueUrl(ReflectionMethod $method): string
+    private function generateUniqueUrl(string $className): string
     {
-        return '/_/' . $this->classUniqueUrl($method->class);
+        return '/_/' . $this->classUniqueUrl($className);
     }
 
     /**
