@@ -13,6 +13,7 @@ use TeamSquad\EventBus\Domain\Exception\InvalidArguments;
 use TeamSquad\EventBus\Domain\Exception\UnknownEventException;
 use TeamSquad\EventBus\Infrastructure\AutoloadConfig;
 use TeamSquad\EventBus\Infrastructure\AutoloaderEventMapGenerator;
+use TeamSquad\Tests\HighThroughputEvent;
 use TeamSquad\Tests\SampleEvent;
 use TeamSquad\Tests\SampleEventEncrypted;
 use TeamSquad\Tests\SampleSecureEvent;
@@ -68,6 +69,7 @@ class AutoloaderEventMapGeneratorTest extends TestCase
             'sample_event'           => SampleEvent::class,
             'sample_secure_event'    => SampleSecureEvent::class,
             'sample.encrypted.event' => SampleEventEncrypted::class,
+            'high.throughput.event'  => HighThroughputEvent::class,
         ], $sut->getAll());
     }
 
@@ -84,6 +86,7 @@ class AutoloaderEventMapGeneratorTest extends TestCase
                 'sample_event'           => SampleEvent::class,
                 'sample_secure_event'    => SampleSecureEvent::class,
                 'sample.encrypted.event' => SampleEventEncrypted::class,
+                'high.throughput.event'  => HighThroughputEvent::class,
             ], $eventMap);
         } else {
             self::fail('File does not exist');
@@ -101,6 +104,7 @@ class AutoloaderEventMapGeneratorTest extends TestCase
         self::assertEquals([
             'sample_event'           => SampleEvent::class,
             'sample.encrypted.event' => SampleEventEncrypted::class,
+            'high.throughput.event'  => HighThroughputEvent::class,
         ], $sut->getAll());
     }
 

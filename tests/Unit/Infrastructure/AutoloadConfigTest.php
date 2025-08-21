@@ -7,8 +7,8 @@ declare(strict_types=1);
 namespace TeamSquad\Tests\Unit\Infrastructure;
 
 use PHPUnit\Framework\TestCase;
+use TeamSquad\EventBus\Domain\EncryptedEvent;
 use TeamSquad\EventBus\Domain\Exception\InvalidArguments;
-use TeamSquad\EventBus\Domain\SecureEvent;
 use TeamSquad\EventBus\Infrastructure\AutoloadConfig;
 use TeamSquad\Tests\SampleEvent;
 
@@ -165,7 +165,7 @@ class AutoloadConfigTest extends TestCase
     {
         return [
             ['TeamsquadIo\SlackService\Domain\Events\AdminCall', true, false],
-            [SecureEvent::class, false, false],
+            [EncryptedEvent::class, false, false],
             ['TeamSquad\Tests\Domain\SecureEvent', false, true],
         ];
     }

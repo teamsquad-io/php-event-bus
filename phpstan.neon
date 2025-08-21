@@ -1,10 +1,9 @@
 parameters:
     level: 9
+    treatPhpDocTypesAsCertain: false
     stubFiles:
         - stubs/Config.stub
     paths:
         - %currentWorkingDirectory%/src/
-    excludePaths:
-        - %currentWorkingDirectory%/tests/
-    ignoreErrors:
-        - '#Trait TeamSquad\\EventBus\\Interfaces\\Consumer\\GoAssistedConsumer is used zero times and is not analysed#'
+        - %currentWorkingDirectory%/tests/SampleConsumer.php
+    ignoreErrors: []

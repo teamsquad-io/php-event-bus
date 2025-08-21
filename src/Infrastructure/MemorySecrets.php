@@ -7,6 +7,8 @@ namespace TeamSquad\EventBus\Infrastructure;
 use TeamSquad\EventBus\Domain\Exception\NotFoundException;
 use TeamSquad\EventBus\Domain\Secrets;
 
+use function sprintf;
+
 class MemorySecrets implements Secrets
 {
     /** @var array<string, string> */

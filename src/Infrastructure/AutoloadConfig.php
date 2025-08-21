@@ -8,6 +8,7 @@ use TeamSquad\EventBus\Domain\Exception\InvalidArguments;
 
 use function is_array;
 use function is_string;
+use function sprintf;
 
 class AutoloadConfig
 {

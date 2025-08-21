@@ -48,7 +48,7 @@ jobs:
         run: composer install --prefer-dist --no-progress --no-suggest
 
       - name: Run friendsofphp/php-cs-fixer
-        run: PHP_CS_FIXER_IGNORE_ENV=true ./tools/php-cs-fixer/vendor/bin/php-cs-fixer fix --dry-run --show-progress=dots --using-cache=no --verbose
+        run: ./vendor/bin/php-cs-fixer fix --dry-run --show-progress=dots --using-cache=no --verbose
 
   type-checker:
     name: Type Checker
@@ -68,7 +68,7 @@ jobs:
         run: ./vendor/bin/psalm --config=psalm.xml --no-progress --shepherd --show-info=false --stats
 
       - name: Run PHPStan
-        run: ./vendor/bin/phpstan analyze -c phpstan.neon src
+        run: ./vendor/bin/phpstan analyze -c phpstan.neon
 
   tests:
     runs-on: ubuntu-latest

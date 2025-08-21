@@ -8,6 +8,8 @@ use InvalidArgumentException;
 use TeamSquad\EventBus\Domain\Event;
 use TeamSquad\EventBus\Domain\EventMapGenerator;
 
+use function sprintf;
+
 class SimpleEventMapGenerator implements EventMapGenerator
 {
     /** @var array<string, class-string<Event>> */

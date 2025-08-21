@@ -73,3 +73,55 @@ docker build -t php-event-bus .
 
 Feel free to open any PR with your ideas, suggestions or improvements.
 
+
+## Consumer configuration properties
+
+This library generates and consumes RabbitMQ configurations for your consumers. Each consumer entry contains the following properties:
+
+- amqp: Name of the AMQP connection profile to use (e.g., default, users).
+- name: Human/unique identifier for the consumer, typically FQCN::method.
+- routing_key: List of routing keys the queue is bound to (e.g., sample_event).
+- unique: Whether this consumer definition should be treated as non-duplicated across generation/deployment.
+- url: HTTP route that maps to a controller endpoint for this consumer.
+- queue: Name of the queue to consume from (created/bound according to params when create_queue is true).
+- exchange: Exchange name to bind the queue to (e.g., teamsquad.event_bus).
+- function: Method on the consumer class that will be invoked for each message.
+- create_queue: If true, the queue will be declared/created automatically when setting up the consumer.
+- workers: Number of worker processes/consumers to spawn for this consumer (parallelism level).
+- params: RabbitMQ queue declaration parameters used when creating/declaring the queue:
+  - passive: If true, do not create; only check that the queue exists.
+  - durable: If true, the queue will survive a broker restart.
+  - exclusive: If true, the queue is restricted to this connection and will be deleted when the connection closes.
+  - auto_delete: If true, the queue will be deleted when the last consumer unsubscribes.
+  - nowait: If true, do not wait for a server response to the declare/bind operation.
+  - args: Additional arguments for the queue declaration:
+    - x-expires (type: int): Message expires (auto-deletes) after this many milliseconds of inactivity.
+    - x-ha-policy (type: string): High-availability policy (e.g., all) for classic mirrored queues (legacy RabbitMQ).
+
+Example configuration (high throughput):
+
+```
+[
+    'amqp'         => 'default',
+    'name'         => 'TeamSquad\Tests\SampleConsumerWithWorkers::listenSampleHighThroughputEvent',
+    'routing_key'  => ['high_throughput_event'],
+    'unique'       => false,
+    'url'          => '/_/tests-sampleconsumerwithworkers',
+    'queue'        => 'high.throughput.queue',
+    'exchange'     => 'teamsquad.event_bus',
+    'function'     => 'listenSampleHighThroughputEvent',
+    'create_queue' => true,
+    'workers'      => 10,
+    'params'       => [
+        'passive'     => false,
+        'durable'     => false,
+        'exclusive'   => false,
+        'auto_delete' => false,
+        'nowait'      => false,
+        'args'        => [
+            'x-expires'   => ['type' => 'int', 'val' => 300000],
+            'x-ha-policy' => ['type' => 'string', 'val' => 'all'],
+        ],
+    ],
+]
+```

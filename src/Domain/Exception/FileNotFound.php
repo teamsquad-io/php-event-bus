@@ -6,6 +6,8 @@ namespace TeamSquad\EventBus\Domain\Exception;
 
 use Exception;
 
+use function sprintf;
+
 class FileNotFound extends Exception
 {
     public function __construct(string $file)

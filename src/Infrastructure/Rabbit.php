@@ -16,6 +16,7 @@ use TeamSquad\EventBus\Domain\Secrets;
 use Throwable;
 
 use function array_key_exists;
+use function sprintf;
 
 class Rabbit
 {
@@ -70,7 +71,7 @@ class Rabbit
         string $exchangeName,
         string $routingKey,
         array $message,
-        int $expiration = null,
+        ?int $expiration = null,
         array $applicationHeaders = []
     ): void {
         if ($expiration !== null && $expiration < 0) {

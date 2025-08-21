@@ -13,13 +13,16 @@ use ReflectionMethod;
 use ReflectionNamedType;
 use RuntimeException;
 use TeamSquad\EventBus\Domain\Consumer;
+use TeamSquad\EventBus\Domain\ConsumerConfig;
 use TeamSquad\EventBus\Domain\Event;
 use TeamSquad\EventBus\Domain\Exception\FileNotFound;
 use TeamSquad\EventBus\Domain\Listen;
 use TeamSquad\EventBus\Domain\RenamedEvent;
 
+use function array_key_exists;
 use function count;
 use function get_class;
+use function sprintf;
 
 use const PHP_EOL;
 
@@ -45,13 +48,11 @@ class ConsumerConfigGenerator
     }
 
     /**
-     * @throws FileNotFound
      * @throws ReflectionException
      * @throws AnnotationException
+     * @throws FileNotFound
      *
      * @return array<array-key, mixed>
-     *
-     * @noinspection PhpRedundantVariableDocTypeInspection
      */
     public function generate(): array
     {
@@ -84,6 +85,7 @@ class ConsumerConfigGenerator
                 $reflectClass->isInstantiable() &&
                 $reflectClass->isSubclassOf(Consumer::class)
             ) {
+                $userConfiguration = [];
                 $amqp = 'default';
                 $bus = $annotationReader->getClassAnnotation($reflectClass, Bus::class);
                 if ($bus) {
@@ -93,113 +95,89 @@ class ConsumerConfigGenerator
                 $consumerName = get_class($reflectClass->newInstanceWithoutConstructor());
                 $controller = $this->classUniqueUrl($class);
                 foreach ($methods as $method) {
-                    if ($method->getNumberOfRequiredParameters() > 0 && strpos($method->getName(), 'listen') === 0) {
-                        $manual = $annotationReader->getMethodAnnotation($method, Manual::class);
+                    if ($method->getNumberOfRequiredParameters() > 0 && str_starts_with($method->getName(), 'listen')) {
+                        $manual = $this->isManual($annotationReader, $method);
                         if ($manual) {
-                            $consumers[] = [
-                                'amqp'         => $amqp,
-                                'name'         => $consumerName . '::' . $method->getName(),
-                                'routing_key'  => $manual->routingKey,
-                                'unique'       => false,
-                                'url'          => $this->generateUniqueUrl($method),
-                                'queue'        => $manual->queue,
-                                'exchange'     => $manual->exchange,
-                                'function'     => $method->getName(),
-                                'create_queue' => $manual->createQueue,
-                                'params' => [
-                                    'passive'     => $manual->passive,
-                                    'durable'     => $manual->durable,
-                                    'exclusive'   => $manual->exclusive,
-                                    'auto_delete' => $manual->autoDelete,
-                                    'nowait'      => $manual->noWait,
-                                    'args'        => $manual->args,
-                                ],
-                            ];
+                            $routingKey = $manual->routingKey;
+                            $userConfiguration['queue'] = $manual->queue;
+                            $userConfiguration['exchange'] = $manual->exchange;
+                            $userConfiguration['createQueue'] = $manual->createQueue;
+                            $userConfiguration['workers'] = $manual->workers;
+                            $userConfiguration['passive'] = $manual->passive;
+                            $userConfiguration['durable'] = $manual->durable;
+                            $userConfiguration['exclusive'] = $manual->exclusive;
+                            $userConfiguration['autoDelete'] = $manual->autoDelete;
+                            $userConfiguration['nowait'] = $manual->noWait;
+                            $userConfiguration['args'] = $manual->args;
                         } else {
                             $eventClass = $this->extractEventClassFromMethod($method);
                             if (!$eventClass) {
                                 continue;
                             }
 
+                            $attributeConsumerConfig = $method->getAttributes(ConsumerConfig::class);
+                            if (isset($attributeConsumerConfig[0])) {
+                                $userConfiguration = $attributeConsumerConfig[0]->getArguments();
+                            }
                             if ($eventClass->implementsInterface(Event::class) && $eventClass->isInstantiable()) {
                                 /** @var Event $evt */
                                 $evt = $eventClass->newInstanceWithoutConstructor();
-                                $rk = [$evt->eventName()];
+                                $routingKey = [
+                                    $evt->eventName(),
+                                ];
                                 foreach ($annotationReader->getClassAnnotations($eventClass) as $annotation) {
                                     if ($annotation instanceof RenamedEvent) {
-                                        $rk[] = $annotation->old;
+                                        $routingKey[] = $annotation->old;
                                     }
                                 }
-                                $consumers[] = [
-                                    'amqp'        => $amqp,
-                                    'name'        => $consumerName . '::' . $method->getName(),
-                                    'routing_key' => $rk,
-                                    'unique'      => false,
-                                    'url'         => $this->generateUniqueUrl($method),
-                                    'queue'       => $this->generateQueueName($method),
-                                    'exchange'    => $this->config->eventBusExchangeName(),
-                                    'function'    => $method->getName(),
-                                    'create_queue' => true,
-                                    'params'      => [
-                                        'passive'     => false,
-                                        'durable'     => false,
-                                        'exclusive'   => false,
-                                        'auto_delete' => false,
-                                        'nowait'      => false,
-                                        'args'        => [
-                                            'x-expires'   => [
-                                                'type' => 'int',
-                                                'val'  => 300000,
-                                            ],
-                                            'x-ha-policy' => [
-                                                'type' => 'string',
-                                                'val'  => 'all',
-                                            ],
-                                        ],
-                                    ],
-                                ];
                             } else {
-                                echo $consumerName . '::' . $method->getName() . PHP_EOL;
                                 $listenAnnotation = $annotationReader->getMethodAnnotation($method, Listen::class);
                                 if (!$listenAnnotation) {
                                     throw new AnnotationException(
                                         sprintf('Listening to a non Event class and missing %s Annotation', Listen::class)
                                     );
                                 }
-                                $consumers[] = [
-                                    'amqp'        => $amqp,
-                                    'name'        => $consumerName . '::' . $method->getName(),
-                                    'routing_key' => [$listenAnnotation->routingKey],
-                                    'url'         => $this->generateUniqueUrl($method),
-                                    'queue'       => $this->generateQueueName($method),
-                                    'unique'      => false,
-                                    'exchange'    => $this->config->eventBusExchangeName(),
-                                    'function'    => $method->getName(),
-                                    'create_queue' => true,
-                                    'params'      => [
-                                        'passive'     => false,
-                                        'durable'     => false,
-                                        'exclusive'   => false,
-                                        'auto_delete' => false,
-                                        'nowait'      => false,
-                                        'args'        => [
-                                            'x-expires'   => [
-                                                'type' => 'int',
-                                                'val'  => 300000,
-                                            ],
-                                            'x-ha-policy' => [
-                                                'type' => 'string',
-                                                'val'  => 'all',
-                                            ],
-                                        ],
-                                    ],
-                                ];
+
+                                $routingKey = [$listenAnnotation->routingKey];
                             }
                         }
+
+                        /** @var string $url */
+                        $url = $this->getUserConfig('url', $userConfiguration, $this->generateUniqueUrl($controller));
+                        $consumers[] = [
+                            'amqp'         => $this->getUserConfig('amqp', $userConfiguration, $amqp),
+                            'name'         => $this->getUserConfig('name', $userConfiguration, $consumerName . '::' . $method->getName()),
+                            'routing_key'  => $this->getUserConfig('routingKey', $userConfiguration, $routingKey),
+                            'unique'       => $this->getUserConfig('unique', $userConfiguration, false),
+                            'url'          => $url,
+                            'queue'        => $this->getUserConfig('queue', $userConfiguration, $this->generateQueueName($method)),
+                            'exchange'     => $this->getUserConfig('exchange', $userConfiguration, $this->config->eventBusExchangeName()),
+                            'function'     => $this->getUserConfig('function', $userConfiguration, $method->getName()),
+                            'create_queue' => $this->getUserConfig('createQueue', $userConfiguration, true),
+                            'workers'      => $this->getUserConfig('workers', $userConfiguration, 1),
+                            'params'       => [
+                                'passive'     => $this->getUserConfig('passive', $userConfiguration, false),
+                                'durable'     => $this->getUserConfig('durable', $userConfiguration, false),
+                                'exclusive'   => $this->getUserConfig('exclusive', $userConfiguration, false),
+                                'auto_delete' => $this->getUserConfig('autoDelete', $userConfiguration, false),
+                                'nowait'      => $this->getUserConfig('nowait', $userConfiguration, false),
+                                'args'        => $this->getUserConfig('args', $userConfiguration, [
+                                    'x-expires'   => [
+                                        'type' => 'int',
+                                        'val'  => 300000,
+                                    ],
+                                    'x-ha-policy' => [
+                                        'type' => 'string',
+                                        'val'  => 'all',
+                                    ],
+                                ]),
+                            ],
+                        ];
+
                         if (!isset($controllers[$controller])) {
                             $controllers[$controller] = $class;
                             $routes[] = [
-                                'pattern' => '/_/' . $controller,
+                                'pattern' => $url,
                                 'route'   => $controller . '/index',
                             ];
                         }
@@ -297,9 +275,9 @@ class ConsumerConfigGenerator
         return str_replace('\\', $replacer, $context . $className);
     }
 
-    private function generateUniqueUrl(ReflectionMethod $method): string
+    private function generateUniqueUrl(string $className): string
     {
-        return '/_/' . $this->classUniqueUrl($method->class);
+        return '/_/' . $this->classUniqueUrl($className);
     }
 
     /**
@@ -335,26 +313,17 @@ class ConsumerConfigGenerator
         }
         $parameter = $parameters[0];
 
-        if (PHP_VERSION_ID >= 80000) {
-            $type = $parameter->getType();
-            if (!$type instanceof ReflectionNamedType) {
-                return null;
-            }
-
-            $className = $type->getName();
-            if (!class_exists($className)) {
-                return null;
-            }
-
-            return new ReflectionClass($className);
-        }
-
-        $type = $parameter->getClass();
-        if (!$type instanceof ReflectionClass) {
+        $type = $parameter->getType();
+        if (!$type instanceof ReflectionNamedType) {
             return null;
         }
 
-        return $type;
+        $className = $type->getName();
+        if (!class_exists($className)) {
+            return null;
+        }
+
+        return new ReflectionClass($className);
     }
 
     private function getReasonBecauseNoConfigGenerated(): string
@@ -367,5 +336,24 @@ class ConsumerConfigGenerator
             $reason = 'and Blacklist is ' . implode(', ', $this->config->getBlackList());
         }
         return $reason;
+    }
+
+    private function isManual(AnnotationReader $annotationReader, ReflectionMethod $method): null|Manual
+    {
+        return $annotationReader->getMethodAnnotation($method, Manual::class);
+    }
+
+    /**
+     * Get user configuration value or return default value.
+     *
+     * @param string $key
+     * @param array<array-key, mixed> $userConfiguration
+     * @param mixed $defaultValue
+     *
+     * @return mixed
+     */
+    private function getUserConfig(string $key, array $userConfiguration, mixed $defaultValue): mixed
+    {
+        return array_key_exists($key, $userConfiguration) ? $userConfiguration[$key] : $defaultValue;
     }
 }

@@ -7,17 +7,18 @@
         "event-bus"
     ],
     "require": {
-        "php": ">=7.4",
-        "php-amqplib/php-amqplib": "^3.2.0",
+        "php": ">=8.0",
         "ext-json": "*",
-        "doctrine/annotations": "^1.14.2 || ^2.0.0"
+        "php-amqplib/php-amqplib": "^v3.7.3",
+        "doctrine/annotations": "^2.0.2"
     },
     "require-dev": {
-        "phpunit/phpunit": "^9.5",
-        "vimeo/psalm": "^4.22 || ^5.0",
-        "phpstan/phpstan": "^1.5 || ^2.0",
+        "phpunit/phpunit": "^9.6.25",
+        "vimeo/psalm": "^5.26.1",
+        "phpstan/phpstan": "2.1.22",
         "symfony/var-dumper": "^5.4",
-        "psalm/plugin-phpunit": "^0.17.0 || ^0.18.0 || ^0.19.0"
+        "psalm/plugin-phpunit": "^0.19.0",
+        "friendsofphp/php-cs-fixer": "^3.86"
     },
     "autoload": {
         "psr-4": {
@@ -42,8 +43,8 @@
         "test-phpunit": "./vendor/bin/phpunit",
         "psalm": "./vendor/bin/psalm",
         "phpstan": "./vendor/bin/phpstan",
-        "csfix": "./tools/php-cs-fixer/vendor/bin/php-cs-fixer fix src",
-        "csrun": "./tools/php-cs-fixer/vendor/bin/php-cs-fixer fix --dry-run || ./tools/php-cs-fixer/vendor/bin/php-cs-fixer fix",
+        "csfix": "./vendor/bin/php-cs-fixer fix src",
+        "csrun": "./vendor/bin/php-cs-fixer fix --dry-run || ./vendor/bin/php-cs-fixer fix",
         "generate-consumer-config": [
             "composer dump-autoload -o",
             "TeamSquad\\Tests\\Unit\\Interfaces\\SampleConfigGeneratorController::generateConsumerConfig"
@@ -51,7 +52,7 @@
     },
     "config": {
         "platform": {
-            "php": "7.4.29"
+            "php": "8.0"
         },
         "allow-plugins": {
             "composer/package-versions-deprecated": true

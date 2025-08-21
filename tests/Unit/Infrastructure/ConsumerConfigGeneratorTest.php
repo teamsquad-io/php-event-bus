@@ -10,7 +10,11 @@ use PHPUnit\Framework\TestCase;
 use TeamSquad\EventBus\Infrastructure\AutoloadConfig;
 use TeamSquad\EventBus\Infrastructure\ConsumerConfigGenerator;
 use TeamSquad\Tests\SampleConsumer;
+use TeamSquad\Tests\SampleConsumerWithAttributes;
+use TeamSquad\Tests\SampleConsumerWithWorkers;
 use TeamSquad\Tests\SampleManualConsumer;
+
+use function sprintf;
 
 class ConsumerConfigGeneratorTest extends TestCase
 {
@@ -40,7 +44,7 @@ class ConsumerConfigGeneratorTest extends TestCase
     {
         $changeDirectoryToRoot = sprintf('cd %s/../../../', __DIR__);
         $composerScript = 'composer run generate-consumer-config';
-        $expectedOutput = 'Generated 2 consumers successfully';
+        $expectedOutput = 'Generated 4 consumers successfully';
         $output = shell_exec($changeDirectoryToRoot . ' & ' . $composerScript);
         self::assertStringContainsString($expectedOutput, $output);
     }
@@ -65,18 +69,78 @@ class ConsumerConfigGeneratorTest extends TestCase
         self::assertEquals([
             'consumers'   => [
                 [
-                    'amqp'        => 'default',
-                    'name'        => 'TeamSquad\Tests\SampleConsumer::listenSampleEvent',
-                    'routing_key' => [
+                    'amqp'         => 'default',
+                    'name'         => 'TeamSquad\Tests\SampleConsumer::listenSampleEvent',
+                    'routing_key'  => [
                         'sample_event',
                     ],
-                    'unique'      => false,
-                    'url'         => '/_/tests-sampleconsumer',
-                    'queue'       => 'teamsquad.event.listen.Tests.SampleConsumer.listenSampleEvent',
-                    'exchange'    => 'teamsquad.event_bus',
-                    'function'    => 'listenSampleEvent',
+                    'unique'       => false,
+                    'url'          => '/_/tests-sampleconsumer',
+                    'queue'        => 'teamsquad.event.listen.Tests.SampleConsumer.listenSampleEvent',
+                    'exchange'     => 'teamsquad.event_bus',
+                    'function'     => 'listenSampleEvent',
                     'create_queue' => true,
-                    'params'      => [
+                    'workers'      => 1,
+                    'params'       => [
+                        'passive'     => false,
+                        'durable'     => false,
+                        'exclusive'   => false,
+                        'auto_delete' => false,
+                        'nowait'      => false,
+                        'args'        => [
+                            'x-expires'   => [
+                                'type' => 'int',
+                                'val'  => 300000,
+                            ],
+                            'x-ha-policy' => [
+                                'type' => 'string',
+                                'val'  => 'all',
+                            ],
+                        ],
+                    ],
+                ],
+                [
+                    'amqp'         => 'chat',
+                    'name'         => 'listenWithAttributesName',
+                    'routing_key'  => [
+                        'routing.key.1',
+                        'routing.key.2',
+                    ],
+                    'unique'       => false,
+                    'url'          => '/api/v1/sample/high/throughput',
+                    'queue'        => 'high.throughput.queue.1',
+                    'exchange'     => 'exchange.name',
+                    'function'     => 'listenSampleHighThroughputEvent1',
+                    'create_queue' => false,
+                    'workers'      => 9,
+                    'params'       => [
+                        'passive'     => true,
+                        'durable'     => true,
+                        'exclusive'   => true,
+                        'auto_delete' => true,
+                        'nowait'      => true,
+                        'args'        => [
+                            'x-expires' => [
+                                'type' => 'int',
+                                'val'  => 100000,
+                            ],
+                        ],
+                    ],
+                ],
+                [
+                    'amqp'         => 'default',
+                    'name'         => 'TeamSquad\Tests\SampleConsumerWithWorkers::listenSampleHighThroughputEvent',
+                    'routing_key'  => [
+                        'high.throughput.event',
+                    ],
+                    'unique'       => false,
+                    'url'          => '/_/tests-sampleconsumerwithworkers',
+                    'queue'        => 'high.throughput.queue',
+                    'exchange'     => 'teamsquad.event_bus',
+                    'function'     => 'listenSampleHighThroughputEvent',
+                    'create_queue' => true,
+                    'workers'      => 10,
+                    'params'       => [
                         'passive'     => false,
                         'durable'     => false,
                         'exclusive'   => false,
@@ -106,6 +170,7 @@ class ConsumerConfigGeneratorTest extends TestCase
                     'exchange'     => '',
                     'function'     => 'listen',
                     'create_queue' => true,
+                    'workers'      => 1,
                     'params'       => [
                         'passive'     => false,
                         'durable'     => false,
@@ -131,13 +196,23 @@ class ConsumerConfigGeneratorTest extends TestCase
                     'route'   => 'tests-sampleconsumer/index',
                 ],
                 [
+                    'pattern' => '/api/v1/sample/high/throughput',
+                    'route'   => 'tests-sampleconsumerwithattributes/index',
+                ],
+                [
+                    'pattern' => '/_/tests-sampleconsumerwithworkers',
+                    'route'   => 'tests-sampleconsumerwithworkers/index',
+                ],
+                [
                     'pattern' => '/_/tests-samplemanualconsumer',
                     'route'   => 'tests-samplemanualconsumer/index',
                 ],
             ],
             'controllers' => [
-                'tests-sampleconsumer'       => SampleConsumer::class,
-                'tests-samplemanualconsumer' => SampleManualConsumer::class,
+                'tests-sampleconsumer'               => SampleConsumer::class,
+                'tests-samplemanualconsumer'         => SampleManualConsumer::class,
+                'tests-sampleconsumerwithworkers'    => SampleConsumerWithWorkers::class,
+                'tests-sampleconsumerwithattributes' => SampleConsumerWithAttributes::class,
             ],
         ], $actual);
     }

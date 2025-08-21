@@ -7,6 +7,8 @@ namespace TeamSquad\EventBus\Infrastructure;
 use DateTimeImmutable;
 use TeamSquad\EventBus\Domain\Clock;
 
+use function sprintf;
+
 class SystemClock implements Clock
 {
     public function timestamp(): int
