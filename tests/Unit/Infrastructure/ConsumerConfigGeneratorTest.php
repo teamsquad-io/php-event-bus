@@ -11,6 +11,7 @@ use TeamSquad\EventBus\Infrastructure\AutoloadConfig;
 use TeamSquad\EventBus\Infrastructure\ConsumerConfigGenerator;
 use TeamSquad\Tests\SampleConsumer;
 use TeamSquad\Tests\SampleManualConsumer;
+
 use function sprintf;
 
 class ConsumerConfigGeneratorTest extends TestCase
