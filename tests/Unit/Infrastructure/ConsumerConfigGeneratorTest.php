@@ -13,6 +13,7 @@ use TeamSquad\Tests\SampleConsumer;
 use TeamSquad\Tests\SampleConsumerWithAttributes;
 use TeamSquad\Tests\SampleConsumerWithWorkers;
 use TeamSquad\Tests\SampleManualConsumer;
+
 use function sprintf;
 
 class ConsumerConfigGeneratorTest extends TestCase
