@@ -10,135 +10,40 @@ use Attribute;
 class ConsumerConfig
 {
     /**
-     * @param string|null $amqp
-     * @param string|null $name
-     * @param array<string>|null $routingKey
-     * @param bool $unique
-     * @param string|null $url
-     * @param string|null $queue
-     * @param string|null $exchange
-     * @param string|null $function
-     * @param bool|null $createQueue
-     * @param int|null $workers
-     * @param bool $passive
-     * @param bool $durable
-     * @param bool $exclusive
-     * @param bool $autoDelete
-     * @param bool $nowait
+     * @param string|null $amqp Name of the AMQP connection profile to use (e.g., default, users).
+     * @param string|null $name human/unique identifier for the consumer, typically FQCN::method
+     * @param array<string>|null $routingKey List of routing keys the queue is bound to (e.g., sample_event).
+     * @param bool $unique whether this consumer definition should be treated as non-duplicated across generation/deployment
+     * @param string|null $url HTTP route that maps to a controller endpoint for this consumer
+     * @param string|null $queue name of the queue to consume from (created/bound according to params when create_queue is true)
+     * @param string|null $exchange Exchange name to bind the queue to (e.g., teamsquad.event_bus).
+     * @param string|null $function method on the consumer class that will be invoked for each message
+     * @param bool|null $createQueue if true, the queue will be declared/created automatically when setting up the consumer
+     * @param int|null $workers number of worker processes/consumers to spawn for this consumer (parallelism level)
+     * @param bool $passive RabbitMQ queue declaration parameters used when creating/declaring the queue:
+     * @param bool $durable if true, do not create; only check that the queue exists
+     * @param bool $exclusive if true, the queue will survive a broker restart
+     * @param bool $autoDelete if true, the queue is restricted to this connection and will be deleted when the connection closes
+     * @param bool $nowait if true, the queue will be deleted when the last consumer unsubscribes
      * @param array<array-key, mixed>|null $args
      */
     public function __construct(
-        private ?string $amqp = null,
-        private ?string $name = null,
-        private ?array $routingKey = null,
-        private bool $unique = false,
-        private ?string $url = null,
-        private ?string $queue = null,
-        private ?string $exchange = null,
-        private ?string $function = null,
-        private ?bool $createQueue = null,
-        private ?int $workers = null,
-        private ?array $args = null,
-        private bool $passive = false,
-        private bool $durable = false,
-        private bool $exclusive = false,
-        private bool $autoDelete = false,
-        private bool $nowait = false,
+        public ?string $amqp = null,
+        public ?string $name = null,
+        public ?array $routingKey = null,
+        public bool $unique = false,
+        public ?string $url = null,
+        public ?string $queue = null,
+        public ?string $exchange = null,
+        public ?string $function = null,
+        public ?bool $createQueue = null,
+        public ?int $workers = null,
+        public ?array $args = null,
+        public bool $passive = false,
+        public bool $durable = false,
+        public bool $exclusive = false,
+        public bool $autoDelete = false,
+        public bool $nowait = false,
     ) {
-    }
-
-    public function amqp(): ?string
-    {
-        return $this->amqp;
-    }
-
-    public function name(): ?string
-    {
-        return $this->name;
-    }
-
-    /**
-     * @return array<string>|null
-     */
-    public function routingKey(): ?array
-    {
-        return $this->routingKey;
-    }
-
-    public function unique(): bool
-    {
-        return $this->unique;
-    }
-
-    public function url(): ?string
-    {
-        return $this->url;
-    }
-
-    public function queue(): ?string
-    {
-        return $this->queue;
-    }
-
-    public function exchange(): ?string
-    {
-        return $this->exchange;
-    }
-
-    public function function(): ?string
-    {
-        return $this->function;
-    }
-
-    public function createQueue(): bool
-    {
-        return $this->createQueue ?? true;
-    }
-
-    public function workers(): int
-    {
-        return $this->workers ?? 1;
-    }
-
-    public function passive(): bool
-    {
-        return $this->passive;
-    }
-
-    public function durable(): bool
-    {
-        return $this->durable;
-    }
-
-    public function exclusive(): bool
-    {
-        return $this->exclusive;
-    }
-
-    public function autoDelete(): bool
-    {
-        return $this->autoDelete;
-    }
-
-    public function nowait(): bool
-    {
-        return $this->nowait;
-    }
-
-    /**
-     * @return array<array-key, mixed>
-     */
-    public function args(): array
-    {
-        return $this->args ?? [
-            'x-expires'   => [
-                'type' => 'int',
-                'val'  => 300000,
-            ],
-            'x-ha-policy' => [
-                'type' => 'string',
-                'val'  => 'all',
-            ],
-        ];
     }
 }
