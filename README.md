@@ -33,6 +33,16 @@ This is the TeamSquad PHP EventBus Library. It's used to publish and listen to e
     <code>composer require teamsquad/php-event-bus</code>
 </p>
 
+## Quick Start
+
+Get started quickly with our [Getting Started Guide](docs/getting-started.md).
+
+## Documentation
+
+- [Getting Started Guide](docs/getting-started.md) - Complete setup and basic usage
+- [Improvement Suggestions](IMPROVEMENTS.md) - Comprehensive improvement roadmap
+- [Task List](TASKS.md) - Actionable development tasks
+
 ## Development
 
 ### Initialization
